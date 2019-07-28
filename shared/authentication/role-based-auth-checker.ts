@@ -1,9 +1,11 @@
 import { AuthChecker } from "type-graphql";
-import { Context } from './context.interface';
+import { GeexContext } from '../context.interface';
+import { authenticated } from '@accounts/boost';
 
-export const authChecker: AuthChecker<Context> = (
+export const RoleBasedAuthChecker: AuthChecker<GeexContext> = async (
     { root, args, context, info }, roles
 ) => {
+    await authenticated(() => { })(root, args, context, info);
     let user = context["req"].user
     if (roles.length === 0) {
         return user !== undefined;

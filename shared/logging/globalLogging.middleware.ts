@@ -7,7 +7,7 @@ const globalLogger = new GeexLogger();
 export const globalLoggingMiddleware = function (req, res, next) {
     const url = req.headers.referer
     const query = req.body.query
-    if (req.body && req.body.query) {
+    if (req.body && req.body.query && !req.body.query.startsWith("query IntrospectionQuery")) {
         globalLogger.debug(url, query);
     }
     if (/{[\s|.|\n]*(\w+)\s{/.exec(query) === null) {

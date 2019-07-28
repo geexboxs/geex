@@ -1,12 +1,11 @@
 import { GraphQLModule } from '@graphql-modules/core';
-import { UserModule } from './user/user.module';
-import { buildSchemaSync } from 'type-graphql';
-import { UserResolver } from './user/user.resolver';
-import { LogInfo } from './custom-middlewares/middlewares/LogInfo';
-import { GeexLogger } from '../shared/logging/Logger';
 
-export const AppModule = new GraphQLModule({
-    imports: [UserModule],
+import { SharedModule } from '../shared/shared.module';
+import { GeexLogger } from '../shared/logging/Logger';
+import { AppModule } from '../app/app.module';
+
+export const ServerModule = new GraphQLModule({
+    imports: [AppModule, SharedModule],
     providers: [{
         provide: GeexLogger, useValue: new GeexLogger({})
     },],

@@ -1,18 +1,16 @@
+import { LogResponse } from "../../shared/logging/logResponse.decorator";
 import { Resolver, Query, Mutation, Authorized, Arg, FieldResolver, Root, Args, ResolverInterface, UseMiddleware } from "type-graphql";
-import { User, UserModelToken, UserModel } from "../../domain/models/user.model";
 import { CreateUserInput } from '../../utils/CreateUserInput'
 import { Inject } from "@graphql-modules/di";
 import { promises } from "dns";
 import { InstanceType, ModelType } from "typegoose";
 import { ClientSession, Document } from "mongoose";
-import { Address, AddressModelToken } from "../../domain/models/address.model";
 import { IResolver } from "../../utils/types";
-
 import { StudentInput } from '../../utils/CreateStudentInput';
-import { Student, StudentModelToken } from '../../domain/models/student.model';
 import { LogInfo } from "../custom-middlewares/middlewares/LogInfo";
 import { request } from "express";
-import { LogResponse } from "../../shared/logging/logResponse.decorator";
+import { User } from "../../domain/models/user.model";
+import { UserModelToken } from "../../domain/domain.module";
 
 
 @Resolver(of => User)
@@ -21,8 +19,8 @@ export class UserResolver {
     constructor(
         @Inject(UserModelToken)
         private userModel: ModelType<User>,
-        @Inject(StudentModelToken)
-        private studentModel: ModelType<Student>,
+        // @Inject(StudentModelToken)
+        // private studentModel: ModelType<Student>,
 
     ) { }
 
@@ -35,6 +33,7 @@ export class UserResolver {
     }
 
     @Query(returns => User)
+    @Authorized()
     @LogResponse()
     async user(id: string) {
         let result = await this.userModel.findOne({ _id: id }).exec();
@@ -43,16 +42,17 @@ export class UserResolver {
 
     @Authorized()
     @Mutation(returns => User)
+    // @Transaction()
     async addUser(@Args() CreateUserInput: CreateUserInput): Promise<InstanceType<User>> {
-        let curSession!: ClientSession;
-        await this.userModel.db.startSession(undefined, async (err, session) => {
-            curSession = session;
-            session.startTransaction();
-        });
+        // let curSession!: ClientSession;
+        // await this.userModel.db.startSession(undefined, async (err, session) => {
+        //     curSession = session;
+        //     session.startTransaction();
+        // });
         let newUser = new User();
-        await newUser.Init(CreateUserInput)
+        await newUser.init(CreateUserInput)
         let result = await this.userModel.create(newUser);
-        await curSession.commitTransaction();
+        // await curSession.commitTransaction();
         return result;
     }
 
@@ -73,19 +73,5 @@ export class UserResolver {
     //     user = await user.execPopulate();
     //     return user.addresses as Address[]
     // }
-
-    @Mutation(returns => Student)
-    async addStudent(@Args() StudentInput: StudentInput): Promise<Student> {
-        let curSession!: ClientSession;
-        await this.studentModel.db.startSession(undefined, async (err, session) => {
-            curSession = session;
-            session.startTransaction();
-        });
-        let student = new Student();
-        await student.Init(StudentInput)
-        let result = await this.studentModel.create(student);
-        await curSession.commitTransaction();
-        return result;
-    }
 
 }

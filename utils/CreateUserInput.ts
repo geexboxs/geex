@@ -1,7 +1,6 @@
 import { IsOptional, Length, MaxLength } from 'class-validator';
 import { Field, InputType, ArgsType } from 'type-graphql';
 import { User } from '../domain/models/user.model';
-
 @ArgsType()
 export class CreateUserInput {
     @Field()

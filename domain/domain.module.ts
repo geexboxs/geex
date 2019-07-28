@@ -1,13 +1,23 @@
-import { User, UserModel } from "./models/user.model";
+import { User } from "./models/user.model";
 
-import { AddressModel } from "./models/address.model";
 import { GraphQLModule } from "@graphql-modules/core";
 import { UserModule } from "../app/user/user.module";
-import { SharedModule } from "../shared/shared.module";
+import { Typegoose } from "typegoose";
+import "./utils/typegoose.extension";
+import { Address } from "./models/address.model";
 
-User.repo = UserModel;
-User.addressRepo = AddressModel;
+const UserModel = Typegoose.getModel(User);
+export const UserModelToken = Symbol("UserModel");
 
+const AddressModel = Typegoose.getModel(Address);
+export const AddressModelToken = Symbol("AddressModel");
 export const DomainModule = new GraphQLModule({
-    imports: [SharedModule]
+    imports: [],
+    providers: [
+        {
+            provide: UserModelToken, useValue: UserModel
+        },{
+            provide: AddressModelToken, useValue: AddressModel
+        }
+    ]
 });

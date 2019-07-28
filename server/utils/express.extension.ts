@@ -8,6 +8,12 @@ import { ExpressToken, ApolloToken } from "../tokens";
 import { buildSchemaSync } from "type-graphql";
 import { RoleBasedAuthChecker } from "../../shared/authentication/role-based-auth-checker";
 import { globalLoggingMiddleware } from "../../shared/logging/globalLogging.middleware";
+import { DatabaseManager } from '@accounts/database-manager';
+import { AccountsModule } from '@accounts/graphql-api';
+import MongoDBInterface from '@accounts/mongo';
+import { AccountsPassword } from '@accounts/password';
+import { AccountsServer } from '@accounts/server';
+import mongoose from 'mongoose';
 type GeexGraphqlServerConfig = GraphQLModuleOptions<any, any, any, IResolvers<any, any>> & {
     useAccounts?: boolean;
 };
@@ -34,20 +40,56 @@ application["useGeexGraphql"] = async function useGeexGraphql(this, config: Geex
 
 
     // 在其他模块之上统一加上auth
-    const accounts = (await accountsBoost({
-        tokenSecret: 'terrible secret',
-        // micro: true, // setting micro to true will instruct `@accounts/boost` to only verify access tokens without any additional session logic
-    }));
-    const accountsModule = accounts.graphql();
-    config.imports.push(<GraphQLModule<any, any, any, IResolvers<any, any>>><unknown>accountsModule)
+
+    const mongoConn = mongoose.connection;
+
+    // Build a storage for storing users
+    const userStorage = new MongoDBInterface(mongoConn);
+    // Create database manager (create user, find users, sessions etc) for accounts-js
+    const accountsDb = new DatabaseManager({
+        sessionStorage: userStorage,
+        userStorage,
+    });
+
+    const accountsPassword = new AccountsPassword({
+        // This option is called when a new user create an account
+        // Inside we can apply our logic to validate the user fields
+        validateNewUser: user => {
+            // For example we can allow only some kind of emails
+            if (!user.email || user.email.endsWith('.xyz')) {
+                throw new Error('Invalid email');
+            }
+            return user;
+        },
+    });
+
+    // Create accounts server that holds a lower level of all accounts operations
+    const accountsServer = new AccountsServer(
+        {
+            db: accountsDb, tokenSecret: 'secret',
+        },
+        {
+            password: accountsPassword,
+        }
+    );
+
+    // Creates resolvers, type definitions, and schema directives used by accounts-js
+    const accountsGraphQL = AccountsModule.forRoot({
+        
+        accountsServer,
+    });
+    // const accounts = (await accountsBoost({
+    //     tokenSecret: 'terrible secret',
+    //     // micro: true, // setting micro to true will instruct `@accounts/boost` to only verify access tokens without any additional session logic
+    // }));
+    // const accountsModule = accounts.graphql();
+    config.imports.push(accountsGraphQL)
     config.extraSchemas = [buildSchemaSync({
         authChecker: RoleBasedAuthChecker,
         resolvers: [entryModule.resolvers],
         container: ({ ...args }) => {
             return entryModule.injector.getSessionInjector(args.context)
         },
-        // container: ({ context }) => context.injector
-
     })]
 
     // 根据entryModule生成 graphql server
@@ -73,23 +115,3 @@ application["useGeexGraphql"] = async function useGeexGraphql(this, config: Geex
 
     return this;
 }
-
-// extraSchemas: [
-//     buildSchemaSync({
-//         authChecker: authChecker,
-//         resolvers: [],
-//         container: ({ ...args }) => {
-//             return UserModule.injector.getSessionInjector(args.context)
-//         },
-//         // container: ({ context }) => context.injector
-
-//     })
-// ],
-//     providers: [
-//         {
-//             provide: GeexLogger, useValue: new GeexLogger({})
-//         },
-//     ],
-//         typeDefs: [
-//             ...OKGScalarDefinitions,
-//         ],

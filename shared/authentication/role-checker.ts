@@ -8,10 +8,11 @@ export const RoleChecker: AuthChecker<GeexContext> = async (
         return false;
     }
     let allowRoles: string[] = [];
-    if (allowRoles) {
-
+    if (!allowRoles || !allowRoles.any()) {
+        return true;
     }
-
-
-    return true; // or false if access is denied
+    if (allowRoles.intersect(context.user.roles)) {
+        return true;
+    }
+    return false; // or false if access is denied
 };

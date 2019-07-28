@@ -10,6 +10,7 @@
     "license": "ISC",
     "dependencies": {
         "@accounts/boost": "^0.15.0",
+        "@accounts/database-manager": "^0.15.0",
         "@accounts/graphql-api": "^0.15.0",
         "@accounts/mongo": "^0.15.0",
         "@accounts/password": "^0.15.0",

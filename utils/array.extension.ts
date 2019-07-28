@@ -1,14 +1,14 @@
 import { List } from "linqts-camelcase";
 declare global {
-    interface Array<T> extends List<T> {
+    interface Array<T> {
         // _elements: T[];
         add(element: T): void;
         // addRange(elements: T[]): void;
         // // aggregate<U>(accumulator: (accum: U, value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => any, initialValue?: U | undefined);
         // all(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean;
-        // any(): boolean;
-        // any(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean;
-        // any(predicate?: any);
+        any(): boolean;
+        any(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean;
+        any(predicate?: any);
         // average(): number;
         // average(transform: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => any): number;
         // average(transform?: any);
@@ -33,7 +33,7 @@ declare global {
         // groupJoin<U>(list: List<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: List<U>) => any): List<any>;
         // indexOf(element: T): number;
         // insert(index: number, element: T): void | Error;
-        // intersect(source: List<T>): List<T>;
+        intersect(source: Array<T>): Array<T>;
         // linqJoin<U>(list: List<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => any): List<any>;
         // last(): T;
         // last(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): T;
@@ -74,15 +74,14 @@ declare global {
         // toList(): List<T>;
         // toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[]; };
         // union(list: List<T>): List<T>;
-        // where(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): List<T>;
+        where(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): Array<T>;
         // zip<U, TOut>(list: List<U>, result: (first: T, second: U) => TOut): List<TOut>;
     }
 }
 // Array.prototype._elements = Array.prototype;
-const _add = List.prototype.add;
 Array.prototype.add = function add<T>(this: Array<T>, element: T): void {
     this["_elements"] = this;
-    return _add.bind(this, element)();
+    return List.prototype.add.bind(this, element)();
 }
 // Array.prototype.addRange = function addRange<T>(this: Array<T>, elements: T[]): void {
 //     return List.prototype.addRange.bind(this, elements)();
@@ -93,9 +92,13 @@ Array.prototype.add = function add<T>(this: Array<T>, element: T): void {
 // Array.prototype.all = function all<T>(this: Array<T>, predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean {
 //     return List.prototype.all.bind(this, predicate)();
 // }
-// Array.prototype.any = function any<T>(this: Array<T>, predicate?: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean {
-//     return List.prototype.any.bind(this, predicate!)();
-// }
+Array.prototype.any = function any<T>(this: Array<T>, predicate?: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean {
+    if (this === undefined) {
+        return false;
+    }
+    this["_elements"] = this;
+    return List.prototype.any.bind(this, predicate!)();
+}
 // Array.prototype.average = function average<T>(this: Array<T>, transform?: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => any): number {
 //     return List.prototype.average.bind(this, transform!)();
 // }
@@ -148,9 +151,10 @@ Array.prototype.add = function add<T>(this: Array<T>, element: T): void {
 // Array.prototype.insert = function insert<T>(this: Array<T>, index: number, element: T): void | Error {
 //     return List.prototype.insert.bind(this, element)();
 // }
-// Array.prototype.intersect = function intersect<T>(this: Array<T>, source: List<T>): List<T> {
-//     return List.prototype.intersect.bind(this, element)();
-// }
+Array.prototype.intersect = function intersect<T>(this: Array<T>, source: Array<T>): Array<T> {
+    this["_elements"] = this;
+    return List.prototype.intersect.bind(this, new List(source))() as unknown as T[];
+}
 // Array.prototype.linqJoin = function linqJoin<T, U>(list: List<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => any): List<any> {
 //     return List.prototype.linqJoin.bind(this, element)();
 // }
@@ -236,9 +240,10 @@ Array.prototype.add = function add<T>(this: Array<T>, element: T): void {
 // Array.prototype.union = function union<T>(this: Array<T>, list: List<T>): List<T> {
 //     return List.prototype.add.bind(this, element)();
 // }
-// Array.prototype.where = function where<T>(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): List<T> {
-//     return List.prototype.add.bind(this, element)();
-// }
+Array.prototype.where = function where<T>(this: Array<T>, predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): Array<T> {
+    this["_elements"] = this;
+    return List.prototype.where.bind(this, predicate)().toArray();
+}
 // Array.prototype.zip = function zip<T, U, TOut>(list: List<U>, result: (first: T, second: U) => TOut): List<TOut> {
 //     return List.prototype.add.bind(this, element)();
 // }

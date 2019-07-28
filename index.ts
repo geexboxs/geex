@@ -6,9 +6,6 @@ import { connect } from "mongoose";
 import express = require("express");
 
 let hehe = [1, 2, 3];
-// @ts-ignore
-console.log(hehe.add(4));
-
 
 connect('mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin');
 

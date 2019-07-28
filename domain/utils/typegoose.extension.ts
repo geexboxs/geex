@@ -3,11 +3,10 @@ import * as mongoose from "mongoose";
 import * as mongodb from "mongodb";
 import { Document } from "mongoose";
 import { staticImplements } from "./decorators";
-import { User } from "../models/user.model";
 import { Typegoose, GetModelForClassOptions } from "typegoose";
 
 Typegoose.getModel = function (ctor: any, options?: GetModelForClassOptions): any {
-    return new Typegoose().getModelForClass(ctor, options);
+    return new ctor().getModelForClass(ctor, options);
 }
 /** fields not in base class of mongoose Document. */
 export type GeexEntityIntersection<T = any> = Partial<Omit<T, keyof Document>>;

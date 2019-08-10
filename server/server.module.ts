@@ -1,6 +1,4 @@
 import { GraphQLModule } from '@graphql-modules/core';
-
-import { SharedModule } from '../shared/shared.module';
 import { GeexLogger } from '../shared/logging/Logger';
 import { AppModule } from '../app/app.module';
 

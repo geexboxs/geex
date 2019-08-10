@@ -2,17 +2,19 @@ import { AppModule } from "../../app/app.module";
 import { GeexLogger } from "./logger";
 import { LogResponseList } from "./logResponse.decorator";
 import { isArray, isString } from "util";
+import { Request, Response } from "express";
+import { OutgoingHttpHeaders, IncomingHttpHeaders } from "http";
+import stringify from 'json-stringify-safe';
 
 const globalLogger = new GeexLogger();
-export const globalLoggingMiddleware = function (req, res, next) {
-    const url = req.headers.referer
+export const globalLoggingMiddleware = function (req: Request, res: Response, next) {
     const query = req.body.query
+    let logContent: { req: { headers: IncomingHttpHeaders, body: string }, res?: { headers: OutgoingHttpHeaders, body: string } };
     if (req.body && req.body.query && !req.body.query.startsWith("query IntrospectionQuery")) {
-        globalLogger.debug(url, query);
+        logContent = { req: { headers: req.headers, body: req.body } }
     }
     if (/{[\s|.|\n]*(\w+)\s{/.exec(query) === null) {
-        next();
-        return;
+        return next();
     }
     var resolverFieldName = /{[\s|.|\n]*(\w+)\s{/.exec(query)![1];
 
@@ -20,30 +22,21 @@ export const globalLoggingMiddleware = function (req, res, next) {
         oldEnd = res.end;
 
     let chunks: any[] = [];
-
     res.write = function (chunk) {
         chunks.push(chunk);
 
-        oldWrite.apply(res, arguments);
+        return oldWrite.apply(res, arguments as any);
     };
-
-    res.end = function (chunk) {
-        if (chunk)
-            chunks.push(chunk);
-        let firstChunk = chunks[0]
-        if (isString(firstChunk)) {
-            if (firstChunk.startsWith("{\"error")) {
-                globalLogger.error(new Error(firstChunk))
-                
-            } else {
-                globalLogger.info(firstChunk)
-            }
-
-        } else if (LogResponseList.includes(resolverFieldName)) {
-            let body = Buffer.concat(chunks).toString('utf8');
+    res.end = function () {
+        let responseContent = chunks.join();
+        if (LogResponseList.includes(resolverFieldName)) {
+            logContent.res = { headers: res.getHeaders(), body: responseContent };
         }
-        oldEnd.apply(res, arguments);
+        if (logContent) {
+            globalLogger.debug(stringify(logContent));
+        }
+        oldEnd.apply(res, arguments as any);
 
     }
-    next();
+    return next();
 };

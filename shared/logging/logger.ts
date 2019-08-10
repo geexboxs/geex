@@ -10,6 +10,13 @@ export interface LoggerConfig {
     consoleConfig?: {}
     fileConfig?: {}
     remoteConfig?: {}
+    /**
+     *metadata to be logged in every log entry
+     *
+     * @type {{}}
+     * @memberof LoggerConfig
+     */
+    metadata?: {}
 }
 
 @Service()
@@ -18,8 +25,8 @@ export class GeexLogger {
     error(error?: Error, ...args: any[]) {
         this.log("error", error, args)
     }
-    _target: LogTarget;
-    _filterLevel: LogLevel;
+    _target: LogTarget = "console";
+    _filterLevel: LogLevel = "debug";
     debug(...args: any[]) {
         this.log("debug", args)
     }
@@ -36,14 +43,9 @@ export class GeexLogger {
     constructor(config?: LoggerConfig) {
         if (config && config.target) {
             this._target = config.target;
-        } else {
-            this._target = "console";
         }
-
         if (config && config.filterLevel) {
             this._filterLevel = config.filterLevel;
-        } else {
-            this._filterLevel = "debug";
         }
 
         switch (this._target) {
@@ -52,8 +54,8 @@ export class GeexLogger {
                     const logger = winston.createLogger({
                         format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
                         // levels: ["debug", "error", "info", "warn"],
-                        level: "debug",
-                        defaultMeta: { service: 'geex' },
+                        level: this._filterLevel,
+                        defaultMeta: config ? config.metadata : undefined,
                         transports: [
                             new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true })) }),
                             //new winston.transports.File({ level: "error", handleExceptions: true, filename: "./hehe.log" })

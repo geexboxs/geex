@@ -1,21 +1,25 @@
 import { GraphQLModule, GraphQLModuleOptions } from "@graphql-modules/core";
 import { IResolvers } from "@kamilkisiela/graphql-tools";
-import { application } from "express";
-import accountsBoost from "@accounts/boost";
+import { application, urlencoded } from "express";
 import { ApolloServer } from "apollo-server-express";
-import bodyParser = require("body-parser");
-import { ExpressToken, ApolloToken } from "../tokens";
+import { ExpressToken, ApolloToken, AccountsToken } from "../server/tokens";
 import { buildSchemaSync } from "type-graphql";
-import { RoleBasedAuthChecker } from "../../shared/authentication/role-based-auth-checker";
-import { globalLoggingMiddleware } from "../../shared/logging/globalLogging.middleware";
+import { RoleBasedAuthChecker } from "../shared/authentication/role-based-auth-checker";
+import { globalLoggingMiddleware } from "../shared/logging/globalLogging.middleware";
 import { DatabaseManager } from '@accounts/database-manager';
 import { AccountsModule } from '@accounts/graphql-api';
 import MongoDBInterface from '@accounts/mongo';
 import { AccountsPassword } from '@accounts/password';
 import { AccountsServer } from '@accounts/server';
-import mongoose from 'mongoose';
-type GeexGraphqlServerConfig = GraphQLModuleOptions<any, any, any, IResolvers<any, any>> & {
+import { LoggerConfig, GeexLogger } from "../shared/logging/Logger";
+import { connect } from "mongoose";
+import express = require("express");
+
+type GeexGraphqlServerConfig = {
+    entryModuleOption: GraphQLModuleOptions<any, any, any, IResolvers<any, any>>;
     useAccounts?: boolean;
+    connectionString: string;
+    loggerConfig?: LoggerConfig;
 };
 
 declare module "express-serve-static-core" {
@@ -25,26 +29,29 @@ declare module "express-serve-static-core" {
 }
 
 application["useGeexGraphql"] = async function useGeexGraphql(this, config: GeexGraphqlServerConfig) {
-    this.use(bodyParser())
-        .use(globalLoggingMiddleware)
-    config.providers = config.providers === undefined ? [] : config.providers as []
-    config.imports = config.imports === undefined ? [] : config.imports as []
+    let connection = (await connect(config.connectionString, { useNewUrlParser: true })).connection;
+    this.use(express.json())
+        .use(globalLoggingMiddleware);
+    config.entryModuleOption.providers = config.entryModuleOption.providers === undefined ? [] : config.entryModuleOption.providers as []
+    config.entryModuleOption.imports = config.entryModuleOption.imports === undefined ? [] : config.entryModuleOption.imports as []
 
-    config.providers.push({
+    config.entryModuleOption.providers.push({
         provide: ExpressToken,
         useValue: this
     })
-    const entryModule = new GraphQLModule(config);
+    config.entryModuleOption.providers.push({
+        provide: GeexLogger,
+        useValue: new GeexLogger(config.loggerConfig)
+    })
+    const entryModule = new GraphQLModule(config.entryModuleOption);
 
     //其他的模块初始化逻辑
 
-
     // 在其他模块之上统一加上auth
 
-    const mongoConn = mongoose.connection;
 
     // Build a storage for storing users
-    const userStorage = new MongoDBInterface(mongoConn);
+    const userStorage = new MongoDBInterface(connection);
     // Create database manager (create user, find users, sessions etc) for accounts-js
     const accountsDb = new DatabaseManager({
         sessionStorage: userStorage,
@@ -66,25 +73,25 @@ application["useGeexGraphql"] = async function useGeexGraphql(this, config: Geex
     // Create accounts server that holds a lower level of all accounts operations
     const accountsServer = new AccountsServer(
         {
-            db: accountsDb, tokenSecret: 'secret',
+            db: accountsDb,
+            tokenSecret: 'secret',
         },
         {
             password: accountsPassword,
         }
     );
-
     // Creates resolvers, type definitions, and schema directives used by accounts-js
     const accountsGraphQL = AccountsModule.forRoot({
-        
         accountsServer,
     });
-    // const accounts = (await accountsBoost({
-    //     tokenSecret: 'terrible secret',
-    //     // micro: true, // setting micro to true will instruct `@accounts/boost` to only verify access tokens without any additional session logic
-    // }));
-    // const accountsModule = accounts.graphql();
-    config.imports.push(accountsGraphQL)
-    config.extraSchemas = [buildSchemaSync({
+
+    entryModule.selfProviders.push({
+        provide: AccountsToken,
+        useValue: accountsServer
+    })
+
+    config.entryModuleOption.imports.push(accountsGraphQL)
+    config.entryModuleOption.extraSchemas = [buildSchemaSync({
         authChecker: RoleBasedAuthChecker,
         resolvers: [entryModule.resolvers],
         container: ({ ...args }) => {
@@ -103,6 +110,10 @@ application["useGeexGraphql"] = async function useGeexGraphql(this, config: Geex
         },
         context: ({ req }) => entryModule.context({ req }),
         resolvers: entryModule.resolvers,
+        uploads: {
+            maxFileSize: 100000000, // 100 MB
+            maxFiles: 10
+        }
     });
     // 将 graphql server 挂载到 express
     apollo.applyMiddleware({ app: this })

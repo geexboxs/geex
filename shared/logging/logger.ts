@@ -33,8 +33,9 @@ export class GeexLogger {
     info(...args: any[]) {
         this.log("info", args)
     }
+    warn(...args: any[])
     warn(error?: Error, ...args: any[]) {
-        this.log("warn", args)
+        this.log("warn", error, args)
     }
 
     /**

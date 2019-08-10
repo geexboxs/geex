@@ -1,5 +1,10 @@
 import { List } from "linqts-camelcase";
 declare global {
+    interface ReadonlyArray<T> { 
+        any(): boolean;
+        any(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): boolean;
+        any(predicate?: any);
+    }
     interface Array<T> {
         // _elements: T[];
         add(element: T): void;
@@ -12,7 +17,7 @@ declare global {
         // average(): number;
         // average(transform: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => any): number;
         // average(transform?: any);
-        // contains(element: T): boolean;
+        contains(element: T): boolean;
         // count(): number;
         // count(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): number;
         // count(predicate?: any);
@@ -106,9 +111,10 @@ Array.prototype.any = function any<T>(this: Array<T>, predicate?: (value?: T | u
 //     return List.prototype.cast.bind(this)();
 // }
 
-// Array.prototype.contains = function contains<T>(element: T): boolean {
-//     return List.prototype.contains.bind(this, element)();
-// }
+Array.prototype.contains = function contains<T>(element: T): boolean {
+    this["_elements"] = this;
+    return List.prototype.contains.bind(this, element)();
+}
 // Array.prototype.count = function count<T>(this: Array<T>, predicate?: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): number {
 //     return List.prototype.count.bind(this, element)();
 // }

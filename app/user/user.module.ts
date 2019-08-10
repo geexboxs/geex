@@ -1,13 +1,20 @@
 import { GraphQLModule } from '@graphql-modules/core';
 // import { UserResolver } from './user.resolver';
-import { buildSchemaSync, Resolver, Query, ObjectType, Field } from 'type-graphql';
+import { buildSchemaSync, Resolver, Query, ObjectType, Field, Authorized } from 'type-graphql';
 import { DomainModule } from '../../domain/domain.module';
 import { RoleBasedAuthChecker } from "../../shared/authentication/role-based-auth-checker";
+import { GeexRoles } from "../../shared/authentication/roles";
 // import { StudentModelToken, StudentModel } from '../../domain/models/student.model';
 @ObjectType()
 export class Test {
     @Field()
     name!: string;
+    @Authorized<GeexRoles>("admin")
+    @Field({ nullable: true })
+    systemData!: string;
+    @Authorized<GeexRoles>("user")
+    @Field({ nullable: true })
+    privateData!: string;
 }
 
 @Resolver(of => Test)
@@ -15,7 +22,9 @@ export class TestResolver {
     @Query(type => Test)
     tests() {
         let hehe = new Test();
-        hehe.name = "123"
+        hehe.name = "233"
+        hehe.privateData = "privateData"
+        hehe.systemData = "systemData"
         return hehe;
     }
 }

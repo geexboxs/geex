@@ -5,13 +5,7 @@ import { authenticated } from '@accounts/boost';
 export const RoleBasedAuthChecker: AuthChecker<GeexContext> = async (
     { root, args, context, info }, roles
 ) => {
-    console.log("hehe")
-    try {
-        await authenticated((...args) => { })(root, args, context, info);
-    }
-    catch (error) {
-        root[info.fieldName] = undefined;
-    }
+    await authenticated((...args) => { })(root, args, context, info);
     let user = context.user
     if (!user) {
         return true;

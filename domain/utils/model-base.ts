@@ -22,5 +22,4 @@ export abstract class ModelBase extends Typegoose {
     @prop()
     @Field()
     updateAt!: Date;
-    init<T>(...args: any[]) { };
 }

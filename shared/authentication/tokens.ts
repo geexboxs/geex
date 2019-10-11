@@ -1,1 +1,1 @@
-export const AccountServerToken = Symbol.for("AccountServer");
+export const AclToken = Symbol.for("Acl");

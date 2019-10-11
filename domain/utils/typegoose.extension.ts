@@ -3,11 +3,8 @@ import * as mongoose from "mongoose";
 import * as mongodb from "mongodb";
 import { Document } from "mongoose";
 import { staticImplements } from "./decorators";
-import { Typegoose, GetModelForClassOptions } from "typegoose";
+import { Typegoose } from "@typegoose/typegoose";
 
-Typegoose.getModel = function (ctor: any, options?: GetModelForClassOptions): any {
-    return new ctor().getModelForClass(ctor, options);
-}
 /** fields not in base class of mongoose Document. */
 export type GeexEntityIntersection<T = any> = Partial<Omit<T, keyof Document>>;
 export type GeexPrimitive = string | number | bigint | boolean | symbol | String | Number | Date | Boolean | BigInt | Symbol | ObjectId | undefined;

@@ -1,11 +1,12 @@
 import { Resolver, Query, Mutation, Authorized, Arg, FieldResolver, Root, Args, ResolverInterface, UseMiddleware } from "type-graphql";
 import { Inject } from "@graphql-modules/di";
 import { promises } from "dns";
-import { InstanceType, ModelType } from "typegoose";
 import { ClientSession, Document } from "mongoose";
 import { request } from "express";
 import { User } from "../../domain/models/user.model";
 import { UserModelToken } from "../../domain/domain.module";
+import { SchemaDirective } from "../../graphql-patch";
+import { ModelType } from "@typegoose/typegoose/lib/types";
 
 @Resolver(of => User)
 export class UserResolver {
@@ -23,6 +24,7 @@ export class UserResolver {
     }
 
     @Query(returns => User)
+    @SchemaDirective("auth")
     @Authorized()
     async user(id: string) {
         let result = await this.userModel.findOne({ _id: id }).exec();

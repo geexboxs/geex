@@ -1,5 +1,5 @@
 import { Field } from "type-graphql";
-import { prop, pre, Typegoose } from "typegoose";
+import { prop, pre, Typegoose } from "@typegoose/typegoose";
 import { Schema } from "mongoose";
 
 @pre<ModelBase>('save', function (next) {
@@ -12,7 +12,7 @@ import { Schema } from "mongoose";
     this.updateAt = new Date();
     next();
 })
-export abstract class ModelBase extends Typegoose {
+export abstract class ModelBase {
     @Field(returns => String)
     _id!: Schema.Types.ObjectId;
 

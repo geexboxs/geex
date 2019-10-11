@@ -1,12 +1,10 @@
-import { prop, Typegoose, pre, arrayProp, Ref, instanceMethod, ModelType, InstanceType, plugin } from 'typegoose';
 // import { Address } from './address.model';
 import { Model, Types, Document, Schema } from 'mongoose';
 import { ObjectType, Field, Authorized, UseMiddleware } from 'type-graphql';
-import { isObject } from 'typegoose/lib/utils';
 import { ObjectId } from 'mongodb';
 import { ModelBase } from '../utils/model-base';
 import { PhoneNumber } from '@okgrow/graphql-scalars';
-import { User as AccountUser } from '@accounts/types';
+import { prop } from '@typegoose/typegoose';
 
 @ObjectType()
 export class UserProfile {

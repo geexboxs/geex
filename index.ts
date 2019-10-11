@@ -1,7 +1,7 @@
 import "reflect-metadata";
+import './graphql-patch';
 import "./shared/server/express.extension";
 import "./shared/utils/array.extension";
-import { AppModule } from "./app/app.module";
 import express = require("express");
 
 const server = express();

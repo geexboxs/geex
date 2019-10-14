@@ -6,7 +6,7 @@ declare global {
         any(predicate?: any);
     }
     interface Array<T> {
-        // _elements: T[];
+        _elements: T[];
         add(element: T): void;
         // addRange(elements: T[]): void;
         // // aggregate<U>(accumulator: (accum: U, value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => any, initialValue?: U | undefined);

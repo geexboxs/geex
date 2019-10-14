@@ -5,9 +5,9 @@ type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogTarget = "console" | "file" | "remote";
 
-export interface LoggerConfig {
+export interface ILoggerConfig {
     /**
-     *log target
+     * log target
      *
      * @type {LogTarget}
      * @default "console"
@@ -15,7 +15,7 @@ export interface LoggerConfig {
      */
     target?: LogTarget;
     /**
-     *minimal level to log
+     * minimal level to log
      *
      * @type {LogLevel}
      * @default "info"
@@ -26,7 +26,7 @@ export interface LoggerConfig {
     fileConfig?: {};
     remoteConfig?: {};
     /**
-     *metadata to be logged in every log entry
+     * metadata to be logged in every log entry
      *
      * @type {{}}
      * @memberof LoggerConfig
@@ -36,34 +36,40 @@ export interface LoggerConfig {
 
 @Injectable()
 export class GeexLogger {
-    public _logger: winston.Logger;
-    public _target: LogTarget = "console";
-    public _filterLevel: LogLevel = "debug";
+    public logger: winston.Logger;
+    public target: LogTarget = "console";
+    public filterLevel: LogLevel = "debug";
 
     /**
      *
      */
-    constructor(@Inject(LoggerConfigToken) config?: LoggerConfig) {
+    constructor(@Inject(LoggerConfigToken) config?: ILoggerConfig) {
         if (config && config.target) {
-            this._target = config.target;
+            this.target = config.target;
         }
         if (config && config.filterLevel) {
-            this._filterLevel = config.filterLevel;
+            this.filterLevel = config.filterLevel;
         }
 
-        switch (this._target) {
+        switch (this.target) {
             default:
                 {
                     const logger = winston.createLogger({
-                        // format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+                        format: winston.format.combine(
+                            winston.format.timestamp(),
+                            winston.format.json(),
+                        ),
                         // levels: ["debug", "error", "info", "warn"],
-                        level: this._filterLevel,
+                        level: this.filterLevel,
                         defaultMeta: config ? config.metadata : undefined,
                         transports: [
-                            new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true, all: true }), winston.format.colorize()) }),
+                            new winston.transports.Console({
+                                level: "debug", handleExceptions: true,
+                                format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true, all: true }), winston.format.colorize()),
+                            }),
                         ],
                     });
-                    this._logger = logger;
+                    this.logger = logger;
                 }
                 break;
         }
@@ -86,16 +92,16 @@ export class GeexLogger {
         // replace with more sophisticated solution :)
         switch (level) {
             case "debug":
-                this._logger.debug(args);
+                this.logger.debug(args);
                 break;
             case "info":
-                this._logger.info(args);
+                this.logger.info(args);
                 break;
             case "warn":
-                this._logger.warn(args);
+                this.logger.warn(args);
                 break;
             case "error":
-                this._logger.error(args);
+                this.logger.error(args);
                 break;
             default:
                 break;

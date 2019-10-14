@@ -5,7 +5,19 @@
     ],
     "jsRules": {},
     "rules": {
-        "max-classes-per-file": false
+        "max-classes-per-file": false,
+        "object-literal-sort-keys": false,
+        "max-line-length": {
+            "options": {
+                "limit": 200
+            }
+        },
+        "no-console": false
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+        "exclude": [
+            "utils/array.extension.ts"
+        ]
+    }
 }

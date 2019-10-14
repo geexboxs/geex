@@ -5,9 +5,9 @@ import { environment } from "./environments/environment";
 import { GlobalLoggingExtension } from "./shared/extensions/global-logging.gql-extension";
 import { RequestIdentityExtension } from "./shared/extensions/request-identity.gql-extension";
 import { SharedModule } from "./shared/shared.module";
-import { GeexContext } from "./shared/utils/abstractions";
-import "./shared/utils/array.extension";
+import { IGeexContext } from "./shared/utils/abstractions";
 import { GeexLogger } from "./shared/utils/logger";
+import "./utils/array.extension";
 
 const entryModule = SharedModule;
 const app = express();

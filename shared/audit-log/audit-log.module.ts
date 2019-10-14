@@ -7,12 +7,12 @@ import { inspect } from "util";
 import { environment } from "../../environments/environment";
 import { AuthModule } from "../auth/auth.module";
 import { LoggerConfigToken } from "../tokens";
-import { GeexContext } from "../utils/abstractions";
-import { GeexLogger, LoggerConfig } from "../utils/logger";
+import { IGeexContext } from "../utils/abstractions";
+import { GeexLogger, ILoggerConfig } from "../utils/logger";
 import { LoggingMiddleware } from "./audit-log.middleware";
 import { AuditLogResolver } from "./audit-log.resolver";
 const resolvers: any = [AuditLogResolver];
-export const AuditLogModule = new GraphQLModule<LoggerConfig | undefined, ExpressContext, GeexContext>({
+export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, IGeexContext>({
     providers: [{
         provide: GeexLogger,
         useFactory: (injector: Injector) => new GeexLogger(injector.get(LoggerConfigToken)),
@@ -21,7 +21,7 @@ export const AuditLogModule = new GraphQLModule<LoggerConfig | undefined, Expres
         resolvers,
         container: {
             get: (someClass, resolverData) => {
-                return (resolverData.context as GeexContext).injector.get(someClass);
+                return (resolverData.context as IGeexContext).injector.get(someClass);
             },
         },
     })],

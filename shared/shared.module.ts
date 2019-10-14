@@ -11,10 +11,10 @@ import { AuthModule } from "./auth/auth.module";
 import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
 import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
 import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken } from "./tokens";
-import { GeexContext, GeexServerConfig } from "./utils/abstractions";
+import { IGeexContext, IGeexServerConfig } from "./utils/abstractions";
 import { GeexLogger } from "./utils/logger";
 
-const result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
+const result = new GraphQLModule<IGeexServerConfig, ExpressContext, IGeexContext>({
     providers: ({ config }) => [
         {
             provide: GeexServerConfigToken,

@@ -1,5 +1,5 @@
+import { Inject, Injectable } from "@graphql-modules/di";
 import winston from "winston";
-import { Injectable, Inject } from "@graphql-modules/di";
 import { LoggerConfigToken } from "../tokens";
 type LogLevel = "debug" | "info" | "warn" | "error";
 
@@ -22,36 +22,23 @@ export interface LoggerConfig {
      * @memberof LoggerConfig
      */
     filterLevel?: LogLevel;
-    consoleConfig?: {}
-    fileConfig?: {}
-    remoteConfig?: {}
+    consoleConfig?: {};
+    fileConfig?: {};
+    remoteConfig?: {};
     /**
      *metadata to be logged in every log entry
      *
      * @type {{}}
      * @memberof LoggerConfig
      */
-    metadata?: {}
+    metadata?: {};
 }
 
 @Injectable()
 export class GeexLogger {
-    _logger: winston.Logger;
-    error(error?: Error, ...args: any[]) {
-        this.log("error", error, args)
-    }
-    _target: LogTarget = "console";
-    _filterLevel: LogLevel = "debug";
-    debug(...args: any[]) {
-        this.log("debug", args)
-    }
-    info(...args: any[]) {
-        this.log("info", args)
-    }
-    warn(...args: any[])
-    warn(error?: Error, ...args: any[]) {
-        this.log("warn", error, args)
-    }
+    public _logger: winston.Logger;
+    public _target: LogTarget = "console";
+    public _filterLevel: LogLevel = "debug";
 
     /**
      *
@@ -74,14 +61,27 @@ export class GeexLogger {
                         defaultMeta: config ? config.metadata : undefined,
                         transports: [
                             new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true, all: true }), winston.format.colorize()) }),
-                        ]
+                        ],
                     });
                     this._logger = logger;
                 }
                 break;
         }
     }
-    log(level: LogLevel, ...args: any[]) {
+    public error(error?: Error, ...args: any[]) {
+        this.log("error", error, args);
+    }
+    public debug(...args: any[]) {
+        this.log("debug", args);
+    }
+    public info(...args: any[]) {
+        this.log("info", args);
+    }
+    public warn(...args: any[]);
+    public warn(error?: Error, ...args: any[]) {
+        this.log("warn", error, args);
+    }
+    public log(level: LogLevel, ...args: any[]) {
         // const NowDate = new Date().toISOString();
         // replace with more sophisticated solution :)
         switch (level) {

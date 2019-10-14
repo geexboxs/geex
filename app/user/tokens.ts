@@ -1,1 +1,1 @@
-export const UserModelToken = Symbol.for("UserModel")
+export const UserModelToken = Symbol.for("UserModel");

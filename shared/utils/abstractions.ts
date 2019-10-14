@@ -1,17 +1,17 @@
-import { Injector } from '@graphql-modules/di';
-import { User } from '../../app/user/user.model';
-import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
-import { LoggerConfig } from './logger';
-import { AuthConfig } from '../auth/auth.module';
+import { Injector } from "@graphql-modules/di";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+import { User } from "../../app/user/user.model";
+import { AuthConfig } from "../auth/auth.module";
+import { LoggerConfig } from "./logger";
 
-export interface GeexContext{
+export interface GeexContext {
     session: ExpressContext;
     user?: User;
     injector: Injector;
 }
 
-export type GeexServerConfig = {
+export interface GeexServerConfig {
     connectionString: string;
     loggerConfig?: LoggerConfig;
     authConfig?: AuthConfig;
-};
+}

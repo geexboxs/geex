@@ -1,36 +1,35 @@
 import { GraphQLModule, GraphQLModuleOptions } from "@graphql-modules/core";
+import { Injector, ProviderScope } from "@graphql-modules/di";
 import { ApolloServer, IResolvers } from "apollo-server-express";
-import { GeexServerConfigToken, LoggerConfigToken, AuthConfigToken } from "./tokens";
-import { GeexLogger } from "./utils/logger";
-import { Connection, createConnection } from "mongoose";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import express = require("express");
-import { AuthModule } from "./auth/auth.module";
-import { AuditLogModule } from "./audit-log/audit-log.module";
-import { GeexContext, GeexServerConfig } from "./utils/abstractions";
-import { ProviderScope, Injector } from "@graphql-modules/di";
+import { Connection, createConnection } from "mongoose";
 import { environment } from "../environments/environment";
 import { LoggingMiddleware } from "./audit-log/audit-log.middleware";
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
+import { AuditLogModule } from "./audit-log/audit-log.module";
+import { AuthModule } from "./auth/auth.module";
 import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
+import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
+import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken } from "./tokens";
+import { GeexContext, GeexServerConfig } from "./utils/abstractions";
+import { GeexLogger } from "./utils/logger";
 
-
-let result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
+const result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
     providers: ({ config }) => [
         {
             provide: GeexServerConfigToken,
-            useValue: config
+            useValue: config,
         }, {
             provide: LoggerConfigToken,
-            useValue: config.loggerConfig
+            useValue: config.loggerConfig,
         }, {
             provide: AuthConfigToken,
-            useValue: config.authConfig
+            useValue: config.authConfig,
         },
         GeexLogger,
         LoggingMiddleware,
         RequestIdentityExtension,
-        GlobalLoggingExtension
+        GlobalLoggingExtension,
     ],
     imports: [AuditLogModule, AuthModule],
 }, environment);

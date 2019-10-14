@@ -1,8 +1,8 @@
-import { Field } from "type-graphql";
-import { prop, pre, Typegoose } from "@typegoose/typegoose";
+import { pre, prop, Typegoose } from "@typegoose/typegoose";
 import { Schema } from "mongoose";
+import { Field } from "type-graphql";
 
-@pre<ModelBase>('save', function (next) {
+@pre<ModelBase>("save", function(next) {
     if (!this) {
         next();
     }
@@ -13,13 +13,13 @@ import { Schema } from "mongoose";
     next();
 })
 export abstract class ModelBase {
-    @Field(returns => String)
-    _id!: Schema.Types.ObjectId;
+    @Field((returns) => String)
+    public _id!: Schema.Types.ObjectId;
 
     @prop()
     @Field()
-    createAt!: Date;
+    public createAt!: Date;
     @prop()
     @Field()
-    updateAt!: Date;
+    public updateAt!: Date;
 }

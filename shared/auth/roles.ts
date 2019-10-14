@@ -1,1 +1,1 @@
-export type GeexRoles = "admin" | "user"
+export type GeexRoles = "admin" | "user";

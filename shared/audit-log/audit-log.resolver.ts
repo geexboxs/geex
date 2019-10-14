@@ -1,17 +1,17 @@
 
 import { Inject } from "@graphql-modules/di";
-import { Authorized, Resolver, Query, Mutation } from "type-graphql";
+import { Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { AuditLog } from "./audit-log.model";
 
-@Resolver(of => AuditLog)
+@Resolver((of) => AuditLog)
 export class AuditLogResolver {
 
     constructor(
 
     ) { }
 
-    @Query(returns => AuditLog)
-    async log() {
+    @Query((returns) => AuditLog)
+    public async log() {
         return new AuditLog("testLog");
     }
 }

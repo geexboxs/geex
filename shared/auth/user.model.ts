@@ -1,6 +1,15 @@
 import { prop } from "@typegoose/typegoose";
 
 export class User {
+
+    @prop()
+    public username: string;
+    @prop()
+    public passwordHash: string;
+    @prop()
+    public roles: string[];
+    @prop()
+    public phone: string;
     /**
      *
      */
@@ -10,13 +19,4 @@ export class User {
         this.roles = roles;
         this.phone = phone;
     }
-
-    @prop()
-    username: string;
-    @prop()
-    passwordHash: string;
-    @prop()
-    roles: string[];
-    @prop()
-    phone: string;
 }

@@ -1,12 +1,11 @@
 
 import { User } from "../../app/user/user.model";
 
-
-import { Authorized, Resolver, Query, Mutation, UseMiddleware } from "type-graphql";
-import passport = require("passport");
-import { AuthMiddleware } from "./auth.middleware";
 import { Inject, Injectable } from "@graphql-modules/di";
 import { ReturnModelType } from "@typegoose/typegoose";
+import passport = require("passport");
+import { Authorized, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import { AuthMiddleware } from "./auth.middleware";
 import { UserModelToken } from "./tokens";
 
 @Resolver()
@@ -19,14 +18,14 @@ export class AuthResolver {
 
     ) { }
 
-    @Mutation(returns => String)
-    async authenticate(): Promise<string> {
-        return "1"
+    @Mutation((returns) => String)
+    public async authenticate(): Promise<string> {
+        return "1";
     }
 
-    @Query(returns => String)
+    @Query((returns) => String)
     @UseMiddleware(AuthMiddleware)
-    async token(): Promise<string> {
-        return "0"
+    public async token(): Promise<string> {
+        return "0";
     }
 }

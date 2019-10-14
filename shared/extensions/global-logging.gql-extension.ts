@@ -1,15 +1,15 @@
-import { GraphQLExtension } from "apollo-server-express";
+import { Inject } from "@graphql-modules/di";
 import { Request } from "apollo-env";
-import { DocumentNode } from "graphql";
 import { GraphQLRequestContext, GraphQLResponse } from "apollo-server-core";
 import { Headers } from "apollo-server-env";
+import { GraphQLExtension } from "apollo-server-express";
+import { DocumentNode } from "graphql";
 import stringify = require("json-stringify-safe");
-import { GeexLogger } from "../utils/logger";
 import { GeexContext } from "../utils/abstractions";
-import { Inject } from "@graphql-modules/di";
+import { GeexLogger } from "../utils/logger";
 
 export class GlobalLoggingExtension extends GraphQLExtension<GeexContext> {
-    _logger: GeexLogger;
+    public _logger: GeexLogger;
     /**
      *
      */
@@ -17,15 +17,15 @@ export class GlobalLoggingExtension extends GraphQLExtension<GeexContext> {
         super();
         this._logger = logger;
     }
-    requestDidStart({ context }: { context: GeexContext }) {
+    public requestDidStart({ context }: { context: GeexContext }) {
         if (context.session.req.body === undefined) {
             return;
         }
-        let logContent = { headers: context.session.req.headers, requestBody: context.session.req.body }
+        const logContent = { headers: context.session.req.headers, requestBody: context.session.req.body };
         this._logger.info(stringify(logContent));
     }
 
-    willSendResponse({ graphqlResponse, context }: {
+    public willSendResponse({ graphqlResponse, context }: {
         graphqlResponse: GraphQLResponse;
         context: GeexContext;
     }) {

@@ -5,7 +5,7 @@ import { ClientSession, Document } from "mongoose";
 import { request } from "express";
 import { User } from "./user.model";
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { AuthMiddleware } from "../../shared/authentication/auth.middleware";
+import { AuthMiddleware } from "../../shared/auth/auth.middleware";
 import { UserModelToken } from "./tokens";
 
 @Resolver(of => User)

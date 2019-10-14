@@ -2,7 +2,7 @@ import { Injector } from '@graphql-modules/di';
 import { User } from '../../app/user/user.model';
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { LoggerConfig } from './logger';
-import { AuthConfig } from '../authentication/auth.module';
+import { AuthConfig } from '../auth/auth.module';
 
 export interface GeexContext{
     session: ExpressContext;

@@ -4,12 +4,12 @@ import { GeexServerConfigToken, LoggerConfigToken, AuthConfigToken } from "./tok
 import { GeexLogger } from "./utils/logger";
 import { Connection, createConnection } from "mongoose";
 import express = require("express");
-import { AuthModule } from "./authentication/auth.module";
-import { LoggingModule } from "./logging/logging.module";
+import { AuthModule } from "./auth/auth.module";
+import { AuditLogModule } from "./audit-log/audit-log.module";
 import { GeexContext, GeexServerConfig } from "./utils/abstractions";
 import { ProviderScope, Injector } from "@graphql-modules/di";
 import { environment } from "../environments/environment";
-import { LoggingMiddleware } from "./logging/logging.middleware";
+import { LoggingMiddleware } from "./audit-log/audit-log.middleware";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
 import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
@@ -32,6 +32,6 @@ let result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
         RequestIdentityExtension,
         GlobalLoggingExtension
     ],
-    imports: [LoggingModule, AuthModule],
+    imports: [AuditLogModule, AuthModule],
 }, environment);
 export const SharedModule = result;

@@ -6,6 +6,8 @@ import { ApolloServer } from "apollo-server-express";
 import { GeexLogger } from "./shared/utils/logger";
 import { RequestIdentityExtension } from "./shared/extensions/request-identity.gql-extension";
 import { GeexContext } from "./shared/utils/abstractions";
+import { GlobalLoggingExtension } from "./shared/extensions/global-logging.gql-extension";
+import { environment } from "./environments/environment";
 
 const entryModule = SharedModule;
 const app = express();
@@ -16,11 +18,7 @@ const apollo = new ApolloServer({
         maxFileSize: 100000000,
         maxFiles: 10,
     },
-    // formatError: error => {
-    //     entryModule.injector.get(GeexLogger).error(error);
-    //     return error;
-    // },
-    extensions: [RequestIdentityExtension]
+    extensions: [() => entryModule.injector.get(RequestIdentityExtension), () => entryModule.injector.get(GlobalLoggingExtension)]
 });
 
 app.use(express.json());

@@ -19,7 +19,7 @@ import { environment } from "../../environments/environment";
 import { inspect } from "util";
 import { ProviderScope } from "@graphql-modules/di";
 import { buildSchema, buildSchemaSync } from "type-graphql";
-import { GlobalLoggingMiddleware } from "../global-logging.middleware";
+import { LoggingMiddleware } from "../logging/logging.middleware";
 import { LoggingModule } from "../logging/logging.module";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 
@@ -55,7 +55,6 @@ export const AuthModule = new GraphQLModule<AuthConfig, ExpressContext, GeexCont
     extraSchemas: () => [
         buildSchemaSync({
             resolvers: [AuthResolver],
-            globalMiddlewares: [GlobalLoggingMiddleware],
             container: {
                 get: (someClass, resolverData) => {
                     return (resolverData.context as GeexContext).injector.get(someClass);

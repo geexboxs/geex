@@ -68,12 +68,12 @@ export class GeexLogger {
             default:
                 {
                     const logger = winston.createLogger({
-                        format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+                        // format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
                         // levels: ["debug", "error", "info", "warn"],
                         level: this._filterLevel,
                         defaultMeta: config ? config.metadata : undefined,
                         transports: [
-                            new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true })) }),
+                            new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true, all: true }), winston.format.colorize()) }),
                         ]
                     });
                     this._logger = logger;

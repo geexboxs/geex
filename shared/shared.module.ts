@@ -9,8 +9,10 @@ import { LoggingModule } from "./logging/logging.module";
 import { GeexContext, GeexServerConfig } from "./utils/abstractions";
 import { ProviderScope, Injector } from "@graphql-modules/di";
 import { environment } from "../environments/environment";
-import { GlobalLoggingMiddleware } from "./global-logging.middleware";
+import { LoggingMiddleware } from "./logging/logging.middleware";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
+import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
 
 
 let result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
@@ -26,7 +28,9 @@ let result = new GraphQLModule<GeexServerConfig, ExpressContext, GeexContext>({
             useValue: config.authConfig
         },
         GeexLogger,
-        GlobalLoggingMiddleware,
+        LoggingMiddleware,
+        RequestIdentityExtension,
+        GlobalLoggingExtension
     ],
     imports: [LoggingModule, AuthModule],
 }, environment);

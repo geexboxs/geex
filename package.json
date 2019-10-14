@@ -25,7 +25,6 @@
         "graphql-scalars": "^1.0.2",
         "graphql-tools": "~4.0.3",
         "json-stringify-safe": "^5.0.1",
-        "json5": "^2.1.1",
         "linqts-camelcase": "^1.12.4",
         "mongodb": "^3.3.2",
         "mongoose": "^5.7.4",

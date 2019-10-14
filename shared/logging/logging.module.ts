@@ -8,7 +8,7 @@ import { printSchema } from "graphql";
 import { environment } from "../../environments/environment";
 import { inspect } from "util";
 import { AuthModule } from "../authentication/auth.module";
-import { GlobalLoggingMiddleware } from "../global-logging.middleware";
+import { LoggingMiddleware } from "./logging.middleware";
 import { LoggerConfigToken } from "../tokens";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 const resolvers: any = [LogResolver];
@@ -16,10 +16,9 @@ export const LoggingModule = new GraphQLModule<LoggerConfig | undefined, Express
     providers: [{
         provide: GeexLogger,
         useFactory: (injector: Injector) => new GeexLogger(injector.get(LoggerConfigToken))
-    }, GlobalLoggingMiddleware, ...resolvers],
+    }, LoggingMiddleware, ...resolvers],
     extraSchemas: () => [buildSchemaSync({
         resolvers,
-        globalMiddlewares: [GlobalLoggingMiddleware],
         container: {
             get: (someClass, resolverData) => {
                 return (resolverData.context as GeexContext).injector.get(someClass);

@@ -1,11 +1,11 @@
-import { GeexContext } from "./utils/abstractions";
-import { GeexLogger } from "./utils/logger";
+import { GeexContext } from "../utils/abstractions";
+import { GeexLogger } from "../utils/logger";
 import { ResolverData, NextFn, MiddlewareInterface } from "type-graphql";
-import { stringify } from "json5";
 import { Inject, Injectable } from "@graphql-modules/di";
+import stringify = require("json-stringify-safe");
 
 @Injectable()
-export class GlobalLoggingMiddleware implements MiddlewareInterface<GeexContext> {
+export class LoggingMiddleware implements MiddlewareInterface<GeexContext> {
     /**
      *
      */

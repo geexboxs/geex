@@ -4,12 +4,13 @@ import express = require("express");
 import { SharedModule } from "./shared/shared.module";
 import { ApolloServer } from "apollo-server-express";
 import { GeexLogger } from "./shared/utils/logger";
-import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
+import { RequestIdentityExtension } from "./shared/extensions/request-identity.gql-extension";
+import { GeexContext } from "./shared/utils/abstractions";
 
 const entryModule = SharedModule;
 const app = express();
 const apollo = new ApolloServer({
-    context: entryModule.context,
+    context: async (session) => await entryModule.context(session),
     schema: entryModule.schema,
     uploads: {
         maxFileSize: 100000000,

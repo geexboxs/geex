@@ -8,10 +8,10 @@ import { Strategy as LocalStrategy } from "passport-local";
 import { PasswordHasher } from "./password-hasher";
 import acl from "acl";
 import { Db } from "mongodb";
-import { AclToken, AuthConfigToken, UserModelToken } from "./tokens";
+import { AclToken, UserModelToken } from "./tokens";
 import passport, { Passport } from "passport";
 import { AuthResolver } from "./auth.resolver";
-import { GeexGraphqlServerConfigToken } from "../tokens";
+import { GeexServerConfigToken, AuthConfigToken } from "../tokens";
 import { AuthMiddleware } from "./auth.middleware";
 import { GraphQLResolveInfo, printSchema } from "graphql";
 import { printSchemaWithDirectives } from "graphql-toolkit";
@@ -21,17 +21,18 @@ import { ProviderScope } from "@graphql-modules/di";
 import { buildSchema, buildSchemaSync } from "type-graphql";
 import { GlobalLoggingMiddleware } from "../global-logging.middleware";
 import { LoggingModule } from "../logging/logging.module";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 
 const UserModel = getModelForClass(User);
 export type AuthConfig = {
     tokenSecret: string;
 }
 
-export const AuthModule = new GraphQLModule<AuthConfig, GeexContext, GeexContext>({
+export const AuthModule = new GraphQLModule<AuthConfig, ExpressContext, GeexContext>({
     defaultProviderScope: ProviderScope.Application,
     providers: (self) => [{
         provide: PasswordHasher,
-        useFactory: injector => new PasswordHasher(injector.get<AuthConfig>(AuthConfigToken) ? injector.get<AuthConfig>(AuthConfigToken).tokenSecret : "")
+        useFactory: injector => new PasswordHasher(injector.get<AuthConfig>(AuthConfigToken) && injector.get<AuthConfig>(AuthConfigToken).tokenSecret || "")
     }, {
         provide: Passport,
         useFactory: injector => passport.use("local", new LocalStrategy(
@@ -46,7 +47,7 @@ export const AuthModule = new GraphQLModule<AuthConfig, GeexContext, GeexContext
         ))
     }, {
         provide: AclToken,
-        useFactory: injector => new acl(new acl.mongodbBackend(createConnection(injector.get<GeexServerConfig>(GeexGraphqlServerConfigToken).connectionString).db, ""))
+        useFactory: injector => new acl(new acl.mongodbBackend(createConnection(injector.get<GeexServerConfig>(GeexServerConfigToken).connectionString).db, ""))
     }, {
         provide: UserModelToken,
         useValue: UserModel

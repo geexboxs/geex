@@ -1,6 +1,6 @@
 import winston from "winston";
 import { Injectable, Inject } from "@graphql-modules/di";
-import { LoggerConfigToken } from "../logging/tokens";
+import { LoggerConfigToken } from "../tokens";
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogTarget = "console" | "file" | "remote";

@@ -16,7 +16,7 @@ export class AuthMiddleware implements MiddlewareInterface<GeexContext> {
         const user = context.user;
         const roles = user && user.roles;
         if (!user) {
-            throw UnauthorizedError;
+            throw new UnauthorizedError();
 
         };
         if (roles === undefined) {
@@ -26,6 +26,6 @@ export class AuthMiddleware implements MiddlewareInterface<GeexContext> {
         if (user.roles.any() && user.roles.intersect(roles).any()) {
             return next();
         }
-        throw UnauthorizedError;
+        throw new UnauthorizedError();
     }
 }

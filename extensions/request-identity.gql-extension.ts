@@ -2,21 +2,14 @@ import { GraphQLExtension } from "apollo-server-express";
 import { Request } from "apollo-env";
 import { DocumentNode } from "graphql";
 import { GraphQLRequestContext, GraphQLResponse } from "apollo-server-core";
-import { Headers } from "apollo-server-env";
-import { GeexLogger } from "./Logger";
-import { stringify } from "json5";
 import rid = require('rid');
 
-const { print } = require('graphql');
-
-export class RequestIdentityExtension<TContext = any> extends GraphQLExtension<TContext> {
-    _logger: GeexLogger;
+export class RequestIdentityExtensionClass<TContext = any> extends GraphQLExtension<TContext> {
     /**
      *
      */
-    constructor(logger: GeexLogger) {
+    constructor() {
         super();
-        this._logger = logger;
     }
     requestDidStart({ request,
         queryString,
@@ -43,3 +36,5 @@ export class RequestIdentityExtension<TContext = any> extends GraphQLExtension<T
         request.headers.set("X-RID", rid())
     }
 }
+
+export const RequestIdentityExtension = () => new RequestIdentityExtensionClass();

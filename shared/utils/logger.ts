@@ -1,11 +1,26 @@
-import { Service } from "typedi";
 import winston from "winston";
+import { Injectable, Inject } from "@graphql-modules/di";
+import { LoggerConfigToken } from "../logging/tokens";
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogTarget = "console" | "file" | "remote";
 
 export interface LoggerConfig {
+    /**
+     *log target
+     *
+     * @type {LogTarget}
+     * @default "console"
+     * @memberof LoggerConfig
+     */
     target?: LogTarget;
+    /**
+     *minimal level to log
+     *
+     * @type {LogLevel}
+     * @default "info"
+     * @memberof LoggerConfig
+     */
     filterLevel?: LogLevel;
     consoleConfig?: {}
     fileConfig?: {}
@@ -19,7 +34,7 @@ export interface LoggerConfig {
     metadata?: {}
 }
 
-@Service()
+@Injectable()
 export class GeexLogger {
     _logger: winston.Logger;
     error(error?: Error, ...args: any[]) {
@@ -41,7 +56,7 @@ export class GeexLogger {
     /**
      *
      */
-    constructor(config?: LoggerConfig) {
+    constructor(@Inject(LoggerConfigToken) config?: LoggerConfig) {
         if (config && config.target) {
             this._target = config.target;
         }
@@ -59,7 +74,6 @@ export class GeexLogger {
                         defaultMeta: config ? config.metadata : undefined,
                         transports: [
                             new winston.transports.Console({ level: "debug", handleExceptions: true, format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true })) }),
-                            //new winston.transports.File({ level: "error", handleExceptions: true, filename: "./hehe.log" })
                         ]
                     });
                     this._logger = logger;

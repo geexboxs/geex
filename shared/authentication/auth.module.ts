@@ -1,76 +1,69 @@
 
-import { Connection } from "mongoose";
-import { buildSchemaSync } from "type-graphql";
-import { DefaultAuthChecker } from "./role-based-auth-checker";
-import { GraphQLModule, ModuleContext } from "@graphql-modules/core";
-import { IResolvers } from "@kamilkisiela/graphql-tools";
+import { Connection, createConnection } from "mongoose";
+import { GraphQLModule, ModuleContext, GraphQLModuleOptions } from "@graphql-modules/core";
 import { getModelForClass } from "@typegoose/typegoose";
 import { User } from "./user.model";
-import { GeexContext } from "../context.interface";
+import { GeexContext, GeexServerConfig } from "../utils/abstractions";
 import { Strategy as LocalStrategy } from "passport-local";
 import { PasswordHasher } from "./password-hasher";
 import acl from "acl";
 import { Db } from "mongodb";
-import { AclToken } from "./tokens";
-import passport from "passport";
+import { AclToken, AuthConfigToken, UserModelToken } from "./tokens";
+import passport, { Passport } from "passport";
 import { AuthResolver } from "./auth.resolver";
+import { GeexGraphqlServerConfigToken } from "../tokens";
+import { AuthMiddleware } from "./auth.middleware";
+import { GraphQLResolveInfo, printSchema } from "graphql";
+import { printSchemaWithDirectives } from "graphql-toolkit";
+import { environment } from "../../environments/environment";
+import { inspect } from "util";
+import { ProviderScope } from "@graphql-modules/di";
+import { buildSchema, buildSchemaSync } from "type-graphql";
+import { GlobalLoggingMiddleware } from "../global-logging.middleware";
+import { LoggingModule } from "../logging/logging.module";
 
 const UserModel = getModelForClass(User);
-export const UserModelToken = Symbol("UserModel");
-
 export type AuthConfig = {
     tokenSecret: string;
 }
 
-export class AuthModule extends GraphQLModule<AuthConfig, GeexContext, GeexContext> {
-    /**
-     *
-     */
-    constructor(config: AuthConfig, connection: Connection) {
-        super();
-        const passwordHasher = new PasswordHasher(config.tokenSecret);
-        const aclInstance = new acl(new acl.mongodbBackend(connection.db, ""));
-        this.selfProviders.push({
-            provide: PasswordHasher,
-            useValue: passwordHasher
-        })
-        this.selfProviders.push({
-            provide: AclToken,
-            useValue: aclInstance
-        })
-        this.selfProviders.push({
-            provide: UserModelToken,
-            useValue: UserModel
-        })
-        passport.use("local", new LocalStrategy(
+export const AuthModule = new GraphQLModule<AuthConfig, GeexContext, GeexContext>({
+    defaultProviderScope: ProviderScope.Application,
+    providers: (self) => [{
+        provide: PasswordHasher,
+        useFactory: injector => new PasswordHasher(injector.get<AuthConfig>(AuthConfigToken) ? injector.get<AuthConfig>(AuthConfigToken).tokenSecret : "")
+    }, {
+        provide: Passport,
+        useFactory: injector => passport.use("local", new LocalStrategy(
             function (username, password, done) {
                 UserModel.findOne({ username: username }, function (err, user) {
                     if (err) { return done(err); }
                     if (!user) { return done(null, false); }
-                    if (passwordHasher.hash(password) !== user.passwordHash) { return done(null, false); }
+                    if (injector.get(PasswordHasher).hash(password) !== user.passwordHash) { return done(null, false); }
                     return done(null, user);
                 });
             }
-        ));
-
-        this.selfProviders.push({
-            provide: DefaultAuthChecker,
-            useValue: DefaultAuthChecker
-        })
-        let schema = buildSchemaSync({
-            authChecker: DefaultAuthChecker,
+        ))
+    }, {
+        provide: AclToken,
+        useFactory: injector => new acl(new acl.mongodbBackend(createConnection(injector.get<GeexServerConfig>(GeexGraphqlServerConfigToken).connectionString).db, ""))
+    }, {
+        provide: UserModelToken,
+        useValue: UserModel
+    }, AuthResolver, AuthMiddleware],
+    extraSchemas: () => [
+        buildSchemaSync({
             resolvers: [AuthResolver],
-            container: ({ ...args }) => {
-                return this.injector.getSessionInjector(args.context);
+            globalMiddlewares: [GlobalLoggingMiddleware],
+            container: {
+                get: (someClass, resolverData) => {
+                    return (resolverData.context as GeexContext).injector.get(someClass);
+                }
             },
-        });
-        this.extraSchemas.push(schema);
-    }
-}
-
-
-
-
+        })
+    ],
+    imports: []
+}, environment.authConfig);
 // Creates resolvers, type definitions, and schema directives used by accounts-js
 // export const AuthModule = AccountsModule.forRoot({
 //     accountsServer,

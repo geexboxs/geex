@@ -1,35 +1,32 @@
 
-import { User } from "../../domain/models/user.model";
-
-import { Inject } from "@graphql-modules/di";
-
-import { UserModelToken } from "./auth.module";
-
-import { ModelType } from "@typegoose/typegoose/lib/types";
+import { User } from "../../app/user/user.model";
 
 
-import { SchemaDirective } from "../../graphql-patch";
-
-import { Authorized, Resolver, Query, Mutation } from "type-graphql";
-import { AuthTokenScalar } from "./types/scalars";
+import { Authorized, Resolver, Query, Mutation, UseMiddleware } from "type-graphql";
 import passport = require("passport");
+import { AuthMiddleware } from "./auth.middleware";
+import { Inject, Injectable } from "@graphql-modules/di";
+import { ReturnModelType } from "@typegoose/typegoose";
+import { UserModelToken } from "./tokens";
 
 @Resolver()
+@Injectable()
 export class AuthResolver {
 
     constructor(
         @Inject(UserModelToken)
-        private userModel: ModelType<User>,
+        public userModel: ReturnModelType<typeof User>,
 
     ) { }
 
-    @Mutation(returns => AuthTokenScalar)
-    async authenticate(username: string, password: string) {
-        return passport.authenticate("local");
+    @Mutation(returns => String)
+    async authenticate(): Promise<string> {
+        return "1"
     }
 
-    @Query(returns => AuthTokenScalar)
-    async token(username: string, password: string) {
-        return passport.authenticate("local");
+    @Query(returns => String)
+    @UseMiddleware(AuthMiddleware)
+    async token(): Promise<string> {
+        return "0"
     }
 }

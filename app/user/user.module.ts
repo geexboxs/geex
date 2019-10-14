@@ -1,25 +1,24 @@
 import { GraphQLModule } from '@graphql-modules/core';
-// import { UserResolver } from './user.resolver';
 import { buildSchemaSync, Resolver, Query, ObjectType, Field, Authorized } from 'type-graphql';
-import { DomainModule } from '../../domain/domain.module';
-import { DefaultAuthChecker } from "../../shared/authentication/role-based-auth-checker";
 import { GeexRoles } from "../../shared/authentication/roles";
+import { DefaultAuthChecker } from '../../shared/authentication/auth-checker';
 import { UserResolver } from './user.resolver';
-// import { StudentModelToken, StudentModel } from '../../domain/models/student.model';
+import { GeexContext } from '../../shared/utils/abstractions';
 const resolvers = [UserResolver];
 export const UserModule: GraphQLModule = new GraphQLModule({
     extraSchemas: [
         buildSchemaSync({
             authChecker: DefaultAuthChecker,
-            resolvers: [...resolvers],
+            resolvers: [UserResolver],
             container: ({ ...args }) => {
-                UserModule.injector.addChild(DomainModule.injector);
-                return UserModule.injector.getSessionInjector(args.context);
+                return {
+                    get(someClass, resolverData) {
+                        return (resolverData.context as GeexContext).injector.get(someClass);
+                    }
+                }
             },
-            // container: ({ context }) => context.injector
-
         })
     ],
     providers: [...resolvers],
-    imports: [DomainModule]
+    imports: []
 });

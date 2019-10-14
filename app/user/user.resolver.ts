@@ -3,10 +3,10 @@ import { Inject } from "@graphql-modules/di";
 import { promises } from "dns";
 import { ClientSession, Document } from "mongoose";
 import { request } from "express";
-import { User } from "../../domain/models/user.model";
-import { UserModelToken } from "../../domain/domain.module";
-import { SchemaDirective } from "../../graphql-patch";
+import { User } from "./user.model";
 import { ModelType } from "@typegoose/typegoose/lib/types";
+import { AuthMiddleware } from "../../shared/authentication/auth.middleware";
+import { UserModelToken } from "./tokens";
 
 @Resolver(of => User)
 export class UserResolver {
@@ -24,8 +24,7 @@ export class UserResolver {
     }
 
     @Query(returns => User)
-    @SchemaDirective("auth")
-    @Authorized()
+    @UseMiddleware(AuthMiddleware)
     async user(id: string) {
         let result = await this.userModel.findOne({ _id: id }).exec();
         return result;

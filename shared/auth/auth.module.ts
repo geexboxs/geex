@@ -16,7 +16,7 @@ import { environment } from "../../environments/environment";
 import { LoggingMiddleware } from "../audit-log/audit-log.middleware";
 import { AuditLogModule } from "../audit-log/audit-log.module";
 import { AuthConfigToken, GeexServerConfigToken } from "../tokens";
-import { IGeexContext, IGeexServerConfig } from "../utils/abstractions";
+import { IGeexContext, IGeexServerConfig, IAuthConfig } from "../../types";
 import { AuthMiddleware } from "./auth.middleware";
 import { AuthResolver } from "./auth.resolver";
 import { AclToken, UserModelToken } from "./tokens";
@@ -24,9 +24,6 @@ import { User } from "./user.model";
 import { PasswordHasher } from "./utils/password-hasher";
 
 const UserModel = getModelForClass(User);
-export interface IAuthConfig {
-    tokenSecret: string;
-}
 
 export const AuthModule = new GraphQLModule<IAuthConfig, ExpressContext, IGeexContext>({
     defaultProviderScope: ProviderScope.Application,

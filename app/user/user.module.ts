@@ -1,7 +1,7 @@
 import { GraphQLModule } from "@graphql-modules/core";
 import { Authorized, buildSchemaSync, Field, ObjectType, Query, Resolver } from "type-graphql";
 import { GeexRoles } from "../../shared/auth/roles";
-import { IGeexContext } from "../../shared/utils/abstractions";
+import { IGeexContext } from "../../types";
 import { UserResolver } from "./user.resolver";
 const resolvers = [UserResolver];
 export const UserModule: GraphQLModule = new GraphQLModule({

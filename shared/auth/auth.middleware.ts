@@ -1,7 +1,7 @@
 import { defaultFieldResolver, DirectiveLocation, GraphQLField, GraphQLFieldResolver, GraphQLInterfaceType, GraphQLObjectType, GraphQLSchema } from "graphql";
 import { VisitableSchemaType } from "graphql-tools/dist/schemaVisitor";
 import { MiddlewareInterface, NextFn, ResolverData, UnauthorizedError } from "type-graphql";
-import { IGeexContext } from "../utils/abstractions";
+import { IGeexContext } from "../../types";
 import { GeexLogger } from "../utils/logger";
 import { GeexRoles } from "./roles";
 

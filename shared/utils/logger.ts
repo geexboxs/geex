@@ -1,38 +1,7 @@
 import { Inject, Injectable } from "@graphql-modules/di";
 import winston from "winston";
 import { LoggerConfigToken } from "../tokens";
-type LogLevel = "debug" | "info" | "warn" | "error";
-
-type LogTarget = "console" | "file" | "remote";
-
-export interface ILoggerConfig {
-    /**
-     * log target
-     *
-     * @type {LogTarget}
-     * @default "console"
-     * @memberof LoggerConfig
-     */
-    target?: LogTarget;
-    /**
-     * minimal level to log
-     *
-     * @type {LogLevel}
-     * @default "info"
-     * @memberof LoggerConfig
-     */
-    filterLevel?: LogLevel;
-    consoleConfig?: {};
-    fileConfig?: {};
-    remoteConfig?: {};
-    /**
-     * metadata to be logged in every log entry
-     *
-     * @type {{}}
-     * @memberof LoggerConfig
-     */
-    metadata?: {};
-}
+import { LogTarget, LogLevel, ILoggerConfig } from "../../types";
 
 @Injectable()
 export class GeexLogger {
@@ -65,7 +34,7 @@ export class GeexLogger {
                         transports: [
                             new winston.transports.Console({
                                 level: "debug", handleExceptions: true,
-                                format: winston.format.combine(winston.format.timestamp(), winston.format.cli({ level: true, all: true }), winston.format.colorize()),
+                                format: winston.format.combine(winston.format.cli({ level: true, all: true }), winston.format.colorize()),
                             }),
                         ],
                     });

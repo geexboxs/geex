@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@graphql-modules/di";
 import stringify = require("json-stringify-safe");
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
-import { IGeexContext } from "../utils/abstractions";
+import { IGeexContext } from "../../types";
 import { GeexLogger } from "../utils/logger";
 
 @Injectable()

@@ -9,10 +9,12 @@ import { LoggingMiddleware } from "./audit-log/audit-log.middleware";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { AuthModule } from "./auth/auth.module";
 import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
-import { RequestIdentityExtension } from "./extensions/request-identity.gql-extension";
-import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken } from "./tokens";
-import { IGeexContext, IGeexServerConfig } from "./utils/abstractions";
+import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken, TracingConfigToken } from "./tokens";
+import { IGeexContext, IGeexServerConfig } from "../types";
 import { GeexLogger } from "./utils/logger";
+import OpentracingExtension from "apollo-opentracing";
+import { Tracer } from "opentracing";
+import { JaegerTraceExtension } from "./extensions/jaeger-trace.gql-extension";
 
 const result = new GraphQLModule<IGeexServerConfig, ExpressContext, IGeexContext>({
     providers: ({ config }) => [
@@ -25,12 +27,16 @@ const result = new GraphQLModule<IGeexServerConfig, ExpressContext, IGeexContext
         }, {
             provide: AuthConfigToken,
             useValue: config.authConfig,
+        }, {
+            provide: TracingConfigToken,
+            useValue: config.traceConfig,
         },
         GeexLogger,
         LoggingMiddleware,
-        RequestIdentityExtension,
         GlobalLoggingExtension,
+        JaegerTraceExtension,
     ],
     imports: [AuditLogModule, AuthModule],
 }, environment);
+
 export const SharedModule = result;

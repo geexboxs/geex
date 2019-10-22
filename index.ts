@@ -3,11 +3,15 @@ import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
 import express = require("express");
 import { environment } from "./environments/environment";
-import { GlobalLoggingExtension } from "./shared/extensions/global-logging.gql-extension";
-import { SharedModule } from "./shared/shared.module";
 import { JaegerTraceExtension } from "./shared/extensions/jaeger-trace.gql-extension";
+import { AppModule } from "./app/app.module";
+import { ComplexityExtension } from "./shared/extensions/complexity.gql-extension";
+import { mongoose } from "@typegoose/typegoose";
+(async () => {
+    await mongoose.connect(environment.connectionString, { useNewUrlParser: true, useUnifiedTopology: true});
+})();
 
-const entryModule = SharedModule;
+const entryModule = AppModule;
 const app = express();
 const apollo = new ApolloServer({
     context: async (session) => await entryModule.context(session),
@@ -16,9 +20,12 @@ const apollo = new ApolloServer({
         maxFileSize: 100000000,
         maxFiles: 10,
     },
+    plugins: [],
     tracing: true,
-    extensions: [() => entryModule.injector.get(GlobalLoggingExtension),
-    () => entryModule.injector.get(JaegerTraceExtension)],
+    extensions: [
+        () => entryModule.injector.get(JaegerTraceExtension),
+        () => entryModule.injector.get(ComplexityExtension),
+    ],
 });
 
 app.use(express.json());

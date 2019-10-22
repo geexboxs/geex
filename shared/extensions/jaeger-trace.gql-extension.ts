@@ -2,7 +2,6 @@ import OpentracingExtension, { RequestStart, ExtendedGraphQLResolveInfo } from "
 import { IGeexContext, IGeexRequestStart, IGeexRequestEnd, IGeexServerConfig } from "../../types";
 import { Inject, Injectable, ProviderScope } from "@graphql-modules/di";
 import { GeexServerConfigToken } from "../tokens";
-import hash from "object-hash";
 import { initTracer, TracingConfig, Reporter } from "jaeger-client";
 import { GeexLogger } from "../utils/logger";
 import { Span } from "opentracing";

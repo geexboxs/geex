@@ -8,13 +8,14 @@ import { environment } from "../environments/environment";
 import { LoggingMiddleware } from "./audit-log/audit-log.middleware";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { AuthModule } from "./auth/auth.module";
-import { GlobalLoggingExtension } from "./extensions/global-logging.gql-extension";
-import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken, TracingConfigToken } from "./tokens";
+import { AuthConfigToken, GeexServerConfigToken, LoggerConfigToken, TracingConfigToken, UserModelToken } from "./tokens";
 import { IGeexContext, IGeexServerConfig } from "../types";
 import { GeexLogger } from "./utils/logger";
 import OpentracingExtension from "apollo-opentracing";
 import { Tracer } from "opentracing";
 import { JaegerTraceExtension } from "./extensions/jaeger-trace.gql-extension";
+import { ComplexityExtension } from "./extensions/complexity.gql-extension";
+import { getModelForClass } from "@typegoose/typegoose";
 
 const result = new GraphQLModule<IGeexServerConfig, ExpressContext, IGeexContext>({
     providers: ({ config }) => [
@@ -33,8 +34,8 @@ const result = new GraphQLModule<IGeexServerConfig, ExpressContext, IGeexContext
         },
         GeexLogger,
         LoggingMiddleware,
-        GlobalLoggingExtension,
         JaegerTraceExtension,
+        ComplexityExtension,
     ],
     imports: [AuditLogModule, AuthModule],
 }, environment);

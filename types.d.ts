@@ -57,7 +57,7 @@ export interface IGeexServerConfig {
     connectionString: string;
     traceConfig: TracingConfig;
     loggerConfig: ILoggerConfig;
-    authConfig?: IAuthConfig;
+    authConfig: IAuthConfig;
 }
 
 export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart {

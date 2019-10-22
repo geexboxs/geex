@@ -3,6 +3,9 @@ import { Authorized, buildSchemaSync, Field, ObjectType, Query, Resolver } from 
 import { GeexRoles } from "../../shared/auth/roles";
 import { IGeexContext } from "../../types";
 import { UserResolver } from "./user.resolver";
+import { getModelForClass } from "@typegoose/typegoose";
+import { User } from "./user.model";
+import { UserModelToken } from "../../shared/tokens";
 const resolvers = [UserResolver];
 export const UserModule: GraphQLModule = new GraphQLModule({
     extraSchemas: [
@@ -18,5 +21,8 @@ export const UserModule: GraphQLModule = new GraphQLModule({
         }),
     ],
     imports: [],
-    providers: [...resolvers],
+    providers: [{
+        provide: UserModelToken,
+        useFactory: (provider) => getModelForClass(User),
+    }, ...resolvers],
 });

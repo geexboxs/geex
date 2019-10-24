@@ -2,10 +2,10 @@ import { Inject, Injectable } from "@graphql-modules/di";
 import stringify = require("json-stringify-safe");
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
 import { IGeexContext } from "../../types";
-import { GeexLogger } from "../utils/logger";
+import { GeexLogger } from "../../shared/utils/logger";
 
 @Injectable()
-export class LoggingMiddleware implements MiddlewareInterface<IGeexContext> {
+export class AuditLogMiddleware implements MiddlewareInterface<IGeexContext> {
     /**
      *
      */

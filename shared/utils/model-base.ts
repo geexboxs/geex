@@ -1,6 +1,6 @@
 import { pre, prop, Typegoose } from "@typegoose/typegoose";
-import { Schema } from "mongoose";
 import { Field } from "type-graphql";
+import { ObjectId } from "mongodb";
 
 @pre<ModelBase>("save", function(next) {
     if (!this) {
@@ -13,8 +13,13 @@ import { Field } from "type-graphql";
     next();
 })
 export abstract class ModelBase {
+    // tslint:disable-next-line: variable-name
+    public _id!: ObjectId;
+
     @Field((returns) => String)
-    public _id!: Schema.Types.ObjectId;
+    public get id() {
+        return this._id.toHexString();
+    }
 
     @prop()
     @Field()

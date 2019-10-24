@@ -1,6 +1,5 @@
 import { Injector } from "@graphql-modules/di";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { User } from "./app/user/user.model";
 import { TracingConfig } from "jaeger-client";
 import { Request } from "apollo-env";
 import { GraphQLRequestContext, GraphQLResponse } from "apollo-server-core";
@@ -8,14 +7,21 @@ import { RequestStart } from "apollo-opentracing";
 
 export interface IGeexContext {
     session: ExpressContext;
-    user?: User;
+    user?: IUserContext;
     injector: Injector;
+}
+
+export interface IUserContext {
+    id: string;
+    username: string;
+    roles: string[];
+    emails: string[];
+    phone: string;
 }
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogTarget = "console" | "file" | "remote";
-
 
 
 export interface IAuthConfig {
@@ -57,7 +63,7 @@ export interface IGeexServerConfig {
     connectionString: string;
     traceConfig: TracingConfig;
     loggerConfig: ILoggerConfig;
-    authConfig: IAuthConfig;
+    userConfig: IAuthConfig;
 }
 
 export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart {
@@ -71,4 +77,16 @@ export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart
 export interface IGeexRequestEnd<TContext = IGeexContext> {
     graphqlResponse: GraphQLResponse;
     context: TContext;
+}
+
+
+
+
+
+
+
+
+
+declare module "type-graphql" {
+    export function Ctx<T>(propertyName?: keyof T): ParameterDecorator;
 }

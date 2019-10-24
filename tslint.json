@@ -16,7 +16,7 @@
         "ordered-imports": false,
         "align": false,
         "member-access": false,
-        "no-unused-expression": false
+        "ban-types":false
     },
     "rulesDirectory": [],
     "linterOptions": {

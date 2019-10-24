@@ -4,7 +4,7 @@ export const environment: IGeexServerConfig = {
     hostname: "127.0.0.1",
     port: 4000,
     connectionString: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
-    authConfig: { tokenSecret: "test" },
+    userConfig: { tokenSecret: "test" },
     loggerConfig: {},
     traceConfig: {
         serviceName: "geex",

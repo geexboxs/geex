@@ -6,10 +6,6 @@ import { AuditLog } from "./audit-log.model";
 @Resolver((of) => AuditLog)
 export class AuditLogResolver {
 
-    constructor(
-
-    ) { }
-
     @Query((returns) => AuditLog)
     public async log() {
         return new AuditLog("testLog");

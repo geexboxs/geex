@@ -36,7 +36,5 @@ export class ComplexityExtension implements GraphQLExtension<IGeexContext> {
                 `Sorry, too complicated query! ${complexity} is over 20 that is the max allowed complexity.`,
             );
         }
-        // And here we can e.g. subtract the complexity point from hourly API calls limit.
-        console.log("Used query complexity points:", complexity);
     }
 }

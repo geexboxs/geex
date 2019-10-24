@@ -1,22 +1,18 @@
 import { GraphQLModule } from "@graphql-modules/core";
-import { Injector } from "@graphql-modules/di";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { printSchema } from "graphql";
-import { buildSchemaSync } from "type-graphql";
-import { inspect } from "util";
+import { buildSchemaSync, ClassType } from "type-graphql";
 import { environment } from "../../environments/environment";
-import { AuthModule } from "../auth/auth.module";
-import { LoggerConfigToken } from "../tokens";
 import { IGeexContext, ILoggerConfig } from "../../types";
-import { GeexLogger } from "../utils/logger";
-import { LoggingMiddleware } from "./audit-log.middleware";
 import { AuditLogResolver } from "./audit-log.resolver";
-const resolvers: any = [AuditLogResolver];
+import { GeexLogger } from "../../shared/utils/logger";
+import { LoggerConfigToken } from "../../shared/tokens";
+
+const resolvers: [ClassType] = [AuditLogResolver];
 export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, IGeexContext>({
-    providers: [{
-        provide: GeexLogger,
-        useFactory: (injector: Injector) => new GeexLogger(injector.get(LoggerConfigToken)),
-    }, LoggingMiddleware, ...resolvers],
+    providers: [GeexLogger, {
+        provide: LoggerConfigToken,
+        useValue: environment.loggerConfig,
+    }, ...resolvers],
     extraSchemas: () => [buildSchemaSync({
         resolvers,
         container: {

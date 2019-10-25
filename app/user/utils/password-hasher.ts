@@ -1,13 +1,16 @@
-import bcrypt from "bcrypt";
 import { Hasher } from "../../../shared/utils/hasher";
+import * as jssha from "jssha";
 export class PasswordHasher extends Hasher {
     /**
      *
      */
-    constructor(private _salt: string) {
+    constructor(private secrect: string) {
         super();
     }
     public hash(str: string): string {
-        return bcrypt.hashSync(str, this._salt);
+        let shaObj = new jssha.default("SHA-512", "TEXT");
+        shaObj.setHMACKey(this.secrect, "TEXT");
+        shaObj.update(str);
+        return shaObj.getHMAC("HEX");
     }
 }

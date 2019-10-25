@@ -70,7 +70,7 @@ declare global {
         // sum(): number;
         // sum(transform: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => number): number;
         // sum(transform?: any);
-        // take(amount: number): List<T>;
+        take(amount: number): T[];
         // takeWhile(predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): List<T>;
         // toArray(): T[];
         // toDictionary<TKey>(key: (key: T) => TKey): List<{ Key: TKey; Value: T; }>;
@@ -225,9 +225,10 @@ Array.prototype.intersect = function intersect<T>(this: T[], source: T[]): T[] {
 // Array.prototype.sum = function sum<T>(this: Array<T>, transform?: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => number): number {
 //     return List.prototype.add.bind(this, element)();
 // }
-// Array.prototype.take = function take<T>(this: Array<T>, amount: number): List<T> {
-//     return List.prototype.add.bind(this, element)();
-// }
+Array.prototype.take = function take<T>(this: T[], amount: number): T[] {
+    this._elements = this;
+    return List.prototype.take.bind(this, amount)().toArray();
+}
 // Array.prototype.takeWhile = function takeWhile<T>(this: Array<T>, predicate: (value?: T | undefined, index?: number | undefined, list?: T[] | undefined) => boolean): List<T> {
 //     return List.prototype.add.bind(this, element)();
 // }

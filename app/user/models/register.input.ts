@@ -6,10 +6,9 @@ import { User } from "./user.model";
 @InputType()
 export class RegisterInput implements Partial<User> {
     @Field()
-    @MaxLength(30)
     username!: string;
 
     @Field()
-    @Length(30, 255)
+    @Length(6, 32)
     password!: string;
 }

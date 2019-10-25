@@ -4,52 +4,56 @@ import { JaegerTraceExtension } from "../shared/extensions/jaeger-trace.gql-exte
 import { ComplexityExtension } from "../shared/extensions/complexity.gql-extension";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { UserModule } from "./user/user.module";
-import express = require("express");
+import * as express from "express";
 import { ApolloServer } from "apollo-server-express";
-import passport = require("passport");
+import * as passport from "passport";
 import { mongoose } from "@typegoose/typegoose";
 import { environment } from "../environments/environment";
-
+import { Passport } from "passport";
+import { buildContext } from "graphql-passport";
+import { GeexServerConfigToken as AppConfigToken } from "../shared/tokens";
+import * as Redis from "ioredis";
+// tslint:disable-next-line: no-var-requires
 async function preInitialize() {
+    return;
 }
-preInitialize();
-export const AppModule: GraphQLModule = new GraphQLModule({
-    providers: [
-        {
-            provide: express,
-            useFactory: (injector) => {
-                const app = express();
-                app.use(express.json());
-                app.use(passport.initialize());
-                injector.get(ApolloServer).applyMiddleware({ app });
-                return app;
-            },
-        },
-        {
-            provide: ApolloServer,
-            useFactory: (injector) => {
-                const apollo = new ApolloServer({
-                    context: async (session) => await AppModule.context(session),
-                    schema: AppModule.schema,
-                    uploads: {
-                        maxFileSize: 100000000,
-                        maxFiles: 10,
-                    },
-                    tracing: true,
-                    extensions: [
-                        () => AppModule.injector.get(JaegerTraceExtension),
-                        () => AppModule.injector.get(ComplexityExtension),
-                    ],
-                });
-                return apollo;
-            },
-        },
-        JaegerTraceExtension,
-        ComplexityExtension,
-    ],
-    imports: [AuditLogModule, UserModule],
-});
-async function postInitialize() {
-    await mongoose.connect(environment.connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
+async function postInitialize(self: GraphQLModule) {
+    await mongoose.connect(environment.connections.mongo, { useNewUrlParser: true, useUnifiedTopology: true });
 }
-postInitialize();
+
+export const AppModule: Promise<GraphQLModule> = (async () => {
+
+    await preInitialize();
+    const self: GraphQLModule = new GraphQLModule({
+        providers: [
+            {
+                provide: ApolloServer,
+                useFactory: (injector) => {
+                    const apollo = new ApolloServer({
+                        context: async (session) => await self.context(buildContext(session)),
+                        schema: self.schema,
+                        uploads: {
+                            maxFileSize: 100000000,
+                            maxFiles: 10,
+                        },
+                        tracing: true,
+                        extensions: [
+                            () => self.injector.get(JaegerTraceExtension),
+                            () => self.injector.get(ComplexityExtension),
+                        ],
+                    });
+                    return apollo;
+                },
+            },
+            {
+                provide: AppConfigToken,
+                useValue: environment,
+            },
+            JaegerTraceExtension,
+            ComplexityExtension,
+        ],
+        imports: [AuditLogModule, await UserModule],
+    });
+    await postInitialize(self);
+    return self;
+})();

@@ -5,6 +5,6 @@ export const permission = (permissionName: string) =>
     rule()(
         async (parent, args, ctx: Required<IGeexContext>, info) => {
             const enforcer = ctx.injector.get(Enforcer);
-            return enforcer.hasPermissionForUser(ctx.user.id, permissionName);
+            return enforcer.hasPermissionForUser(ctx.session.getUser().id, permissionName);
         },
     );

@@ -6,26 +6,31 @@ import { ClientSession, Document } from "mongoose";
 import { Arg, Args, Authorized, FieldResolver, Mutation, Query, Resolver, ResolverInterface, Root, UseMiddleware, ID, Ctx } from "type-graphql";
 import { User } from "./models/user.model";
 import { UserModelToken } from "../../shared/tokens";
-import { Session } from "./models/session.model";
+import { Session, SessionStore } from "./models/session.model";
 import { VerifyType } from "./models/verify-type";
 import { RegisterInput } from "./models/register.input";
-import passport = require("passport");
+import * as passport from "passport";
 import { IGeexContext } from "../../types";
 import { PasswordHasher } from "./utils/password-hasher";
-import { i18n } from "../../shared/utils/i18n";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+import { I18N } from "../../shared/utils/i18n";
+import * as ioredis from "ioredis";
+import { role } from "./rules/role.rule";
 
 @Resolver((of) => User)
 export class UserResolver {
-
     constructor(
         @Inject(UserModelToken)
         private userModel: ModelType<User>,
-
+        @Inject(ioredis.default)
+        private redis: ioredis.Redis,
+        @Inject(SessionStore)
+        private sessionStore: SessionStore,
     ) { }
 
     @Mutation(() => ID)
     public async register(@Arg("registerInput") { username, password }: RegisterInput, @Ctx<IGeexContext>("injector") injector: Injector) {
-        const newUser = User.create(username, password, injector.get(PasswordHasher));
+        const newUser = new User(username, injector.get(PasswordHasher).hash(password));
         const result = await this.userModel.create(newUser);
         return result.id;
     }
@@ -52,13 +57,13 @@ export class UserResolver {
     public async sendVerifyCode(@Arg("type", () => VerifyType) type: VerifyType, @Arg("target") target: string) {
         switch (type) {
             case VerifyType.Email:
-                
+
                 break;
             case VerifyType.Sms:
 
                 break;
             default:
-                throw Error(i18n("InvalidInput"));
+                throw Error(I18N.message.InvalidParams);
         }
     }
 
@@ -106,10 +111,28 @@ export class UserResolver {
         throw Error("todo");
     }
 
+    @Mutation(() => Boolean)
+    @Authorized<any>(role(["admin"]))
+    public async signOut(@Ctx() context: IGeexContext) {
+        // await this.redis.del(`session:${context.session.getUser().id}`);
+        // context.session.logout();
+        return true;
+    }
+
     @Mutation(() => Session)
-    public async authenticate(@Arg("userIdentifier") userIdentifier: string, @Arg("password") password: string) {
-        // todo:
-        throw Error("todo");
+    public async authenticate(@Arg("userIdentifier") userIdentifier: string, @Arg("password") password: string, @Ctx() context: IGeexContext) {
+        if (context.session.isAuthenticated()) {
+            const user = context.session.getUser();
+            const sessionCache = await this.sessionStore.createOrRefresh(user);
+            return sessionCache;
+        } else {
+            const { user } = await context.session.authenticate("local", { username: userIdentifier, password });
+            if (user) {
+                const sessionCache = await this.sessionStore.createOrRefresh(user);
+                return sessionCache;
+            }
+            throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
+        }
     }
     @Query(() => String)
     public async twoFactorKey() {

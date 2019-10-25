@@ -1,6 +1,6 @@
 import { GraphQLExtension } from "graphql-extensions";
 import { IGeexRequestStart, IGeexContext } from "../../types";
-import { getComplexity, simpleEstimator, fieldExtensionsEstimator } from "graphql-query-complexity";
+import { getComplexity, simpleEstimator, fieldConfigEstimator } from "graphql-query-complexity";
 import { request } from "http";
 import { separateOperations, ExecutionArgs } from "graphql";
 
@@ -22,7 +22,7 @@ export class ComplexityExtension implements GraphQLExtension<IGeexContext> {
             // If no estimator returns a value, an exception is raised.
             estimators: [
                 // Using fieldExtensionsEstimator is mandatory to make it work with type-graphql.
-                fieldExtensionsEstimator(),
+                fieldConfigEstimator(),
                 // Add more estimators here...
                 // This will assign each field a complexity of 1
                 // if no other estimator returned a value.

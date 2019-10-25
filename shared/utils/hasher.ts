@@ -1,7 +1,10 @@
-import bcrypt from "bcrypt";
+import * as jssha from "jssha";
+
 export class Hasher {
 
     public hash(str: string): string {
-        return bcrypt.hashSync(str, "");
+        let shaObj = new jssha.default("SHA-512", "TEXT");
+        shaObj.update(str);
+        return shaObj.getHash("HEX");
     }
 }

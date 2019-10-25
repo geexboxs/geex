@@ -6,6 +6,7 @@ import { IGeexContext, ILoggerConfig } from "../../types";
 import { AuditLogResolver } from "./audit-log.resolver";
 import { GeexLogger } from "../../shared/utils/logger";
 import { LoggerConfigToken } from "../../shared/tokens";
+import { RbacAuthChecker } from "../../shared/utils/rbac-auth-checker";
 
 const resolvers: [ClassType] = [AuditLogResolver];
 export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, IGeexContext>({
@@ -20,6 +21,7 @@ export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, Expre
                 return (resolverData.context as IGeexContext).injector.get(someClass);
             },
         },
+        authChecker: RbacAuthChecker,
     })],
     imports: [],
 }, environment.loggerConfig);

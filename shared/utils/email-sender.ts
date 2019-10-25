@@ -1,4 +1,4 @@
-import SmtpClient from "emailjs-smtp-client";
+import * as SmtpClient from "emailjs-smtp-client";
 export class EmailSender extends SmtpClient {
 
     /**

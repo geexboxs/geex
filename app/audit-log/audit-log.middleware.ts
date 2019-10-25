@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@graphql-modules/di";
-import stringify = require("json-stringify-safe");
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
 import { IGeexContext } from "../../types";
 import { GeexLogger } from "../../shared/utils/logger";
+import * as json5 from "json5";
 
 @Injectable()
 export class AuditLogMiddleware implements MiddlewareInterface<IGeexContext> {
@@ -16,7 +16,7 @@ export class AuditLogMiddleware implements MiddlewareInterface<IGeexContext> {
         try {
             if (info.parentType.isTypeOf === undefined && (info.parentType.name === "Query" || info.parentType.name === "Mutation" || info.parentType.name === "Subscription")) {
                 const logContent = { headers: context.session.req.headers, query: context.session.req.body };
-                this.logger.debug(stringify(logContent));
+                this.logger.debug(json5.stringify(logContent));
             }
         } catch (error) {
             console.error(error);

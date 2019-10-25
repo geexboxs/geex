@@ -1,10 +1,13 @@
-import { IGeexServerConfig } from "../types";
+import { IGeexServerConfig as IServerConfig, ILoggerConfig, IAuthConfig } from "../types";
 
-export const environment: IGeexServerConfig = {
+export const environment: IServerConfig = {
     hostname: "127.0.0.1",
     port: 4000,
-    connectionString: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
-    userConfig: { tokenSecret: "test" },
+    connections: {
+        mongo: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
+        redis: "redis://localhost:6379/0?password=P@ssw0rd"
+    },
+    authConfig: { tokenSecret: "test" },
     loggerConfig: {},
     traceConfig: {
         serviceName: "geex",

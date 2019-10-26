@@ -5,7 +5,18 @@ export const environment: IServerConfig = {
     port: 4000,
     connections: {
         mongo: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
-        redis: "redis://localhost:6379/0?password=P@ssw0rd"
+        redis: "redis://localhost:6379/0?password=P@ssw0rd",
+        smtp: {
+            host: "smtp-mail.outlook.com",
+            port: 587,
+            username: "",
+            password: "",
+            secure: true,
+            sendAs: {
+                name: "",
+                address: "",
+            },
+        },
     },
     authConfig: { tokenSecret: "test" },
     loggerConfig: {},

@@ -1,7 +1,7 @@
-import * as common from "./common";
-import * as message from "./message";
+import common from "./common";
+import message from "./message";
 
-export default Object.assign({}, {
-  common:common.default,
-  message:message.default,
-});
+export const langs = {
+    common,
+    message
+}

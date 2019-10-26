@@ -2,10 +2,10 @@ import { ObjectType, Field, ID } from "type-graphql";
 import { prop } from "@typegoose/typegoose";
 import { DateTimeResolver, IPv4Resolver } from "graphql-scalars";
 import { IUserContext } from "../../../types";
-import * as ioredis from "ioredis";
+import ioredis = require("ioredis");
 import { Jwt, JwtPayload } from "../../../shared/utils/jwt";
 import { Inject } from "@graphql-modules/di";
-import * as json5 from "json5";
+import json5 = require("json5");
 
 @ObjectType()
 export class Session {
@@ -14,8 +14,6 @@ export class Session {
     public get userId() {
         return this.user.id;
     }
-    @Field(() => String)
-    public refreshToken!: string;
     @Field(() => String)
     public accessToken!: string;
     @Field(() => DateTimeResolver)
@@ -38,13 +36,15 @@ export class SessionStore {
      *
      */
 
-    constructor(@Inject(ioredis.default) private redis: ioredis.Redis, @Inject(Jwt) private jwt: Jwt) {
+    constructor(@Inject(ioredis) private redis: ioredis.Redis, @Inject(Jwt) private jwt: Jwt) {
         this.ttl = 3600 * 24 * 10;
+    }
+    async del(userId: any) {
+        await this.redis.del(`session:${userId}`);
     }
     async createOrRefresh(user: IUserContext) {
         const session = new Session({
-            accessToken: this.jwt.sign(new JwtPayload(user, "accessToken")),
-            refreshToken: this.jwt.sign(new JwtPayload(user, "refreshToken")),
+            accessToken: this.jwt.sign(new JwtPayload(user)),
             user,
             expireAt: new Date().add({ seconds: this.ttl }),
         });

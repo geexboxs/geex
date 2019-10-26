@@ -20,7 +20,8 @@
         "ordered-imports": false,
         "align": false,
         "member-access": false,
-        "ban-types": false
+        "ban-types": false,
+        "prefer-const": false
     },
     "rulesDirectory": [],
     "linterOptions": {

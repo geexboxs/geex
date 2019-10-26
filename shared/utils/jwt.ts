@@ -1,8 +1,8 @@
-import * as _ from "lodash";
+import _ = require("lodash");
 import { Netmask } from "netmask";
 import { IGeexContext, IUserContext } from "../../types";
 import { Request } from "express";
-import * as jwt from "jsonwebtoken";
+import jwt = require("jsonwebtoken");
 
 export class Jwt {
 
@@ -21,14 +21,14 @@ export class Jwt {
      *
      * @param {string} payload
      * @param {string} userId
-     * @param {("accessToken" | "refreshToken")} tokenType
+     * @param {("accessToken" | "refreshToken")} audience
      * @returns 
      * @memberof Jwt
      */
-    verify(payload: string, userId: string, tokenType: "accessToken" | "refreshToken", userIp: string) {
+    verify(payload: string, userId: string, userIp: string, audience: string = "*") {
         const preCondition = jwt.verify(payload, this.secret, {
             issuer: this.iss,
-            audience: tokenType,
+            audience,
             subject: userId,
         });
         if (preCondition) {
@@ -61,7 +61,7 @@ export class JwtPayload {
      */
     constructor(
         user: IUserContext,
-        public aud: "accessToken" | "refreshToken",
+        public aud: string = "*",
         public iss?: string,
         public alg?: string) {
         this.name = user.username;

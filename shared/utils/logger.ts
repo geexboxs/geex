@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@graphql-modules/di";
-import * as winston from "winston";
+import winston = require("winston");
 import { LoggerConfigToken } from "../tokens";
 import { LogTarget, LogLevel, ILoggerConfig } from "../../types";
 

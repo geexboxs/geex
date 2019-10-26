@@ -4,15 +4,15 @@ import { JaegerTraceExtension } from "../shared/extensions/jaeger-trace.gql-exte
 import { ComplexityExtension } from "../shared/extensions/complexity.gql-extension";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { UserModule } from "./user/user.module";
-import * as express from "express";
+import express = require("express");
 import { ApolloServer } from "apollo-server-express";
-import * as passport from "passport";
+import passport = require("passport");
 import { mongoose } from "@typegoose/typegoose";
 import { environment } from "../environments/environment";
 import { Passport } from "passport";
 import { buildContext } from "graphql-passport";
 import { GeexServerConfigToken as AppConfigToken } from "../shared/tokens";
-import * as Redis from "ioredis";
+import Redis = require("ioredis");
 // tslint:disable-next-line: no-var-requires
 async function preInitialize() {
     return;

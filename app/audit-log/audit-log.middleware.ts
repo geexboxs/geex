@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@graphql-modules/di";
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
 import { IGeexContext } from "../../types";
 import { GeexLogger } from "../../shared/utils/logger";
-import * as json5 from "json5";
+import json5 = require("json5");
 
 @Injectable()
 export class AuditLogMiddleware implements MiddlewareInterface<IGeexContext> {

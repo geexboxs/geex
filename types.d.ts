@@ -73,12 +73,25 @@ export interface ILoggerConfig {
     metadata?: {};
 }
 
+type ISmtpConfig = {
+    secure: boolean;
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    sendAs: {
+        name: string;
+        address: string;
+    };
+};
+
 export interface IGeexServerConfig {
     hostname: string;
     port: number;
     connections: {
         mongo: string;
         redis: string;
+        smtp: ISmtpConfig
     }
     traceConfig: TracingConfig;
     loggerConfig: ILoggerConfig;
@@ -135,6 +148,9 @@ declare global {
         }
     }
 }
+
+type ModelFieldResolver<T, TKey extends keyof T> = (this: T) => T[TKey] | PromiseLike<T[TKey]>;
+
 
 
 /** fields not in base class of mongoose Document. */

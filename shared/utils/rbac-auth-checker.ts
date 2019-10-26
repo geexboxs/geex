@@ -2,7 +2,7 @@ import { AuthChecker, UnauthorizedError } from "type-graphql";
 import { IGeexContext } from "../../types";
 import { IRule, allow } from "graphql-shield";
 import { IShieldContext } from "graphql-shield/dist/types";
-import * as objHash from "object-hash";
+import objHash = require("object-hash");
 export const RbacAuthChecker: AuthChecker<IGeexContext & IShieldContext, IRule> = (
     { root, args, context, info },
     funcs: IRule[],

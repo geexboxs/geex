@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import _ = require("lodash");
 import { addDays, addHours, addMinutes, addSeconds, addMilliseconds, addWeeks, addMonths, addYears } from "date-fns";
 
 declare global {

@@ -9,23 +9,26 @@ import { UserModelToken } from "../../shared/tokens";
 import { Session, SessionStore } from "./models/session.model";
 import { VerifyType } from "./models/verify-type";
 import { RegisterInput } from "./models/register.input";
-import * as passport from "passport";
+import passport = require("passport");
 import { IGeexContext } from "../../types";
 import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
-import * as ioredis from "ioredis";
+import ioredis = require("ioredis");
 import { role } from "./rules/role.rule";
+import { Enforcer } from "casbin";
 
 @Resolver((of) => User)
 export class UserResolver {
     constructor(
         @Inject(UserModelToken)
         private userModel: ModelType<User>,
-        @Inject(ioredis.default)
+        @Inject(ioredis)
         private redis: ioredis.Redis,
         @Inject(SessionStore)
         private sessionStore: SessionStore,
+        @Inject(PasswordHasher)
+        private passwordHasher: PasswordHasher,
     ) { }
 
     @Mutation(() => ID)
@@ -81,9 +84,19 @@ export class UserResolver {
     }
 
     @Mutation(() => Boolean)
-    public async changePassword(@Arg("oldPassword") oldPassword: string, @Arg("newPassword") newPassword: string) {
-        // todo:
-        throw Error("todo");
+    @Authorized()
+    public async changePassword(@Arg("oldPassword") oldPassword: string, @Arg("newPassword") newPassword: string, @Ctx() context: IGeexContext) {
+        let userDoc = await this.userModel.findById(context.session.getUser().id).exec();
+        if (userDoc === null) {
+            throw new Error(I18N.message.userNotFound);
+        }
+        if (userDoc.passwordHash === this.passwordHasher.hash(oldPassword)) {
+            userDoc.passwordHash = this.passwordHasher.hash(newPassword);
+            userDoc = await userDoc.save();
+            return Boolean(userDoc && userDoc.passwordHash === this.passwordHasher.hash(newPassword));
+        } else {
+            throw new Error(I18N.message.passwordIncorrect);
+        }
     }
     @Mutation(() => Boolean)
     public async setTwoFactor(@Arg("key") key: string, @Arg("code") code: string) {
@@ -100,11 +113,7 @@ export class UserResolver {
         // todo:
         throw Error("todo");
     }
-    @Mutation(() => Session)
-    public async refreshToken(@Arg("refreshToken") refreshToken: string) {
-        // todo: refreshToken need to check ip change
-        throw Error("todo");
-    }
+
     @Mutation(() => Session)
     public async externalAuthenticate(@Arg("provider") provider: string, @Arg("userIdentifier") userIdentifier: string) {
         // todo:
@@ -114,25 +123,19 @@ export class UserResolver {
     @Mutation(() => Boolean)
     @Authorized<any>(role(["admin"]))
     public async signOut(@Ctx() context: IGeexContext) {
-        // await this.redis.del(`session:${context.session.getUser().id}`);
+        await this.sessionStore.del(context.session.getUser().id);
         // context.session.logout();
         return true;
     }
 
     @Mutation(() => Session)
     public async authenticate(@Arg("userIdentifier") userIdentifier: string, @Arg("password") password: string, @Ctx() context: IGeexContext) {
-        if (context.session.isAuthenticated()) {
-            const user = context.session.getUser();
+        const { user } = await context.session.authenticate("local", { username: userIdentifier, password });
+        if (user) {
             const sessionCache = await this.sessionStore.createOrRefresh(user);
             return sessionCache;
-        } else {
-            const { user } = await context.session.authenticate("local", { username: userIdentifier, password });
-            if (user) {
-                const sessionCache = await this.sessionStore.createOrRefresh(user);
-                return sessionCache;
-            }
-            throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
+        throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
     }
     @Query(() => String)
     public async twoFactorKey() {

@@ -4,9 +4,9 @@
  */
 
 import { IntlFormat } from "kiwi-intl";
-import * as enUsLangs from "../../.kiwi/en-US";
-import * as zhCNLangs from "../../.kiwi/zh-CN";
-import * as zhTWLangs from "../../.kiwi/zh-TW";
+import { langs as enUsLangs } from "../../.kiwi/en-US";
+import { langs as zhCNLangs } from "../../.kiwi/zh-CN";
+import { langs as zhTWLangs } from "../../.kiwi/zh-TW";
 
 export enum LangEnum {
     "zh-CN" = "zh-CN",
@@ -16,9 +16,9 @@ export enum LangEnum {
 
 
 const langs = {
-    "en-US": enUsLangs.default,
-    "zh-CN": zhCNLangs.default,
-    "zh-TW": zhTWLangs.default
+    "en-US": enUsLangs,
+    "zh-CN": zhCNLangs,
+    "zh-TW": zhTWLangs
 };
 // 从 Cookie 中取语言值, 默认为 zh-CN
 

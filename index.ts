@@ -1,7 +1,7 @@
 import "./utils/array.extension";
 import "./utils/date.extension";
 import "reflect-metadata";
-import * as express from "express";
+import express = require("express");
 import { environment } from "./environments/environment";
 import { AppModule } from "./app/app.module";
 import { Passport } from "passport";
@@ -9,7 +9,7 @@ import { ApolloServer } from "apollo-server-express";
 import passport = require("passport");
 async function main() {
     const entryModule = await AppModule;
-    const app = express.default();
+    const app = express();
     app.use(express.json());
     app.use(entryModule.injector.get(Passport));
     app.all("/*", (req, res, next) => {

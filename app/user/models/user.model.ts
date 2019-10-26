@@ -1,10 +1,12 @@
 // import { Address } from './address.model';
-import { prop } from "@typegoose/typegoose";
+import { prop, instanceMethod, DocumentType } from "@typegoose/typegoose";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
 import { Authorized, Field, ObjectType, UseMiddleware } from "type-graphql";
 import { ModelBase } from "../../../shared/utils/model-base";
+import { Injector } from "@graphql-modules/di";
+import { ModelFieldResolver } from "../../../types";
 
 @ObjectType()
 export class User extends ModelBase {
@@ -13,9 +15,7 @@ export class User extends ModelBase {
     public username!: string;
     @prop()
     public passwordHash!: string;
-    // @prop()
-    @Field((type) => [String])
-    public roles: string[] = [];
+
     @prop()
     @Field()
     public avatarUrl: string = "";

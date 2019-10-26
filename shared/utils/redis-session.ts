@@ -3,9 +3,9 @@
 //  * Copyright(c) 2012 TJ Holowaychuk <tj@vision-media.ca>
 //  * MIT Licensed
 //  */
-// import * as expressSession from "express-session";
+// import expressSession = require("express-session");
 // import { Request } from "express";
-// import * as json5 from "json5";
+// import json5 = require("json5");
 
 // // All callbacks should have a noop if none provided for compatibility
 // // with the most Redis clients.

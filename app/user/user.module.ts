@@ -53,11 +53,9 @@ async function postInitialize(self: GraphQLModule) {
             passwordHash: passwordHasher.hash(password),
         }).exec();
         if (userDoc === null) {
-            throw new Error(I18N.message.userNotFound)
+            throw new Error(I18N.message.userNotFound);
         } else {
             const user = userDoc.toObject({ getters: true }) as IUserContext;
-            const enforcer = self.injector.get(Enforcer);
-            user.roles = await enforcer.getRolesForUser(user!.id);
             done(undefined, user);
         }
     }));
@@ -80,7 +78,6 @@ async function postInitialize(self: GraphQLModule) {
             done(undefined, session && session.user);
         }
     }));
-    await self.injector.get(EmailSender).send([{ name: "lulus", address: "snys98@outlook.com" }], "test", "text");
     return;
 }
 export const UserModule = (async () => {
@@ -102,7 +99,16 @@ export const UserModule = (async () => {
             },
             {
                 provide: UserModelToken,
-                useFactory: (provider) => getModelForClass(User),
+                useFactory: (injector) => {
+                    const userModel = getModelForClass(User);
+                    userModel.setDependentImplementionForModel("roles", function (this: User) {
+                        return injector.get(Enforcer).getRolesForUser(this.id)
+                    });
+                    userModel.setDependentImplementionForModel<"permissions">("permissions", function (this: User) {
+                        return injector.get(Enforcer).getPermissionsForUser(this.id);
+                    });
+                    return userModel;
+                },
             },
             {
                 provide: UserModuleConfigToken,
@@ -110,7 +116,7 @@ export const UserModule = (async () => {
             },
             {
                 provide: PasswordHasher,
-                useFactory: (provider) => new PasswordHasher(environment.authConfig.tokenSecret),
+                useFactory: (injector) => new PasswordHasher(environment.authConfig.tokenSecret),
             },
             {
                 provide: EmailSender,

@@ -17,6 +17,7 @@ import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
 import { role } from "./rules/role.rule";
 import { Enforcer } from "casbin";
+import { EmailSender } from "../../shared/utils/email-sender";
 
 @Resolver((of) => User)
 export class UserResolver {
@@ -29,6 +30,9 @@ export class UserResolver {
         private sessionStore: SessionStore,
         @Inject(PasswordHasher)
         private passwordHasher: PasswordHasher,
+        @Inject(EmailSender)
+        private emailSender: EmailSender,
+
     ) { }
 
     @Mutation(() => ID)
@@ -60,7 +64,7 @@ export class UserResolver {
     public async sendVerifyCode(@Arg("type", () => VerifyType) type: VerifyType, @Arg("target") target: string) {
         switch (type) {
             case VerifyType.Email:
-
+                this.emailSender.send([{ name: target, address: target }], content, "text")
                 break;
             case VerifyType.Sms:
 

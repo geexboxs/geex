@@ -1,8 +1,9 @@
 import { pre, prop, Typegoose } from "@typegoose/typegoose";
 import { Field } from "type-graphql";
 import { ObjectId } from "mongodb";
+import { ModelFieldResolver } from "../../types";
 
-@pre<ModelBase>("save", function(next) {
+@pre<ModelBase>("save", function (next) {
     if (!this) {
         next();
     }

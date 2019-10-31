@@ -149,7 +149,7 @@ declare global {
     }
 }
 
-type ModelFieldResolver<T, TKey extends keyof T> = (this: T) => T[TKey] | PromiseLike<T[TKey]>;
+type ModelFieldResolver<T, TKey extends keyof T = any> = (this: T, ...params: T[TKey] extends (...args: any) => any ? Parameters<T[TKey]> : never) => T[TKey];
 
 
 

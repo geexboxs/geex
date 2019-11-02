@@ -5,10 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.1.1" />
-    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.1.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="10.2.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.2.0" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.2.0" />
     <PackageReference Include="HotChocolate.Stitching" Version="10.2.0" />
+    <PackageReference Include="HotChocolate.Types.Filters" Version="10.2.0" />
+    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
   </ItemGroup>

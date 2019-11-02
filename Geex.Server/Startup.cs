@@ -1,15 +1,18 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Geex.Server.Types;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Geex.Core;
+using Geex.Core.User;
+using Geex.Shared;
+using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
-using HotChocolate.Language;
+using HotChocolate.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -17,29 +20,40 @@ namespace Geex.Server
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public Startup(IHostEnvironment env)
+        {
+            // In ASP.NET Core 3.0 `env` will be an IWebHostingEnvironment, not IHostingEnvironment.
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
+
+        public ILifetimeScope AutofacContainer { get; set; }
+        public IConfigurationRoot Configuration { get; set; }
+
+
+        // This is the default if you don't have an environment specific method.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication();
-            services.AddGraphQL(provider =>
-                SchemaBuilder.New()
-                    .AddServices(provider)
-                    .AddAuthorizeDirectiveType()
-                    .AddQueryType<QueryType>()
-                    .AddMutationType<MutationType>()
-                    .AddSubscriptionType<SubscriptionType>()
-                    .AddTypes(typeof(Startup).Assembly.DefinedTypes.Where(x => x.Namespace == $"{typeof(Startup).Namespace}.Types").ToArray())
-                    .Create());
+            
+            services.AddGraphQLEntryModule<AppModule>();
+        }
+        // This is the default if you don't have an environment specific method.
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // Add things to the Autofac ContainerBuilder.
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        // This is the default if you don't have an environment specific method.
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseAuthentication();
 
             app.UseGraphQL();
@@ -50,10 +64,7 @@ namespace Geex.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
             });
         }
     }

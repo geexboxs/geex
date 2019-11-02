@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Geex.Server.Types
+namespace Geex.Shared.Roots
 {
-    public class MutationType
+    public class Subscription
     {
-        public bool HeathCheck => true;
+        
     }
 }

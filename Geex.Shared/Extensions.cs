@@ -15,7 +15,7 @@ namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static void AddGraphQLEntryModule<T>(this IServiceCollection containerBuilder, Action<IQueryExecutionBuilder> build = null) where T : GraphQLEntryModule<T>
+        public static void AddGeexGraphQL<T>(this IServiceCollection containerBuilder, Action<IQueryExecutionBuilder> build = null) where T : GraphQLEntryModule<T>
         {
             var schemaBuilder = SchemaBuilder.New();
             var schemaFactory = new Func<IServiceProvider, ISchema>(provider =>

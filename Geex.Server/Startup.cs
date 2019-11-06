@@ -12,6 +12,7 @@ using HotChocolate.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,8 +40,12 @@ namespace Geex.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication();
+            services.AddDbContext<DbContext>(options=>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("Default"));
+            });
             
-            services.AddGraphQLEntryModule<AppModule>();
+            services.AddGeexGraphQL<AppModule>();
         }
         // This is the default if you don't have an environment specific method.
         public void ConfigureContainer(ContainerBuilder builder)
@@ -56,7 +61,11 @@ namespace Geex.Server
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             app.UseAuthentication();
 
-            app.UseGraphQL();
+            app.UseGraphQL(new QueryMiddlewareOptions()
+            {
+                EnableSubscriptions = true,
+                Path = ""
+            });
             app.UseVoyager();
             app.UsePlayground();
 
@@ -64,7 +73,7 @@ namespace Geex.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapGet("/check-health", async context => { await context.Response.WriteAsync("ok"); });
             });
         }
     }

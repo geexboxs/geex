@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
+    <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

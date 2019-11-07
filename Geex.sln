@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Shared", "Geex.Shared\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Core", "Geex.Core\Geex.Core.csproj", "{2DF5580F-2D52-4DB0-9087-15D003177303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geex.Data", "Geex.Data\Geex.Data.csproj", "{549E161B-CC68-4DA9-8136-998765E94B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Data", "Geex.Data\Geex.Data.csproj", "{549E161B-CC68-4DA9-8136-998765E94B82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microex.All", ".submodules\Microex.All\Microex.All\Microex.All.csproj", "{B38ACB9B-1BE2-45C5-A9C6-49A43696AC17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{549E161B-CC68-4DA9-8136-998765E94B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{549E161B-CC68-4DA9-8136-998765E94B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{549E161B-CC68-4DA9-8136-998765E94B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B38ACB9B-1BE2-45C5-A9C6-49A43696AC17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B38ACB9B-1BE2-45C5-A9C6-49A43696AC17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B38ACB9B-1BE2-45C5-A9C6-49A43696AC17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B38ACB9B-1BE2-45C5-A9C6-49A43696AC17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

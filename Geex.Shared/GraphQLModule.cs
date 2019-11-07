@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac;
 using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +18,12 @@ namespace Geex.Shared
     public interface IGraphQLModule
     {
         void PreInitialize(IServiceCollection containerBuilder, SchemaBuilder schemaBuilder);
-        void PostInitialize();
+        void PostInitialize(IServiceProvider serviceProvider);
     }
     public abstract class GraphQLModule<T> : IGraphQLModule<T> where T : IGraphQLModule
     {
 
-        public abstract void PostInitialize();
+        public abstract void PostInitialize(IServiceProvider serviceProvider);
 
         /// <summary>
         /// This is the first event called on application startup.

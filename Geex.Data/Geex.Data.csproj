@@ -1,10 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20191107095204_Init.cs" />
+    <Compile Remove="Migrations\20191107095204_Init.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\.submodules\Microex.All\Microex.All\Microex.All.csproj" />
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
     <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
   </ItemGroup>

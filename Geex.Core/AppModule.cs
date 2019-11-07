@@ -1,10 +1,7 @@
 ﻿using System;
-using Autofac;
 using Geex.Core.User;
-using UserEntity = Geex.Core.User.User;
 using Geex.Shared;
-using HotChocolate;
-using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Geex.Core
 {
@@ -12,7 +9,7 @@ namespace Geex.Core
     public class AppModule : GraphQLEntryModule<AppModule>
     {
 
-        public override void PostInitialize()
+        public override void PostInitialize(IServiceProvider serviceProvider)
         {
         }
     }

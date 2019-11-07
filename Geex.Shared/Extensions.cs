@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 using Autofac;
 using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
+using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using BindingFlags = System.Reflection.BindingFlags;
 
@@ -46,6 +49,12 @@ namespace Geex.Shared
             RegisterModule(typeof(T), containerBuilder, schemaBuilder);
 
         }
+        public static void UseGeexGraphQL(this IApplicationBuilder app)
+        {
+            app.UseGraphQL();
+            app.UseVoyager();
+            app.UsePlayground();
+        }
 
         private static void RegisterModule(Type module, IServiceCollection containerBuilder,
             SchemaBuilder schemaBuilder)
@@ -69,7 +78,7 @@ namespace Geex.Shared
             moduleInstance.PreInitialize(containerBuilder, schemaBuilder);
             containerBuilder.AddSingleton(provider =>
                 {
-                    moduleInstance.PostInitialize();
+                    moduleInstance.PostInitialize(provider);
                     return moduleInstance;
                 });
         }

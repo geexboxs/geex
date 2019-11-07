@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac;
 using Geex.Core.User.Types;
 using Geex.Core.User.Types.RootExtensions;
 using Geex.Shared;
@@ -15,7 +16,7 @@ namespace Geex.Core.User
     public class UserModule : GraphQLModule<UserModule>
     {
 
-        public override void PostInitialize()
+        public override void PostInitialize(IServiceProvider serviceProvider)
         {
         }
 

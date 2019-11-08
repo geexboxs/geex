@@ -6,6 +6,10 @@ namespace Geex.Data
 {
     public class GeexDbContext : IdentityServerDbContext<Core.User.User>
     {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -13,7 +17,7 @@ namespace Geex.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(GeexDbContext).Assembly);
         }
 
-        public GeexDbContext(DbContextOptions options, ConfigurationStoreOptions configurationStoreOptions, OperationalStoreOptions operationalStoreOptions) : base(options, configurationStoreOptions, operationalStoreOptions)
+        public GeexDbContext(DbContextOptions options) : base(options)
         {
         }
     }

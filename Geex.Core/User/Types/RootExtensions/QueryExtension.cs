@@ -14,7 +14,7 @@ namespace Geex.Core.User.Types.RootExtensions
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
             descriptor.Name(nameof(Query));
-            descriptor.Field<UserResolver>(x => x.QueryUsers(default))// return
+            descriptor.Field<UserResolver>(x => x.QueryUsers(default, default))// return
                 .UsePaging<UserType>()// paging
                 .UseSorting<User>(x =>
                 {

@@ -9,7 +9,7 @@ namespace Geex.Core.User.Types.RootExtensions
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
             descriptor.Name(nameof(Mutation));
-            descriptor.Field<UserResolver>(x => x.Register(default, default)).Argument("input", x => x.Type<RegisterUserInputType>());
+            descriptor.Field<UserResolver>(x => x.Register(default, default, default)).Argument("input", x => x.Type<RegisterUserInputType>());
             base.Configure(descriptor);
         }
     }

@@ -47,6 +47,10 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<GeexDbContext>(options =>
+             {
+                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
+             });
             services.AddAuthentication();
             services.AddHealthChecks();
             services.AddIdentity<User, Role>(
@@ -91,10 +95,7 @@ namespace Geex.Server
             //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
 
 
-            services.AddDbContext<IdentityServerDbContext<User>>(options =>
-             {
-                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
-             });
+
 
             services.AddGeexGraphQL<AppModule>();
         }
@@ -102,13 +103,14 @@ namespace Geex.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // Add things to the Autofac ContainerBuilder.
+            builder.RegisterSource<DbSetRegistrationSource<GeexDbContext>>();
         }
 
         // This is the default if you don't have an environment specific method.
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-            app.EnsurePredefinedIdentityServerConfigs<IdentityServerDbContext<User>, User>();
+            app.EnsurePredefinedIdentityServerConfigs<GeexDbContext, User>();
 
             if (env.IsDevelopment())
             {

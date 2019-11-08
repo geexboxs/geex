@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Geex.Core.User.Inputs;
 using Geex.Core.User.Types.Inputs;
 using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Resolvers;
+using Microex.All.IdentityServer;
+using Microsoft.EntityFrameworkCore;
 
 namespace Geex.Core.User
 {
@@ -12,35 +16,16 @@ namespace Geex.Core.User
     public class UserResolver
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<User> QueryUsers([Parent] Query query)
+        public IQueryable<User> QueryUsers([Parent] Query query, [Service]MicroexUserManager<User> userManager)
         {
-            return new EnumerableQuery<User>(Users);
+            return userManager.Users;
         }
 
-        public static List<User> Users { get; set; } = new List<User>
-            {
-                new User
-                {
-                    Id = "1"
-                },
-                new User
-                {
-                    Id = "2"
-                },
-                new User
-                {
-                    Id = "3"
-                },
-                new User
-                {
-                    Id = "4"
-                }
-            };
 
-        public bool Register([Parent] Mutation mutation, IResolverContext context)
+
+        public async Task<bool> Register([Parent] Mutation mutation, [Service]MicroexUserManager<User> userManager, RegisterUserInput input)
         {
-            var input = context.Argument<RegisterUserInputType.RegisterUserInput>("input");
-            Users.Add(new User() { UserName = input.UserName });
+            await userManager.CreateAsync(new User(input.PhoneOrEmail, input.UserName), input.Password);
             return true;
         }
     }

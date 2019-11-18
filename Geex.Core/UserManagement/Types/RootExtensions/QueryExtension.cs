@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Geex.Shared.Roots;
+﻿using Geex.Shared.Roots;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace Geex.Core.User.Types.RootExtensions
+namespace Geex.Core.UserManagement.Types.RootExtensions
 {
     public class QueryExtension : ObjectTypeExtension
     {

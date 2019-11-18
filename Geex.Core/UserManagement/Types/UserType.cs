@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HotChocolate.Types;
+﻿using HotChocolate.Types;
 
-namespace Geex.Core.User.Types
+namespace Geex.Core.UserManagement.Types
 {
     public class UserType : ObjectType<User>
     {

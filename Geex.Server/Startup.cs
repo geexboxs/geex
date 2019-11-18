@@ -3,23 +3,19 @@ using System.Linq;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core;
-using Geex.Core.User;
+using Geex.Core.UserManagement;
 using Geex.Data;
 using Geex.Shared;
+using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Types;
-using IdentityServer4.AspNetIdentity;
-using IdentityServer4.Services;
-using Microex.All.EntityFramework;
-using Microex.All.IdentityServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -47,70 +43,24 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<GeexDbContext>(options =>
-             {
-                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
-             });
             services.AddAuthentication();
             services.AddHealthChecks();
-            services.AddIdentity<User, Role>(
-                    options =>
-                    {
-                        // Password settings
-                        options.Password.RequireDigit = true;
-                        options.Password.RequiredLength = 6;
-                        options.Password.RequireNonAlphanumeric = false;
-                        options.Password.RequireUppercase = false;
-                        options.Password.RequireLowercase = false;
-
-                        // Lockout settings
-                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                        options.Lockout.MaxFailedAccessAttempts = 10;
-                        options.Lockout.AllowedForNewUsers = true;
-
-                        // User settings
-                        options.User.RequireUniqueEmail = false;
-                    })
-                .AddUserManager<MicroexUserManager<User>>()
-                .AddSignInManager<MicroexSignInManager<User>>()
-                .AddEntityFrameworkStores<GeexDbContext>()
-                .AddDefaultTokenProviders();
-            services.AddIdentityServer(options =>
-            {
-                options.Authentication.CookieLifetime = new TimeSpan(24, 0, 0);
-                options.Authentication.CookieSlidingExpiration = false;
-            })
-                .AddJwtBearerClientAuthentication()
-                .AddDeveloperSigningCredential()
-                // lulus:此处添加正式证书,不知道证书加密类型,未作处理
-                //.AddSigningCredential()
-                .AddConfigurationStore<GeexDbContext>()
-                .AddOperationalStore<GeexDbContext>()
-                .AddProfileService<ProfileService<User>>()
-                .AddRedirectUriValidator<RegexRedirectUriValidator>()
-                .AddCorsPolicyService<RegexCorsPolicyService>()
-                .AddConfigurationStoreCache()
-                .AddAspNetIdentity<User>();
-            //bug :idsr的bug
-            //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
-
-
+            AddIdentityServerWithAspNetIdentity(services);
 
 
             services.AddGeexGraphQL<AppModule>();
         }
+
+
         // This is the default if you don't have an environment specific method.
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            // Add things to the Autofac ContainerBuilder.
-            builder.RegisterSource<DbSetRegistrationSource<GeexDbContext>>();
         }
 
         // This is the default if you don't have an environment specific method.
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-            app.EnsurePredefinedIdentityServerConfigs<GeexDbContext, User>();
 
             if (env.IsDevelopment())
             {
@@ -124,5 +74,24 @@ namespace Geex.Server
 
             app.UseGeexGraphQL();
         }
+
+        private void AddIdentityServerWithAspNetIdentity(IServiceCollection services)
+        {
+            services.AddIdentityServer(options =>
+                {
+                    options.Authentication.CookieLifetime = new TimeSpan(24, 0, 0);
+                    options.Authentication.CookieSlidingExpiration = false;
+                })
+                .AddJwtBearerClientAuthentication()
+                .AddDeveloperSigningCredential()
+                // lulus:此处添加正式证书,不知道证书加密类型,未作处理
+                //.AddSigningCredential()
+                .AddMongoRepository()
+                .AddRedirectUriValidator<RegexRedirectUriValidator>()
+                .AddCorsPolicyService<RegexCorsPolicyService>();
+            //bug :idsr的bug
+            //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
+        }
+
     }
 }

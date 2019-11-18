@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\.submodules\Microex.All\Microex.All\Microex.All.csproj" />
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
     <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
   </ItemGroup>

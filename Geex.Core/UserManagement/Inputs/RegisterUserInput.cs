@@ -1,4 +1,4 @@
-﻿namespace Geex.Core.User.Inputs
+﻿namespace Geex.Core.UserManagement.Inputs
 {
     public class RegisterUserInput
     {

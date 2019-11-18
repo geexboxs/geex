@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
 using Geex.Shared.Roots.RootTypes;
@@ -12,7 +13,7 @@ using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using BindingFlags = System.Reflection.BindingFlags;
+using MongoDB.Driver;
 
 namespace Geex.Shared
 {
@@ -89,5 +90,16 @@ namespace Geex.Shared
                 .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.Types")).ToArray());
         }
 
+        public static bool IsValidEmail(this string str)
+        {
+            return new Regex(@"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}").IsMatch(str);
+        }
+
+        public static IIdentityServerBuilder AddMongoRepository(this IIdentityServerBuilder builder)
+        {
+            builder.Services.AddTransient<IMongoClient, MongoClient>();
+
+            return builder;
+        }
     }
 }

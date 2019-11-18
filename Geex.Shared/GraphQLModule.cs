@@ -17,20 +17,20 @@ namespace Geex.Shared
     }
     public interface IGraphQLModule
     {
-        void PreInitialize(IServiceCollection containerBuilder, SchemaBuilder schemaBuilder);
-        void PostInitialize(IServiceProvider serviceProvider);
+        void PreInitialize(ContainerBuilder containerBuilder, SchemaBuilder schemaBuilder);
+        void PostInitialize(IContainer serviceProvider);
     }
     public abstract class GraphQLModule<T> : IGraphQLModule<T> where T : IGraphQLModule
     {
 
-        public abstract void PostInitialize(IServiceProvider serviceProvider);
+        public abstract void PostInitialize(IContainer serviceProvider);
 
         /// <summary>
         /// This is the first event called on application startup.
         /// Codes can be placed here to run before dependency injection registrations.
         /// Please do not use `this` in the scope
         /// </summary>
-        public virtual void PreInitialize(IServiceCollection containerBuilder, SchemaBuilder schemaBuilder)
+        public virtual void PreInitialize(ContainerBuilder containerBuilder, SchemaBuilder schemaBuilder)
         {
             schemaBuilder.AddModuleTypes<T>();
         }

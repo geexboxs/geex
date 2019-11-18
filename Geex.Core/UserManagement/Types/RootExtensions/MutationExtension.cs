@@ -1,8 +1,7 @@
-﻿using Geex.Core.User.Types.Inputs;
-using Geex.Shared.Roots;
+﻿using Geex.Shared.Roots;
 using HotChocolate.Types;
 
-namespace Geex.Core.User.Types.RootExtensions
+namespace Geex.Core.UserManagement.Types.RootExtensions
 {
     public class MutationExtension : ObjectTypeExtension
     {

@@ -1,7 +1,6 @@
-﻿using Geex.Core.User.Inputs;
-using HotChocolate.Types;
+﻿using HotChocolate.Types;
 
-namespace Geex.Core.User.Types.Inputs
+namespace Geex.Core.UserManagement.Types.Inputs
 {
     public class RegisterUserInputType : InputObjectType<RegisterUserInput>
     {

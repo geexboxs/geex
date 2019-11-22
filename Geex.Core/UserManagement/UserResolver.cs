@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Geex.Core.UserManagement.Inputs;
 using Geex.Shared.Roots;
 using HotChocolate;
+using IdentityModel;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Driver;
 
@@ -21,22 +22,21 @@ namespace Geex.Core.UserManagement
 
 
 
-        public async Task<bool> Register([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, RegisterUserInput input)
+        public async Task<bool> Register([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, [Service]IPasswordHasher<User> passwordHasher, RegisterUserInput input)
         {
-            await userCollection.InsertOneAsync(new User(input.PhoneOrEmail, input.Password, input.UserName,));
+            await userCollection.InsertOneAsync(new User(input.PhoneOrEmail, input.Password, input.UserName, (u, x) => passwordHasher.HashPassword(u, x)));
             return true;
         }
 
         public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, AssignRoleInput input)
         {
-            var user = await userManager.FindByIdAsync(input.UserId);
-            user.UserRoles.Clear();
-            var result = await userManager.AddToRolesAsync(user, input.Roles);
-            if (result.Succeeded)
+            var user = await userCollection.Find(x => x.Id == input.UserId).FirstOrDefaultAsync();
+            user.Roles.Clear();
+            foreach (var role in input.Roles)
             {
-                return true;
+                user.Roles.Add(new Role(role));
             }
-            throw new Exception(result.Errors.First().Description);
+            return true;
         }
     }
 }

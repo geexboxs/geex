@@ -9,7 +9,7 @@ namespace Geex.Core.UserManagement
     public class UserModule : GraphQLModule<UserModule>
     {
 
-        public override void PostInitialize(IContainer serviceProvider)
+        public override void PostInitialize(IComponentContext serviceProvider)
         {
         }
 

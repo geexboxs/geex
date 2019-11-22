@@ -46,15 +46,14 @@ namespace Geex.Server
             services.AddAuthentication();
             services.AddHealthChecks();
             AddIdentityServerWithAspNetIdentity(services);
-
-
-            services.AddGeexGraphQL<AppModule>();
         }
+
 
 
         // This is the default if you don't have an environment specific method.
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.AddGeexGraphQL<AppModule>();
         }
 
         // This is the default if you don't have an environment specific method.

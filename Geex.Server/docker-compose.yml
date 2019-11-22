@@ -8,7 +8,7 @@ services:
         ports:
             - 27017:27017
         environment:
-            MONGO_INITDB_ROOT_USERNAME: XxusernamexX
+            MONGO_INITDB_ROOT_USERNAME: u5ern@me
             MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
 
     mongo-express:
@@ -18,7 +18,7 @@ services:
         ports:
             - 8081:8081
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: XxusernamexX
+            ME_CONFIG_MONGODB_ADMINUSERNAME: u5ern@me
             ME_CONFIG_MONGODB_ADMINPASSWORD: P@ssw0rd
         links:
             - mongo

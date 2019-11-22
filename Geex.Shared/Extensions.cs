@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
 using HotChocolate.AspNetCore;
@@ -19,7 +20,7 @@ namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static void AddGeexGraphQL<T>(this IServiceCollection containerBuilder, Action<IQueryExecutionBuilder> build = null) where T : GraphQLEntryModule<T>
+        public static void AddGeexGraphQL<T>(this ContainerBuilder containerBuilder, Action<IQueryExecutionBuilder> build = null) where T : GraphQLEntryModule<T>
         {
             var schemaBuilder = SchemaBuilder.New();
             var schemaFactory = new Func<IServiceProvider, ISchema>(provider =>
@@ -37,16 +38,17 @@ namespace Geex.Shared
                 }
                 return schema;
             });
+            IServiceCollection serviceCollection = new ServiceCollection();
             if (build == null)
             {
-                containerBuilder.AddGraphQL(schemaFactory);
+                serviceCollection.AddGraphQL(schemaFactory);
             }
             else
             {
-                containerBuilder.AddGraphQL(schemaFactory, build);
+                serviceCollection.AddGraphQL(schemaFactory, build);
             }
-            containerBuilder.AddSingleton(schemaBuilder);
-
+            serviceCollection.AddSingleton(schemaBuilder);
+            containerBuilder.Populate(serviceCollection);
             RegisterModule(typeof(T), containerBuilder, schemaBuilder);
 
         }
@@ -57,7 +59,7 @@ namespace Geex.Shared
             app.UsePlayground();
         }
 
-        private static void RegisterModule(Type module, IServiceCollection containerBuilder,
+        private static void RegisterModule(Type module, ContainerBuilder containerBuilder,
             SchemaBuilder schemaBuilder)
         {
             var dependModules = module.GetCustomAttribute<DependsOnAttribute>()?.DependedModuleTypes;
@@ -77,11 +79,11 @@ namespace Geex.Shared
 
             var moduleInstance = ctor.Invoke(null) as IGraphQLModule;
             moduleInstance.PreInitialize(containerBuilder, schemaBuilder);
-            containerBuilder.AddSingleton(provider =>
-                {
-                    moduleInstance.PostInitialize(provider);
-                    return moduleInstance;
-                });
+            containerBuilder.Register(x =>
+            {
+                moduleInstance.PostInitialize(x);
+                return moduleInstance;
+            });
         }
 
         public static ISchemaBuilder AddModuleTypes<TModule>(this SchemaBuilder schemaBuilder)

@@ -18,12 +18,12 @@ namespace Geex.Shared
     public interface IGraphQLModule
     {
         void PreInitialize(ContainerBuilder containerBuilder, SchemaBuilder schemaBuilder);
-        void PostInitialize(IContainer serviceProvider);
+        void PostInitialize(IComponentContext serviceProvider);
     }
     public abstract class GraphQLModule<T> : IGraphQLModule<T> where T : IGraphQLModule
     {
 
-        public abstract void PostInitialize(IContainer serviceProvider);
+        public abstract void PostInitialize(IComponentContext serviceProvider);
 
         /// <summary>
         /// This is the first event called on application startup.

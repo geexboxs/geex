@@ -1,4 +1,5 @@
-﻿using HotChocolate.Types;
+﻿using Geex.Core.UserManagement.Inputs;
+using HotChocolate.Types;
 
 namespace Geex.Core.UserManagement.Types.Inputs
 {

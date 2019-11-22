@@ -41,13 +41,13 @@ namespace Geex.Core.UserManagement
         /// <summary>
         /// Gets or sets the claims.
         /// </summary>
-        public ICollection<Claim> Claims { get; set; } = new HashSet<Claim>(new ClaimComparer());
+        public ICollection<Role> Roles { get; set; } = new HashSet<Role>(comparer:Role.Comparer);
         [Obsolete("This ctor should not be used in user code.")]
         public User()
         {
 
         }
-        public User(string phoneOrEmail, string password, string username = null, Func<string, string> passwordHasher = null)
+        public User(string phoneOrEmail, string password, string username = null, Func<User, string, string> passwordHasher = null)
         {
             if (phoneOrEmail.IsValidEmail())
             {
@@ -58,6 +58,7 @@ namespace Geex.Core.UserManagement
                 this.PhoneNumber = phoneOrEmail;
             }
             this.Username = username ?? phoneOrEmail;
+            this.Password = passwordHasher.Invoke(this, password);
         }
 
         public string PhoneNumber { get; set; }

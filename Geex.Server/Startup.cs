@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Driver;
 
 namespace Geex.Server
 {
@@ -43,7 +44,8 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication();
+            services.AddAuthentication()
+                .AddJwtBearer();
             services.AddHealthChecks();
             AddIdentityServerWithAspNetIdentity(services);
         }
@@ -54,6 +56,7 @@ namespace Geex.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.AddGeexGraphQL<AppModule>();
+            builder.RegisterGeneric(typeof(IMongoCollection<>));
         }
 
         // This is the default if you don't have an environment specific method.

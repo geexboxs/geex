@@ -4,7 +4,7 @@ using Geex.Shared;
 using HotChocolate;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Geex.Core.UserManagement
+namespace Geex.Core.Users
 {
     public class UserModule : GraphQLModule<UserModule>
     {

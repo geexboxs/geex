@@ -2,7 +2,7 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace Geex.Core.UserManagement.Types.RootExtensions
+namespace Geex.Core.Users.Types.RootExtensions
 {
     public class QueryExtension : ObjectTypeExtension
     {
@@ -14,12 +14,12 @@ namespace Geex.Core.UserManagement.Types.RootExtensions
                 .UseSorting<User>(x =>
                 {
                     x.BindFieldsExplicitly();
-                    x.Sortable(y => y.Id);
+                    x.Sortable(y => y.Username);
                 })// sort
                 .UseFiltering<User>(x =>
                 {
                     x.BindFieldsExplicitly();
-                    x.Filter(y => y.Id);
+                    x.Filter(y => y.Username);
                 })// filter
                 ;
             base.Configure(descriptor);

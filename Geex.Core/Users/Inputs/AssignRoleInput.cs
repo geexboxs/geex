@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Geex.Core.UserManagement.Inputs
+namespace Geex.Core.Users.Inputs
 {
     public class AssignRoleInput
     {

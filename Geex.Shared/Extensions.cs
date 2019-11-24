@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Shared.Roots.RootTypes;
+using Geex.Shared.Types;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
+using HotChocolate.Types;
+using IdentityServer4.MongoDB.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace Geex.Shared
@@ -31,6 +35,7 @@ namespace Geex.Shared
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddSubscriptionType<SubscriptionType>()
+                .AddType<ObjectIdType>()
                 .Create();
                 if (schema.QueryType.Fields.All(x => x.IsIntrospectionField) || schema.MutationType.Fields.All(x => x.IsIntrospectionField))
                 {
@@ -97,9 +102,22 @@ namespace Geex.Shared
             return new Regex(@"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}").IsMatch(str);
         }
 
-        public static IIdentityServerBuilder AddMongoRepository(this IIdentityServerBuilder builder)
+        public static IIdentityServerBuilder AddMongoRepository(this IIdentityServerBuilder builder,
+            string connectionString)
         {
-            builder.Services.AddTransient<IMongoClient, MongoClient>();
+            builder.Services.AddSingleton<IOptions<MongoDBConfiguration>>(new OptionsWrapper<MongoDBConfiguration>(new MongoDBConfiguration()
+            {
+                ConnectionString = connectionString,
+                Database = new MongoUrl(connectionString).DatabaseName
+            }));
+            builder.AddConfigurationStore(options =>
+             {
+                 options.ConnectionString = connectionString;
+             })
+            .AddOperationalStore(options =>
+            {
+                options.ConnectionString = connectionString;
+            });
 
             return builder;
         }

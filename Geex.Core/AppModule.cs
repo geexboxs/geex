@@ -1,6 +1,6 @@
 ﻿using System;
 using Autofac;
-using Geex.Core.UserManagement;
+using Geex.Core.Users;
 using Geex.Shared;
 using HotChocolate;
 using Microsoft.Extensions.DependencyInjection;

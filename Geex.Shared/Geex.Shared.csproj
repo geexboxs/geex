@@ -8,6 +8,7 @@
     <PackageReference Include="AutoEquality" Version="0.5.4" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
+    <PackageReference Include="Casbin.NET" Version="1.2.3" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="10.2.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.2.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.2.0" />
@@ -16,9 +17,11 @@
     <PackageReference Include="HotChocolate.Types.Sorting" Version="10.2.0" />
     <PackageReference Include="IdentityServer4" Version="3.0.2" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
+    <PackageReference Include="IdentityServer4.Contrib.MongoDB" Version="2.3.3" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.9.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
+    <PackageReference Include="Selz.IdentityServer4.MongoDB" Version="2.0.5" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 
-namespace Geex.Core.UserManagement.Types
+namespace Geex.Core.Users.Types
 {
     public class UserType : ObjectType<User>
     {

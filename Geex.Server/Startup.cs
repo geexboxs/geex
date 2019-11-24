@@ -3,7 +3,7 @@ using System.Linq;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core;
-using Geex.Core.UserManagement;
+using Geex.Core.Users;
 using Geex.Data;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
@@ -12,6 +12,7 @@ using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Types;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +21,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace Geex.Server
 {
     public class Startup
     {
+        private readonly IHostEnvironment _env;
+
         public Startup(IHostEnvironment env)
         {
+            _env = env;
             // In ASP.NET Core 3.0 `env` will be an IWebHostingEnvironment, not IHostingEnvironment.
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -47,6 +52,7 @@ namespace Geex.Server
             services.AddAuthentication()
                 .AddJwtBearer();
             services.AddHealthChecks();
+            services.AddCasbinAuthorization();
             AddIdentityServerWithAspNetIdentity(services);
         }
 
@@ -56,7 +62,17 @@ namespace Geex.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.AddGeexGraphQL<AppModule>();
-            builder.RegisterGeneric(typeof(IMongoCollection<>));
+            builder.Register(x=>new PasswordHasher<User>()).AsImplementedInterfaces();
+            AddMongoDb(builder, this.Configuration.GetConnectionString("Default"));
+        }
+
+        private static void AddMongoDb(ContainerBuilder builder, string connectionString)
+        {
+            builder.Register(x => new MongoUrl(connectionString)).AsSelf().AsImplementedInterfaces();
+            builder.Register(x => new MongoClient(x.Resolve<MongoUrl>())).AsSelf().AsImplementedInterfaces();
+            builder.Register(x => x.Resolve<IMongoClient>().GetDatabase(x.Resolve<MongoUrl>().DatabaseName)).AsSelf()
+                .AsImplementedInterfaces();
+            builder.RegisterSource<MongoCollectionRegistrationSource>();
         }
 
         // This is the default if you don't have an environment specific method.
@@ -88,7 +104,7 @@ namespace Geex.Server
                 .AddDeveloperSigningCredential()
                 // lulus:此处添加正式证书,不知道证书加密类型,未作处理
                 //.AddSigningCredential()
-                .AddMongoRepository()
+                .AddMongoRepository(this.Configuration.GetConnectionString("Default"))
                 .AddRedirectUriValidator<RegexRedirectUriValidator>()
                 .AddCorsPolicyService<RegexCorsPolicyService>();
             //bug :idsr的bug

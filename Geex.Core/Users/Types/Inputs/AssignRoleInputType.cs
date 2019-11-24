@@ -1,7 +1,7 @@
-﻿using Geex.Core.UserManagement.Inputs;
+﻿using Geex.Core.Users.Inputs;
 using HotChocolate.Types;
 
-namespace Geex.Core.UserManagement.Types.Inputs
+namespace Geex.Core.Users.Types.Inputs
 {
     public class AssignRoleInputType : InputObjectType<AssignRoleInput>
     {

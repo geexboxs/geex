@@ -1,27 +1,28 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core;
 using Geex.Core.Users;
-using Geex.Data;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared.Roots.RootTypes;
+using Geex.Shared._ShouldMigrateToLib.Authentication;
+using Geex.Shared._ShouldMigrateToLib.Authorization;
 using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Voyager;
-using HotChocolate.Types;
-using IdentityServer4.Services;
+using IdentityServer4.MongoDB.Entities;
+using IdentityServer4.MongoDB.Mappers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
 namespace Geex.Server
@@ -49,11 +50,50 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication()
-                .AddJwtBearer();
-            services.AddHealthChecks();
             services.AddCasbinAuthorization();
-            AddIdentityServerWithAspNetIdentity(services);
+            services.AddScoped<GeexCookieAuthenticationEvents>();
+            services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.EventsType = typeof(GeexCookieAuthenticationEvents);
+                })
+                    .AddIdentityServerAuthentication(
+                        options =>
+                        {
+                            if (_env.IsDevelopment())
+                            {
+                                IdentityModelEventSource.ShowPII = true;
+                            }
+                            options.ApiName = _env.ApplicationName;
+                            options.Authority = $"http://{Environment.GetEnvironmentVariable("HOST_NAME")}";
+                            options.ApiSecret = _env.ApplicationName;
+                            options.RequireHttpsMetadata = false;
+                            options.JwtBearerEvents = new JwtBearerEvents
+                            {
+                                OnChallenge = context =>
+                                {
+                                    return Task.CompletedTask;
+                                },
+                                OnTokenValidated = ContextBoundObject =>
+                                {
+                                    return Task.CompletedTask;
+                                },
+                                OnMessageReceived = context =>
+                                {
+                                    return Task.CompletedTask;
+                                },
+                                OnAuthenticationFailed = context =>
+                                {
+                                    var te = context.Exception;
+                                    return Task.CompletedTask;
+                                }
+                            };
+                        });
+
+            services.AddHealthChecks();
+
+            AddDefaultIdentityServer(services);
         }
 
 
@@ -62,12 +102,17 @@ namespace Geex.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.AddGeexGraphQL<AppModule>();
-            builder.Register(x=>new PasswordHasher<User>()).AsImplementedInterfaces();
+            builder.Register(x => new PasswordHasher<User>()).AsImplementedInterfaces();
             AddMongoDb(builder, this.Configuration.GetConnectionString("Default"));
         }
 
+        public ISchemaBuilder SchemaBuilder { get; set; }
+
         private static void AddMongoDb(ContainerBuilder builder, string connectionString)
         {
+            var pack = new ConventionPack();
+            pack.Add(new IgnoreExtraElementsConvention(true));
+            ConventionRegistry.Register("My Solution Conventions", pack, t => true);
             builder.Register(x => new MongoUrl(connectionString)).AsSelf().AsImplementedInterfaces();
             builder.Register(x => new MongoClient(x.Resolve<MongoUrl>())).AsSelf().AsImplementedInterfaces();
             builder.Register(x => x.Resolve<IMongoClient>().GetDatabase(x.Resolve<MongoUrl>().DatabaseName)).AsSelf()
@@ -79,21 +124,25 @@ namespace Geex.Server
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-
+            InitializeIdentityServerDatabase(app);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Strict,
+            });
 
             app.UseHealthChecks("/health-check");
 
-
-            app.UseAuthentication();
+            //app.UseAuthentication();
+            app.UseIdentityServer();
 
             app.UseGeexGraphQL();
         }
 
-        private void AddIdentityServerWithAspNetIdentity(IServiceCollection services)
+        private void AddDefaultIdentityServer(IServiceCollection services)
         {
             services.AddIdentityServer(options =>
                 {
@@ -107,9 +156,44 @@ namespace Geex.Server
                 .AddMongoRepository(this.Configuration.GetConnectionString("Default"))
                 .AddRedirectUriValidator<RegexRedirectUriValidator>()
                 .AddCorsPolicyService<RegexCorsPolicyService>();
+            services.AddSingleton<IdentityServerSeedConfig>();
             //bug :idsr的bug
             //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
         }
 
+        private static void InitializeIdentityServerDatabase(IApplicationBuilder app)
+        {
+
+            bool createdNewRepository = false;
+            var repository = app.ApplicationServices.GetService<IMongoCollection<Client>>();
+            if (repository.AsQueryable().Any())
+            {
+                return;
+            }
+
+            //  --Client
+            IdentityServerSeedConfig identityServerSeedConfig = app.ApplicationServices.GetService<IdentityServerSeedConfig>();
+            foreach (var client in identityServerSeedConfig.Clients)
+            {
+                app.ApplicationServices.GetService<IMongoCollection<Client>>().InsertOne(client.ToEntity());
+            }
+            foreach (var res in identityServerSeedConfig.IdentityResources)
+            {
+                app.ApplicationServices.GetService<IMongoCollection<IdentityResource>>().InsertOne(res.ToEntity());
+            }
+            foreach (var api in identityServerSeedConfig.ApiResources)
+            {
+                app.ApplicationServices.GetService<IMongoCollection<ApiResource>>().InsertOne((api.ToEntity()));
+            }
+            createdNewRepository = true;
+
+
+            // If it's a new Repository (database), need to restart the website to configure Mongo to ignore Extra Elements.
+            if (createdNewRepository)
+            {
+                var newRepositoryMsg = $"Mongo Repository created/populated! Please restart you website, so Mongo driver will be configured  to ignore Extra Elements - e.g. IdentityServer \"_id\" ";
+                throw new Exception(newRepositoryMsg);
+            }
+        }
     }
 }

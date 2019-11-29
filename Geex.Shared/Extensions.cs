@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Geex.Shared._ShouldMigrateToLib.Authorization;
 using Geex.Shared.Roots.RootTypes;
 using Geex.Shared.Types;
 using HotChocolate;
@@ -24,18 +26,19 @@ namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static void AddGeexGraphQL<T>(this ContainerBuilder containerBuilder, Action<IQueryExecutionBuilder> build = null) where T : GraphQLEntryModule<T>
+        public static void AddGeexGraphQL<T>(this ContainerBuilder containerBuilder) where T : GraphQLEntryModule<T>
         {
-            var schemaBuilder = SchemaBuilder.New();
-            var schemaFactory = new Func<IServiceProvider, ISchema>(provider =>
+            var schemaBuilder = SchemaBuilder.New()
+                .AddQueryType<QueryType>()
+                .AddMutationType<MutationType>()
+                .AddSubscriptionType<SubscriptionType>()
+                .AddType<ObjectIdType>();
+            var services = new ServiceCollection();
+            services.AddGraphQL(provider =>
             {
                 var schema = schemaBuilder
                 .AddServices(provider)
                 .AddAuthorizeDirectiveType()
-                .AddQueryType<QueryType>()
-                .AddMutationType<MutationType>()
-                .AddSubscriptionType<SubscriptionType>()
-                .AddType<ObjectIdType>()
                 .Create();
                 if (schema.QueryType.Fields.All(x => x.IsIntrospectionField) || schema.MutationType.Fields.All(x => x.IsIntrospectionField))
                 {
@@ -43,19 +46,14 @@ namespace Geex.Shared
                 }
                 return schema;
             });
-            IServiceCollection serviceCollection = new ServiceCollection();
-            if (build == null)
+            services.AddQueryRequestInterceptor((context, builder, token) =>
             {
-                serviceCollection.AddGraphQL(schemaFactory);
-            }
-            else
-            {
-                serviceCollection.AddGraphQL(schemaFactory, build);
-            }
-            serviceCollection.AddSingleton(schemaBuilder);
-            containerBuilder.Populate(serviceCollection);
-            RegisterModule(typeof(T), containerBuilder, schemaBuilder);
+                return Task.CompletedTask;
+            });
 
+            services.AddSingleton(schemaBuilder);
+            containerBuilder.Populate(services);
+            RegisterModule(typeof(T), containerBuilder, schemaBuilder);
         }
         public static void UseGeexGraphQL(this IApplicationBuilder app)
         {
@@ -65,7 +63,7 @@ namespace Geex.Shared
         }
 
         private static void RegisterModule(Type module, ContainerBuilder containerBuilder,
-            SchemaBuilder schemaBuilder)
+            ISchemaBuilder schemaBuilder)
         {
             var dependModules = module.GetCustomAttribute<DependsOnAttribute>()?.DependedModuleTypes;
             if (dependModules != null)
@@ -91,7 +89,7 @@ namespace Geex.Shared
             });
         }
 
-        public static ISchemaBuilder AddModuleTypes<TModule>(this SchemaBuilder schemaBuilder)
+        public static ISchemaBuilder AddModuleTypes<TModule>(this ISchemaBuilder schemaBuilder)
         {
             return schemaBuilder
                 .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.Types")).ToArray());

@@ -6,7 +6,7 @@ using MongoDB.Driver;
 using NetCasbin.Model;
 using NetCasbin.Persist;
 
-namespace Geex.Core.Users
+namespace Geex.Shared._ShouldMigrateToLib.Authorization
 {
     public class CasbinMongoAdapter : IAdapter
     {

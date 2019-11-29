@@ -11,7 +11,7 @@ namespace Geex.Core
     [DependsOn(typeof(UserModule))]
     public class AppModule : GraphQLEntryModule<AppModule>
     {
-        public override void PreInitialize(ContainerBuilder containerBuilder, SchemaBuilder schemaBuilder)
+        public override void PreInitialize(ContainerBuilder containerBuilder, ISchemaBuilder schemaBuilder)
         {
             base.PreInitialize(containerBuilder, schemaBuilder);
         }

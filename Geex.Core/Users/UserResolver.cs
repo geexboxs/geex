@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Geex.Core.Users.Inputs;
 using Geex.Shared.Roots;
@@ -8,9 +9,11 @@ using HotChocolate;
 using IdentityModel;
 using IdentityModel.Client;
 using IdentityServer4;
+using IdentityServer4.AccessTokenValidation;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -45,24 +48,33 @@ namespace Geex.Core.Users
             AuthenticateInput input)
         {
             var user = (await userCollection.FindAsync(x => (x.Username == input.UserIdentifier || x.PhoneNumber == input.UserIdentifier || x.Email == input.UserIdentifier))).First();
-            if (passwordHasher.VerifyHashedPassword(user, user.Password, input.Password) != PasswordVerificationResult.Failed &&
-                identityServerInteractionService.IsValidReturnUrl(input.RedirectUri))
+            if (passwordHasher.VerifyHashedPassword(user, user.Password, input.Password) != PasswordVerificationResult.Failed)
             {
-                await httpContextAccessor.HttpContext.SignInAsync(new IdentityServerUser(user.Id.ToString()), new AuthenticationProperties()
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim("name", user.Username),
+                    new Claim(JwtClaimTypes.Subject,user.Id.ToString()),
+                };
+
+                var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+                await httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties()
                 {
                     AllowRefresh = false,
                     ExpiresUtc = DateTimeOffset.Now.AddHours(2),
                     IsPersistent = true,
                     IssuedUtc = DateTimeOffset.Now,
                     RedirectUri = input.RedirectUri,
-                    Items = { { "roles", user.Roles.Select(x => x.Name).ToJson() } }
+                    Items = { { "roles", user.Roles.Select(x => x.Name).ToJson() } },
                 });
+                var result = await httpContextAccessor.HttpContext.AuthenticateAsync(IdentityServerAuthenticationDefaults.AuthenticationScheme);
+                return true;
             }
 
-            return true;
+            return false;
         }
 
-        [Authorize(Policy = "Permission.Mutation.AssignRoles")]
+
         public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, AssignRoleInput input)
         {
             var user = await userCollection.Find(x => x.Id == ObjectId.Parse(input.UserId)).FirstOrDefaultAsync();

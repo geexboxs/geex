@@ -13,7 +13,7 @@ namespace Geex.Core.Users
         {
         }
 
-        public override void PreInitialize(ContainerBuilder containerBuilder, SchemaBuilder schemaBuilder)
+        public override void PreInitialize(ContainerBuilder containerBuilder, ISchemaBuilder schemaBuilder)
         {
             base.PreInitialize(containerBuilder, schemaBuilder);
         }

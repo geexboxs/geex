@@ -14,7 +14,7 @@ namespace Geex.Core.Users.Types.RootExtensions
             descriptor.Field<UserResolver>(x => x.Authenticate(default, default, default, default, default, default))
                 .Argument("input", x => x.Type<AuthenticateInputType>());
             descriptor.Field<UserResolver>(x => x.AssignRoles(default, default, default))
-                .Argument("input", x => x.Type<AssignRoleInputType>());
+                .Argument("input", x => x.Type<AssignRoleInputType>()).Authorize("Permission");
             base.Configure(descriptor);
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Builder;
 using Autofac.Core;
+using Humanizer;
 using MongoDB.Driver;
 
 namespace Geex.Shared._ShouldMigrateToLib
@@ -38,7 +39,7 @@ namespace Geex.Shared._ShouldMigrateToLib
                 var m = mongoDatabase.GetType().GetMethod(nameof(IMongoDatabase.GetCollection), new Type[] { typeof(string), typeof(MongoCollectionSettings) });
                 var method =
                     m.MakeGenericMethod(swt.ServiceType.GetGenericArguments());
-                return method.Invoke(mongoDatabase, new object[] { swt.ServiceType.GetGenericArguments()[0].Name, c.ResolveOptional<MongoCollectionSettings>() });
+                return method.Invoke(mongoDatabase, new object[] { swt.ServiceType.GetGenericArguments()[0].Name.Pluralize(), c.ResolveOptional<MongoCollectionSettings>() });
             })
                     .As(service)
                     .CreateRegistration();

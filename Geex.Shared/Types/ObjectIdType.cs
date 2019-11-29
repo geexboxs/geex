@@ -64,6 +64,17 @@ namespace Geex.Shared.Types
             throw new ScalarSerializationException("");
         }
 
+        public override bool TrySerialize(object value, out object serialized)
+        {
+            if (value is ObjectId s)
+            {
+                serialized = s;
+                return true;
+            }
+            serialized = ObjectId.Empty;
+            return false;
+        }
+
         public override bool TryDeserialize(object serialized, out object value)
         {
             if (serialized is string str)

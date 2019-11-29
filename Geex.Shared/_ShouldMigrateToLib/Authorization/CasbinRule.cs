@@ -1,4 +1,4 @@
-﻿namespace Geex.Core.Users
+﻿namespace Geex.Shared._ShouldMigrateToLib.Authorization
 {
     public class CasbinRule
     {

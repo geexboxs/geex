@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Autofac;
 using Geex.Core.Users.Inputs;
+using Geex.Shared._ShouldMigrateToLib;
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
 using HotChocolate;
 using IdentityModel;
@@ -17,74 +23,80 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
+using Repository.Mongo;
 
 namespace Geex.Core.Users
 {
-    [GraphQLResolverOf(typeof(User))]
+    [GraphQLResolverOf(typeof(AppUser))]
     [GraphQLResolverOf(typeof(Query))]
     public class UserResolver
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<User> QueryUsers([Parent] Query query, [Service]IMongoCollection<User> userCollection)
+        public IQueryable<AppUser> QueryUsers([Parent] Query query, [Service]Repository<AppUser> userCollection)
         {
-            return userCollection.AsQueryable();
+            return userCollection.Collection.AsQueryable();
         }
 
-
-
-        public async Task<bool> Register([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, [Service]IPasswordHasher<User> passwordHasher, RegisterUserInput input)
+        public async Task<bool> Register([Parent] Mutation mutation,
+            [Service]IComponentContext componentContext,
+            RegisterUserInput input)
         {
-            await userCollection.InsertOneAsync(new User(input.PhoneOrEmail, input.Password, userCollection.AsQueryable(), (u, x) => passwordHasher.HashPassword(u, x), input.UserName));
+            var user = new AuthUser(input.PhoneOrEmail, input.Password, input.UserName);
+            var authUserCollection = componentContext.Resolve<Repository<AuthUser>>(new PositionalParameter(0,"Users"));
+            authUserCollection.Insert(user);
+            var appUser = new AppUser(user);
+            var appUserCollection = componentContext.Resolve<Repository<AppUser>>(new PositionalParameter(0, "Users"));
+            appUserCollection.Insert(appUser);
             return true;
         }
 
-        public async Task<bool> Authenticate([Parent] Mutation mutation,
-            [Service]IMongoCollection<User> userCollection,
-            [Service]IHttpContextAccessor httpContextAccessor,
-            [Service]IPasswordHasher<User> passwordHasher,
-            [Service]IIdentityServerInteractionService identityServerInteractionService,
-            AuthenticateInput input)
+        //public async Task<TokenResponse> Authenticate([Parent] Mutation mutation,
+        //    [Service]IComponentContext componentContext,
+
+        //    AuthenticateInput input)
+        //{
+        //    IMongoCollection<AppUser> userCollection = componentContext.Resolve<IMongoCollection<AppUser>>();
+        //    IHttpContextAccessor httpContextAccessor = componentContext.Resolve<IHttpContextAccessor>();
+        //    IPasswordHasher<AppUser> passwordHasher = componentContext.Resolve<IPasswordHasher<AppUser>>();
+        //    IHostEnvironment env = componentContext.Resolve<IHostEnvironment>();
+        //    if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authentication", out var authValue))
+        //    {
+        //        await httpContextAccessor.HttpContext.AuthenticateAsync();
+        //    }
+        //    var client = new HttpClient() { BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("HOST_NAME")}") };
+        //    var tokenResponse = await client.RequestTokenAsync(new TokenRequest()
+        //    {
+        //        Address = "http://localhost:8000/connect/token",
+        //        ClientId = env.ApplicationName,
+        //        ClientSecret = env.ApplicationName,
+        //        GrantType = GrantType.ResourceOwnerPassword,
+        //        Parameters = new Dictionary<string, string>() {
+        //            { "username", input.UserIdentifier },
+        //            { "password", input.Password },
+        //            { "scope",$"{env.ApplicationName}" }
+        //        }
+        //    });
+        //    if (tokenResponse.HttpStatusCode == HttpStatusCode.OK)
+        //    {
+        //        return tokenResponse;
+        //    }
+        //    throw tokenResponse.Exception;
+        //}
+
+
+        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]Repository<AppUser> userCollection, AssignRoleInput input)
         {
-            var user = (await userCollection.FindAsync(x => (x.Username == input.UserIdentifier || x.PhoneNumber == input.UserIdentifier || x.Email == input.UserIdentifier))).First();
-            if (passwordHasher.VerifyHashedPassword(user, user.Password, input.Password) != PasswordVerificationResult.Failed)
-            {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim("name", user.Username),
-                    new Claim(JwtClaimTypes.Subject,user.Id.ToString()),
-                };
-
-                var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
-                await httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties()
-                {
-                    AllowRefresh = false,
-                    ExpiresUtc = DateTimeOffset.Now.AddHours(2),
-                    IsPersistent = true,
-                    IssuedUtc = DateTimeOffset.Now,
-                    RedirectUri = input.RedirectUri,
-                    Items = { { "roles", user.Roles.Select(x => x.Name).ToJson() } },
-                });
-                var result = await httpContextAccessor.HttpContext.AuthenticateAsync(IdentityServerAuthenticationDefaults.AuthenticationScheme);
-                return true;
-            }
-
-            return false;
-        }
-
-
-        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]IMongoCollection<User> userCollection, AssignRoleInput input)
-        {
-            var user = await userCollection.Find(x => x.Id == ObjectId.Parse(input.UserId)).FirstOrDefaultAsync();
+            var user = userCollection.Get(input.UserId);
             user.Roles.Clear();
             foreach (var role in input.Roles)
             {
                 user.Roles.Add(new Role(role));
             }
-            var updateDefinition = new UpdateDefinitionBuilder<User>().Set(x => x.Roles, user.Roles);
-            userCollection.UpdateOne(x => x.Id == user.Id, updateDefinition);
+            userCollection.Update(user, x => x.Roles, user.Roles);
             return true;
         }
     }

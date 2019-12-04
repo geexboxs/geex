@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
+using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots.RootTypes;
 using HotChocolate;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,21 @@ namespace Geex.Shared
     public abstract class GraphQLModule<T> : IGraphQLModule<T> where T : IGraphQLModule
     {
 
-        public abstract void PostInitialize(IComponentContext serviceProvider);
+        public virtual void PostInitialize(IComponentContext serviceProvider)
+        {
+            var types = typeof(T).Assembly.GetTypes();
+            foreach (var typeInfo in types.Where(x => x.GetInterface(nameof(IFunctionalEntity)) != default))
+            {
+                try
+                {
+                    typeInfo.GetProperties().First(x=>x.PropertyType == typeof(Func<IComponentContext>)).SetValue(null, new Func<IComponentContext>(() => serviceProvider));
+                }
+                catch (InvalidOperationException _)
+                {
+                    throw new Exception($"class implements {typeof(IFunctionalEntity)} must have a static member of type {typeof(Func<IComponentContext>)}");
+                }
+            }
+        }
 
         /// <summary>
         /// This is the first event called on application startup.
@@ -46,13 +61,5 @@ namespace Geex.Shared
 
         public Type QueryType { get; set; } = typeof(QueryType);
 
-    }
-
-    public class GraphQLModuleOptions<T> : IGraphQLModuleOptions where T : IGraphQLModule
-    {
-    }
-
-    public interface IGraphQLModuleOptions
-    {
     }
 }

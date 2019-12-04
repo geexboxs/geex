@@ -2,7 +2,7 @@
 using System.Linq;
 using NetCasbin.Model;
 
-namespace Geex.Shared._ShouldMigrateToLib.Authorization
+namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class Enforcer
     {
@@ -66,9 +66,9 @@ m = (p.sub == ""*"" || g(r.sub, p.sub)) && (p.obj == ""*"" || g2(r.obj, p.obj)) 
         }
 
 
-        public List<GroupPolicy> GetUserGroupPolicies(string sub, string sub_group)
+        public List<GroupPolicy> GetUserGroupPolicies(string sub)
         {
-            return internalEnforcer.GetFilteredNamedGroupingPolicy("g", 0, sub, sub_group).Select(x => new GroupPolicy(x)).ToList();
+            return internalEnforcer.GetFilteredNamedGroupingPolicy("g", 0, sub).Select(x => new GroupPolicy(x)).ToList();
         }
 
         public bool AddResourceGroupPolicy(string resourceId, string groupId)

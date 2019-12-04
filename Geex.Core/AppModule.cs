@@ -18,6 +18,7 @@ namespace Geex.Core
 
         public override void PostInitialize(IComponentContext serviceProvider)
         {
+            base.PostInitialize(serviceProvider);
         }
     }
 }

@@ -11,12 +11,12 @@ namespace Geex.Core.Users.Types.RootExtensions
             descriptor.Name(nameof(Query));
             descriptor.Field<UserResolver>(x => x.QueryUsers(default, default))// return
                 .UsePaging<UserType>()// paging
-                .UseSorting<User>(x =>
+                .UseSorting<AppUser>(x =>
                 {
                     x.BindFieldsExplicitly();
                     x.Sortable(y => y.Username);
                 })// sort
-                .UseFiltering<User>(x =>
+                .UseFiltering<AppUser>(x =>
                 {
                     x.BindFieldsExplicitly();
                     x.Filter(y => y.Username);

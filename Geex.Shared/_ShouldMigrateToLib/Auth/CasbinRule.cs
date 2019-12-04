@@ -1,6 +1,8 @@
-﻿namespace Geex.Shared._ShouldMigrateToLib.Authorization
+﻿using Repository.Mongo;
+
+namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class CasbinRule
+    public class CasbinRule : Entity
     {
         public string PType { get; set; }
         public string V0 { get; set; }

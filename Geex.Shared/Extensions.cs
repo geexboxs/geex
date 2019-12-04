@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Geex.Shared._ShouldMigrateToLib.Authorization;
 using Geex.Shared.Roots.RootTypes;
 using Geex.Shared.Types;
 using HotChocolate;
@@ -82,10 +81,9 @@ namespace Geex.Shared
 
             var moduleInstance = ctor.Invoke(null) as IGraphQLModule;
             moduleInstance.PreInitialize(containerBuilder, schemaBuilder);
-            containerBuilder.Register(x =>
+            containerBuilder.RegisterBuildCallback(x =>
             {
                 moduleInstance.PostInitialize(x);
-                return moduleInstance;
             });
         }
 

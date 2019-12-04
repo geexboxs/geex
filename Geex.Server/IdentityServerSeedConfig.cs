@@ -35,7 +35,7 @@ namespace Geex.Server
                     ClientSecrets = new List<Secret>(){new Secret(_env.ApplicationName.Sha256())},
                     RequireConsent = false,
                     AllowAccessTokensViaBrowser = true,
-                    AllowedGrantTypes = GrantTypes.Hybrid,
+                    AllowedGrantTypes = GrantTypes.Hybrid.Concat(GrantTypes.ResourceOwnerPassword).ToList(),
                     //FrontChannelLogoutUri = "https://localhost:44302/Home/FrontChannelLogout",
                     //BackChannelLogoutUri = "https://localhost:44302/Home/FrontChannelLogout",
                     AllowOfflineAccess = true,
@@ -47,7 +47,7 @@ namespace Geex.Server
                 {
                     ApiSecrets = new List<Secret>(){new Secret(_env.ApplicationName) },
                     Name = _env.ApplicationName,
-                    Scopes = new List<Scope>(){new Scope(_env.ApplicationName) },
+                    Scopes = new List<Scope>(){new Scope(_env.ApplicationName),new Scope(IdentityServerConstants.StandardScopes.Profile),new Scope(IdentityServerConstants.StandardScopes.OpenId) },
                 }
             };
         }

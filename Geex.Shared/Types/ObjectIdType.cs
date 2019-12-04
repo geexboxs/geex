@@ -11,7 +11,7 @@ using MongoDB.Bson;
 
 namespace Geex.Shared.Types
 {
-    public class ObjectIdType : ScalarType
+    public class ObjectIdType : ScalarType<ObjectId>
     {
         public ObjectIdType() : base("ObjectId")
         {
@@ -92,7 +92,5 @@ namespace Geex.Shared.Types
             value = null;
             return false;
         }
-
-        public override Type ClrType => typeof(ObjectId);
     }
 }

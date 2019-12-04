@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core;
-using Geex.Core.Users;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Authentication;
-using Geex.Shared._ShouldMigrateToLib.Authorization;
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using HotChocolate;
-using IdentityServer4.MongoDB.Entities;
+using Humanizer;
+using IdentityModel;
 using IdentityServer4.MongoDB.Mappers;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using ApiResource = IdentityServer4.MongoDB.Entities.ApiResource;
+using Client = IdentityServer4.MongoDB.Entities.Client;
+using IdentityResource = IdentityServer4.MongoDB.Entities.IdentityResource;
 
 namespace Geex.Server
 {
@@ -43,7 +47,6 @@ namespace Geex.Server
             Configuration = builder.Build();
         }
 
-        public ILifetimeScope AutofacContainer { get; set; }
         public IConfigurationRoot Configuration { get; set; }
 
 
@@ -101,8 +104,9 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void ConfigureContainer(ContainerBuilder builder)
         {
+
             builder.AddGeexGraphQL<AppModule>();
-            builder.Register(x => new PasswordHasher<User>()).AsImplementedInterfaces();
+            builder.Register(x => new PasswordHasher<AuthUser>()).AsImplementedInterfaces();
             AddMongoDb(builder, this.Configuration.GetConnectionString("Default"));
         }
 
@@ -123,7 +127,6 @@ namespace Geex.Server
         // This is the default if you don't have an environment specific method.
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
-            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
             InitializeIdentityServerDatabase(app);
             if (env.IsDevelopment())
             {
@@ -151,6 +154,7 @@ namespace Geex.Server
                 })
                 .AddJwtBearerClientAuthentication()
                 .AddDeveloperSigningCredential()
+                .AddResourceOwnerValidator<GeexPasswordValidator>()
                 // lulus:此处添加正式证书,不知道证书加密类型,未作处理
                 //.AddSigningCredential()
                 .AddMongoRepository(this.Configuration.GetConnectionString("Default"))
@@ -165,7 +169,7 @@ namespace Geex.Server
         {
 
             bool createdNewRepository = false;
-            var repository = app.ApplicationServices.GetService<IMongoCollection<Client>>();
+            var repository = app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<Client>(nameof(Client).Humanize().Pluralize());
             if (repository.AsQueryable().Any())
             {
                 return;
@@ -175,15 +179,15 @@ namespace Geex.Server
             IdentityServerSeedConfig identityServerSeedConfig = app.ApplicationServices.GetService<IdentityServerSeedConfig>();
             foreach (var client in identityServerSeedConfig.Clients)
             {
-                app.ApplicationServices.GetService<IMongoCollection<Client>>().InsertOne(client.ToEntity());
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<Client>(nameof(Client).Humanize().Pluralize()).InsertOne(client.ToEntity());
             }
             foreach (var res in identityServerSeedConfig.IdentityResources)
             {
-                app.ApplicationServices.GetService<IMongoCollection<IdentityResource>>().InsertOne(res.ToEntity());
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<IdentityResource>(nameof(IdentityResource).Humanize().Pluralize()).InsertOne(res.ToEntity());
             }
             foreach (var api in identityServerSeedConfig.ApiResources)
             {
-                app.ApplicationServices.GetService<IMongoCollection<ApiResource>>().InsertOne((api.ToEntity()));
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<ApiResource>(nameof(ApiResource).Humanize().Pluralize()).InsertOne((api.ToEntity()));
             }
             createdNewRepository = true;
 

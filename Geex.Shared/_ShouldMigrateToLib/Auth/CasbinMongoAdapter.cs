@@ -5,14 +5,15 @@ using System.Text;
 using MongoDB.Driver;
 using NetCasbin.Model;
 using NetCasbin.Persist;
+using Repository.Mongo;
 
-namespace Geex.Shared._ShouldMigrateToLib.Authorization
+namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class CasbinMongoAdapter : IAdapter
     {
-        public Func<IMongoCollection<CasbinRule>> RuleCollection { get; }
+        public Func<Repository<CasbinRule>> RuleCollection { get; }
 
-        public CasbinMongoAdapter(Func<IMongoCollection<CasbinRule>> ruleCollection)
+        public CasbinMongoAdapter(Func<Repository<CasbinRule>> ruleCollection)
         {
             RuleCollection = ruleCollection;
         }
@@ -20,7 +21,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Authorization
         public void LoadPolicy(Model model)
         {
             var collection = RuleCollection.Invoke();
-            var list = collection.AsQueryable().ToList();
+            var list = collection.Collection.AsQueryable().ToList();
             LoadPolicyData(model, Helper.LoadPolicyLine, list);
         }
 
@@ -53,7 +54,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Authorization
                 line.V4 = fieldValues[4 - fieldIndex];
             if (fieldIndex <= 5 && 5 < fieldIndex + num)
                 line.V5 = fieldValues[5 - fieldIndex];
-            RuleCollection.Invoke().DeleteMany(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
+            RuleCollection.Invoke().Delete(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
                                                     && (fieldIndex <= 1 && 1 < fieldIndex + num && x.V1 == line.V1)
                                                     && (fieldIndex <= 2 && 2 < fieldIndex + num && x.V2 == line.V2)
                                                     && (fieldIndex <= 3 && 3 < fieldIndex + num && x.V3 == line.V3)
@@ -89,7 +90,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Authorization
             }
             if (!source.Any())
                 return;
-            RuleCollection.Invoke().InsertMany(source);
+            RuleCollection.Invoke().Insert(source);
         }
 
         void IAdapter.AddPolicy(string sec, string ptype, IList<string> rule)
@@ -109,7 +110,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Authorization
 
         public void AddPolicy(string pType, IList<string> rule)
         {
-            RuleCollection.Invoke().InsertOne(savePolicyLine(pType, rule));
+            RuleCollection.Invoke().Insert(savePolicyLine(pType, rule));
         }
 
         private void LoadPolicyData(

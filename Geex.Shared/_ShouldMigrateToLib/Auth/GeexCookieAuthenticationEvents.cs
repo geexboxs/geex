@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-namespace Geex.Shared._ShouldMigrateToLib.Authentication
+namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class GeexCookieAuthenticationEvents : CookieAuthenticationEvents
     {

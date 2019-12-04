@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -8,6 +9,7 @@ using Autofac.Builder;
 using Autofac.Core;
 using Humanizer;
 using MongoDB.Driver;
+using Repository.Mongo;
 
 namespace Geex.Shared._ShouldMigrateToLib
 {
@@ -27,7 +29,7 @@ namespace Geex.Shared._ShouldMigrateToLib
                 yield break;
 
             var def = swt.ServiceType.GetGenericTypeDefinition();
-            if (def != typeof(IMongoCollection<>))
+            if (def != typeof(Repository<>))
                 yield break;
 
             // if you have one `IDBContext` registeration you don't need the
@@ -35,11 +37,12 @@ namespace Geex.Shared._ShouldMigrateToLib
 
             yield return RegistrationBuilder.ForDelegate((c, p) =>
             {
+                var repoType = typeof(Repository<>).MakeGenericType(swt.ServiceType.GetGenericArguments());
                 var mongoDatabase = c.Resolve<IMongoDatabase>();
-                var m = mongoDatabase.GetType().GetMethod(nameof(IMongoDatabase.GetCollection), new Type[] { typeof(string), typeof(MongoCollectionSettings) });
-                var method =
-                    m.MakeGenericMethod(swt.ServiceType.GetGenericArguments());
-                return method.Invoke(mongoDatabase, new object[] { swt.ServiceType.GetGenericArguments()[0].Name.Pluralize(), c.ResolveOptional<MongoCollectionSettings>() });
+                var ctor = repoType.GetConstructor(new[] { typeof(IMongoDatabase), typeof(string) });
+                Func<object> paramProvider = default;
+                var collectionName = p.FirstOrDefault()?.CanSupplyValue(ctor.GetParameters()[1], c, out paramProvider) != default ? paramProvider.Invoke() : swt.ServiceType.GetGenericArguments()[0].Name.Pluralize();
+                return ctor.Invoke(null, new object[] { mongoDatabase, collectionName });
             })
                     .As(service)
                     .CreateRegistration();

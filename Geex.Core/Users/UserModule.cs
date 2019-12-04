@@ -11,6 +11,7 @@ namespace Geex.Core.Users
 
         public override void PostInitialize(IComponentContext serviceProvider)
         {
+            base.PostInitialize(serviceProvider);
         }
 
         public override void PreInitialize(ContainerBuilder containerBuilder, ISchemaBuilder schemaBuilder)

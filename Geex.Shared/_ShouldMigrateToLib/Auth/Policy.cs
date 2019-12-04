@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Geex.Shared._ShouldMigrateToLib.Authorization
+namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class Policy
     {

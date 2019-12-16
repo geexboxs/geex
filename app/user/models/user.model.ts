@@ -1,5 +1,5 @@
 // import { Address } from './address.model';
-import { prop, instanceMethod, DocumentType, plugin, pre } from "@typegoose/typegoose";
+import { prop, DocumentType, plugin, pre } from "@typegoose/typegoose";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
@@ -10,18 +10,6 @@ import { ModelFieldResolver } from "../../../types";
 
 @ObjectType()
 export class User extends ModelBase {
-    @Field()
-    public get roles(): Promise<string[]> | undefined {
-        return User._getterImplementions["roles"] && User._getterImplementions["roles"]();
-    }
-    @Field()
-    public get permissions(): string[] | undefined {
-        return User._getterImplementions["permissions"] && User._getterImplementions["permissions"]();
-    }
-    public static setDependentImplementionForModel<T extends keyof User>(key: T, implemention: ModelFieldResolver<User, T>) {
-        this._getterImplementions.set(key, implemention);
-    }
-    private static _getterImplementions: Map<keyof User, ModelFieldResolver<User>> = new Map();
     @prop()
     @Field()
     public username!: string;

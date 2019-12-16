@@ -100,14 +100,7 @@ export const UserModule = (async () => {
             {
                 provide: UserModelToken,
                 useFactory: (injector) => {
-                    const userModel = getModelForClass(User);
-                    userModel.setDependentImplementionForModel("roles", function (this: User) {
-                        return injector.get(Enforcer).getRolesForUser(this.id)
-                    });
-                    userModel.setDependentImplementionForModel<"permissions">("permissions", function (this: User) {
-                        return injector.get(Enforcer).getPermissionsForUser(this.id);
-                    });
-                    return userModel;
+                    return getModelForClass(User);
                 },
             },
             {

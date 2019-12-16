@@ -15,9 +15,9 @@ import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
-import { role } from "./rules/role.rule";
 import { Enforcer } from "casbin";
 import { EmailSender } from "../../shared/utils/email-sender";
+import { permission } from "./rules/permission.rule";
 
 @Resolver((of) => User)
 export class UserResolver {
@@ -64,7 +64,7 @@ export class UserResolver {
     public async sendVerifyCode(@Arg("type", () => VerifyType) type: VerifyType, @Arg("target") target: string) {
         switch (type) {
             case VerifyType.Email:
-                this.emailSender.send([{ name: target, address: target }], content, "text")
+                this.emailSender.send([{ name: target, address: target }], "", "text")
                 break;
             case VerifyType.Sms:
 
@@ -125,7 +125,7 @@ export class UserResolver {
     }
 
     @Mutation(() => Boolean)
-    @Authorized<any>(role(["admin"]))
+    @Authorized(permission(""))
     public async signOut(@Ctx() context: IGeexContext) {
         await this.sessionStore.del(context.session.getUser().id);
         // context.session.logout();

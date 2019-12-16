@@ -20,7 +20,7 @@ type IPassportContext = {
     logout: () => any
 }
 
-export interface IGeexContext {
+export interface IGeexContext  {
     session: ExpressContext & ISubscriptionContext & IPassportContext;
     injector: Injector;
 }
@@ -29,6 +29,7 @@ export interface IUserContext {
     id: string;
     username: string;
     roles: string[];
+    permissions: string[];
     email: string;
     phone: string;
     avatarUrl: string;
@@ -98,11 +99,9 @@ export interface IGeexServerConfig {
     authConfig: IAuthConfig;
 }
 
-export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart {
-    context: IGeexContext;
+export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart<TContext> {
     extensions?: any;
     queryString?: string;
-    requestContext: GraphQLRequestContext,
 }
 
 

@@ -9,12 +9,12 @@ export const environment: IServerConfig = {
         smtp: {
             host: "smtp-mail.outlook.com",
             port: 587,
-            username: "",
-            password: "",
-            secure: true,
+            username: "snys98@outlook.com",
+            password: "snys19931103",
+            secure: false,
             sendAs: {
-                name: "",
-                address: "",
+                name: "snys98@outlook.com",
+                address: "snys98@outlook.com",
             },
         },
     },

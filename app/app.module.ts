@@ -3,22 +3,23 @@ import { buildSchemaSync } from "type-graphql";
 import { JaegerTraceExtension } from "../shared/extensions/jaeger-trace.gql-extension";
 import { ComplexityExtension } from "../shared/extensions/complexity.gql-extension";
 import { AuditLogModule } from "./audit-log/audit-log.module";
-import { UserModule } from "./user/user.module";
 import express = require("express");
 import { ApolloServer } from "apollo-server-express";
 import passport = require("passport");
 import { mongoose } from "@typegoose/typegoose";
-import { environment } from "../environments/environment";
+import { appConfig } from "../configs/app-config";
 import { Passport } from "passport";
 import { buildContext } from "graphql-passport";
 import { GeexServerConfigToken as AppConfigToken } from "../shared/tokens";
 import Redis = require("ioredis");
+import { AccountModule } from "./account/account.module";
+import { SessionModule } from "./session/session.module";
 // tslint:disable-next-line: no-var-requires
 async function preInitialize() {
     return;
 }
 async function postInitialize(self: GraphQLModule) {
-    await mongoose.connect(environment.connections.mongo, { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(appConfig.connections.mongo, { useNewUrlParser: true, useUnifiedTopology: true });
 }
 
 export const AppModule: Promise<GraphQLModule> = (async () => {
@@ -47,12 +48,12 @@ export const AppModule: Promise<GraphQLModule> = (async () => {
             },
             {
                 provide: AppConfigToken,
-                useValue: environment,
+                useValue: appConfig,
             },
             JaegerTraceExtension,
             ComplexityExtension,
         ],
-        imports: [AuditLogModule, await UserModule],
+        imports: [AuditLogModule, await AccountModule, await SessionModule],
     });
     await postInitialize(self);
     return self;

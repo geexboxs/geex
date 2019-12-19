@@ -25,9 +25,6 @@ export class Session {
     constructor(init: Partial<Session>) {
         Object.assign(this, init);
     }
-    public expired() {
-        return this.expireAt < new Date();
-    }
 }
 
 export class SessionStore {
@@ -55,12 +52,7 @@ export class SessionStore {
         const sessionStr = await this.redis.get(`session:${userId}`);
         if (sessionStr) {
             const session = json5.parse(sessionStr) as Session;
-            if (session && !Session.prototype.expired.call(session)) {
-                return session;
-            } else {
-                await this.redis.del(`session:${userId}`);
-                return null;
-            }
+            return session;
         }
         return null;
     }

@@ -1,7 +1,7 @@
 import { GraphQLModule } from "@graphql-modules/core";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { buildSchemaSync, ClassType } from "type-graphql";
-import { environment } from "../../environments/environment";
+import { appConfig } from "../../configs/app-config";
 import { IGeexContext, ILoggerConfig } from "../../types";
 import { AuditLogResolver } from "./audit-log.resolver";
 import { GeexLogger } from "../../shared/utils/logger";
@@ -12,7 +12,7 @@ const resolvers: [ClassType] = [AuditLogResolver];
 export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, IGeexContext>({
     providers: [GeexLogger, {
         provide: LoggerConfigToken,
-        useValue: environment.loggerConfig,
+        useValue: appConfig.loggerConfig,
     }, ...resolvers],
     extraSchemas: () => [buildSchemaSync({
         resolvers,
@@ -24,4 +24,4 @@ export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, Expre
         authChecker: RbacAuthChecker,
     })],
     imports: [],
-}, environment.loggerConfig);
+}, appConfig.loggerConfig);

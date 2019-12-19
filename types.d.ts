@@ -92,7 +92,7 @@ export interface IGeexServerConfig {
     connections: {
         mongo: string;
         redis: string;
-        smtp: ISmtpConfig
+        smtp?: ISmtpConfig
     }
     traceConfig: TracingConfig;
     loggerConfig: ILoggerConfig;

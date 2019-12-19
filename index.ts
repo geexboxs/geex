@@ -2,7 +2,7 @@ import "./utils/array.extension";
 import "./utils/date.extension";
 import "reflect-metadata";
 import express = require("express");
-import { environment } from "./environments/environment";
+import { appConfig } from "./configs/app-config";
 import { AppModule } from "./app/app.module";
 import { Passport } from "passport";
 import { ApolloServer } from "apollo-server-express";
@@ -21,8 +21,8 @@ async function main() {
         })(req, res, next);
     });
     entryModule.injector.get(ApolloServer).applyMiddleware({ app });
-    app.listen(environment.port, environment.hostname);
-    console.log(`Server ready at http://${environment.hostname}:${environment.port}/graphql`);
+    app.listen(appConfig.port, appConfig.hostname);
+    console.log(`Server ready at http://${appConfig.hostname}:${appConfig.port}/graphql`);
 }
 
 main();

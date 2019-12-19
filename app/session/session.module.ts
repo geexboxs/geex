@@ -1,38 +1,28 @@
-
+import { ClassType, buildSchemaSync } from "type-graphql";
+import { SessionResolver } from "./session.resolver";
 import { GraphQLModule } from "@graphql-modules/core";
-import { ProviderScope, Type } from "@graphql-modules/di";
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { createConnection } from "mongoose";
-import { environment } from "../../environments/environment";
-import { IGeexContext, IGeexServerConfig, IAuthConfig, IUserContext } from "../../types";
-import { GeexServerConfigToken, UserModelToken, AuthConfigToken as UserModuleConfigToken } from "../../shared/tokens";
-import { Model, Enforcer, newEnforcer } from "casbin";
-import MongooseAdapter = require("@elastic.io/casbin-mongoose-adapter");
-import { CasbinModel } from "./utils/casbin-model";
-import { UserResolver } from "./user.resolver";
-import { buildSchemaSync, ClassType } from "type-graphql";
-import { getModelForClass, ReturnModelType } from "@typegoose/typegoose";
-import { User } from "./models/user.model";
-import { PasswordHasher } from "./utils/password-hasher";
-import { GraphQLLocalStrategy } from "graphql-passport";
 import { Passport } from "passport";
 import passport = require("passport");
-import ioredis = require("ioredis");
-import { I18N } from "../../shared/utils/i18n";
-import { Jwt } from "../../shared/utils/jwt";
-import { SessionStore } from "./models/session.model";
 import json5 = require("json5");
+import { ReturnModelType, getModelForClass } from "@typegoose/typegoose";
+import { User } from "../account/models/user.model";
+import { UserModelToken, AuthConfigToken } from "../../shared/tokens";
+import { PasswordHasher } from "../account/utils/password-hasher";
+import { I18N } from "../../shared/utils/i18n";
+import { IUserContext, IAuthConfig, IGeexContext } from "../../types";
+import { appConfig } from "../../configs/app-config";
+import { SessionStore } from "./models/session.model";
+import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+import { Jwt } from "../../shared/utils/jwt";
+import { EmailSender } from "../../shared/utils/email-sender";
+import { GraphQLLocalStrategy } from "graphql-passport";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { RbacAuthChecker } from "../../shared/utils/rbac-auth-checker";
-import { EmailSender } from "../../shared/utils/email-sender";
+import ioredis = require("ioredis");
 
-const resolvers: [ClassType] = [UserResolver];
-let enforcer: Enforcer;
+const resolvers: [ClassType] = [SessionResolver];
+
 async function preInitialize() {
-    const adapter = await MongooseAdapter.newAdapter(environment.connections.mongo);
-    enforcer = await newEnforcer(CasbinModel, adapter);
-    enforcer.enableAutoSave(true);
-    await enforcer.loadPolicy();
     return;
 }
 async function postInitialize(self: GraphQLModule) {
@@ -61,8 +51,8 @@ async function postInitialize(self: GraphQLModule) {
     }));
     passport.use("jwt", new JwtStrategy({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: environment.authConfig.tokenSecret,
-        issuer: environment.hostname,
+        secretOrKey: appConfig.authConfig.tokenSecret,
+        issuer: appConfig.hostname,
         audience: "accessToken",
     }, async (jwt_payload, done) => {
         const userId = jwt_payload && jwt_payload.sub;
@@ -71,27 +61,27 @@ async function postInitialize(self: GraphQLModule) {
         }
         const sessionStore = self.injector.get(SessionStore);
         const session = await sessionStore.get(userId);
-        if (session === null || session.expired()) {
+        if (session === null) {
             await sessionStore.del(userId);
-            throw new Error(I18N.message.sessionExpired);
+            throw new Error(I18N.message.sessionNotFound);
         } else {
             done(undefined, session && session.user);
         }
     }));
     return;
 }
-export const UserModule = (async () => {
+export const SessionModule = (async () => {
     await preInitialize();
     const self = new GraphQLModule<IAuthConfig, ExpressContext, IGeexContext>({
         providers: () => [
             SessionStore,
             {
                 provide: ioredis,
-                useValue: new ioredis(environment.connections.redis),
+                useValue: new ioredis(appConfig.connections.redis),
             },
             {
                 provide: Jwt,
-                useValue: new Jwt(environment.authConfig.tokenSecret, `${environment.hostname}`),
+                useValue: new Jwt(appConfig.authConfig.tokenSecret, `${appConfig.hostname}`),
             },
             {
                 provide: Passport,
@@ -104,28 +94,24 @@ export const UserModule = (async () => {
                 },
             },
             {
-                provide: UserModuleConfigToken,
-                useValue: environment.authConfig,
+                provide: AuthConfigToken,
+                useValue: appConfig.authConfig,
             },
             {
                 provide: PasswordHasher,
-                useFactory: (injector) => new PasswordHasher(environment.authConfig.tokenSecret),
+                useFactory: (injector) => new PasswordHasher(appConfig.authConfig.tokenSecret),
             },
             {
                 provide: EmailSender,
-                useValue: new EmailSender(environment.connections.smtp.sendAs, {
-                    secure: environment.connections.smtp.secure,
+                useValue: appConfig.connections.smtp && new EmailSender(appConfig.connections.smtp.sendAs, {
+                    secure: appConfig.connections.smtp.secure,
                     auth: {
-                        user: environment.connections.smtp.username,
-                        pass: environment.connections.smtp.password,
+                        user: appConfig.connections.smtp.username,
+                        pass: appConfig.connections.smtp.password,
                     },
-                    host: environment.connections.smtp.host,
-                    port: environment.connections.smtp.port,
+                    host: appConfig.connections.smtp.host,
+                    port: appConfig.connections.smtp.port,
                 }),
-            },
-            {
-                provide: Enforcer,
-                useValue: enforcer,
             },
             ...resolvers,
         ],
@@ -142,7 +128,7 @@ export const UserModule = (async () => {
                 authChecker: RbacAuthChecker,
             }),
         ],
-    }, environment.authConfig);
+    }, appConfig.authConfig);
 
     await postInitialize(self);
     return self;

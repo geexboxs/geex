@@ -25,7 +25,7 @@ export class Jwt {
      * @returns 
      * @memberof Jwt
      */
-    verify(payload: string, userId: string, userIp: string, audience: string = "*") {
+    verify(payload: string, userId: string, userIp: string, audience: string = "accessToken") {
         const preCondition = jwt.verify(payload, this.secret, {
             issuer: this.iss,
             audience,
@@ -61,7 +61,7 @@ export class JwtPayload {
      */
     constructor(
         user: IUserContext,
-        public aud: string = "*",
+        public aud: string = "accessToken",
         public iss?: string,
         public alg?: string) {
         this.name = user.username;

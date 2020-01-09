@@ -26,7 +26,7 @@ export class SessionResolver {
         private sessionStore: SessionStore,
     ) { }
     @Mutation(() => Boolean)
-    @Authorized(permission(""))
+    @Authorized()
     public async signOut(@Ctx() context: IGeexContext) {
         await this.sessionStore.del(context.session.getUser().id);
         // context.session.logout();

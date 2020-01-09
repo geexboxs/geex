@@ -24,10 +24,6 @@ export class AccountResolver {
     constructor(
         @Inject(UserModelToken)
         private userModel: ModelType<User>,
-        @Inject(ioredis)
-        private redis: ioredis.Redis,
-        @Inject(SessionStore)
-        private sessionStore: SessionStore,
         @Inject(PasswordHasher)
         private passwordHasher: PasswordHasher,
         @Inject(EmailSender)

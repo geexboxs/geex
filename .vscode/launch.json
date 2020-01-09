@@ -7,6 +7,18 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Debug",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
+            "args": [
+                "${workspaceRoot}/index.ts"
+            ],
+            "restart": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Run",
             "console": "integratedTerminal",
             "args": [

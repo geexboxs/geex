@@ -14,9 +14,9 @@ using Repository.Mongo;
 
 namespace Geex.Core.Users
 {
-    public class AppUser : Entity, IFunctionalEntity
+    public class AppUser : Entity
     {
-        public static Func<IComponentContext> ComponentContextResolver { get; set; }
+        
 
         /// <summary>
         /// Gets or sets the username.

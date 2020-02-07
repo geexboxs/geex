@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,6 +9,7 @@ using Autofac;
 using Geex.Core.Users.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+using Geex.Shared._ShouldMigrateToLib.Middlewares;
 using Geex.Shared.Roots;
 using HotChocolate;
 using IdentityModel;
@@ -40,16 +40,16 @@ namespace Geex.Core.Users
         {
             return userCollection.Collection.AsQueryable();
         }
-
+        [UnitOfWork]
         public async Task<bool> Register([Parent] Mutation mutation,
             [Service]IComponentContext componentContext,
             RegisterUserInput input)
         {
             var user = new AuthUser(input.PhoneOrEmail, input.Password, input.UserName);
-            var authUserCollection = componentContext.Resolve<Repository<AuthUser>>(new PositionalParameter(0,"Users"));
+            var authUserCollection = componentContext.Resolve<Repository<AuthUser>>();
             authUserCollection.Insert(user);
             var appUser = new AppUser(user);
-            var appUserCollection = componentContext.Resolve<Repository<AppUser>>(new PositionalParameter(0, "Users"));
+            var appUserCollection = componentContext.Resolve<Repository<AppUser>>();
             appUserCollection.Insert(appUser);
             return true;
         }

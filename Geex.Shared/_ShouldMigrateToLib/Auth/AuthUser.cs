@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
+using CommonServiceLocator;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Repository.Mongo;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class AuthUser : Entity, IFunctionalEntity
+    public class AuthUser : Entity
     {
-        public static Func<IComponentContext> ComponentContextResolver { get; set; }
         /// <summary>
         /// Gets or sets the username.
         /// </summary>
@@ -23,7 +24,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         public AuthUser(string phoneOrEmail, string password, string username = null)
         {
-            var passwordHasher = AuthUser.ComponentContextResolver.Invoke().Resolve<IPasswordHasher<AuthUser>>();
+            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<AuthUser>>();
             if (phoneOrEmail.IsValidEmail())
             {
                 this.Email = phoneOrEmail;
@@ -40,7 +41,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         private void CheckDuplicateUser()
         {
-            var users = ComponentContextResolver.Invoke().Resolve<Repository<AuthUser>>();
+            var users = ServiceLocator.Current.GetService<Repository<AuthUser>>();
             if (users
                 .Any(o => o.Username == this.Username || o.Email == this.Email || o.PhoneNumber == this.PhoneNumber))
             {
@@ -50,7 +51,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
         }
         public bool CheckPassword(string password)
         {
-            var passwordHasher = ComponentContextResolver.Invoke().Resolve<IPasswordHasher<AuthUser>>();
+            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<AuthUser>>();
             return passwordHasher.VerifyHashedPassword(this, this.Password, password) == PasswordVerificationResult.Success;
         }
     }

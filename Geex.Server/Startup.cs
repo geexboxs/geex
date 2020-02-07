@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.CommonServiceLocator;
+using CommonServiceLocator;
 using Geex.Core;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
@@ -110,6 +112,8 @@ namespace Geex.Server
             AddMongoDb(builder, this.Configuration.GetConnectionString("Default"));
         }
 
+
+
         public ISchemaBuilder SchemaBuilder { get; set; }
 
         private static void AddMongoDb(ContainerBuilder builder, string connectionString)
@@ -121,12 +125,14 @@ namespace Geex.Server
             builder.Register(x => new MongoClient(x.Resolve<MongoUrl>())).AsSelf().AsImplementedInterfaces();
             builder.Register(x => x.Resolve<IMongoClient>().GetDatabase(x.Resolve<MongoUrl>().DatabaseName)).AsSelf()
                 .AsImplementedInterfaces();
-            builder.RegisterSource<MongoCollectionRegistrationSource>();
+            builder.RegisterSource<MongoRepositoryRegistrationSource>();
         }
 
         // This is the default if you don't have an environment specific method.
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
+            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(app.ApplicationServices.GetAutofacRoot()));
+
             InitializeIdentityServerDatabase(app);
             if (env.IsDevelopment())
             {

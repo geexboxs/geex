@@ -24,21 +24,7 @@ namespace Geex.Shared
     public abstract class GraphQLModule<T> : IGraphQLModule<T> where T : IGraphQLModule
     {
 
-        public virtual void PostInitialize(IComponentContext serviceProvider)
-        {
-            var types = typeof(T).Assembly.GetTypes();
-            foreach (var typeInfo in types.Where(x => x.GetInterface(nameof(IFunctionalEntity)) != default))
-            {
-                try
-                {
-                    typeInfo.GetProperties().First(x=>x.PropertyType == typeof(Func<IComponentContext>)).SetValue(null, new Func<IComponentContext>(() => serviceProvider));
-                }
-                catch (InvalidOperationException _)
-                {
-                    throw new Exception($"class implements {typeof(IFunctionalEntity)} must have a static member of type {typeof(Func<IComponentContext>)}");
-                }
-            }
-        }
+        public abstract void PostInitialize(IComponentContext serviceProvider);
 
         /// <summary>
         /// This is the first event called on application startup.

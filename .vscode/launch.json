@@ -12,7 +12,9 @@
             "console": "integratedTerminal",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
             "args": [
-                "${workspaceRoot}/index.ts"
+                "-C",
+                "ttypescript",
+                "${workspaceRoot}/index"
             ],
             "restart": true
         },

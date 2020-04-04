@@ -1,0 +1,29 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Mutation {
+  register(registerInput: RegisterInput!): ID!
+  verify(code: String!): Boolean!
+  resetPassword(newPassword: String!, code: String!): Boolean!
+  sendVerifyCode(target: String!, type: VerifyType!): Boolean!
+  sendResetPasswordCode(target: String!, type: VerifyType!): Boolean!
+  changePassword(newPassword: String!, oldPassword: String!): Boolean!
+  setTwoFactor(code: String!, key: String!): Boolean!
+  unsetTwoFactor(code: String!): Boolean!
+}
+
+type Query {
+  twoFactorKey: String!
+}
+
+input RegisterInput {
+  username: String!
+  password: String!
+}
+
+"""verify types, email or sms"""
+enum VerifyType {
+  Email
+  Sms
+}

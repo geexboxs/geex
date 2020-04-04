@@ -3,10 +3,10 @@ import { prop, DocumentType, plugin, pre } from "@typegoose/typegoose";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
-import { Authorized, Field, ObjectType, UseMiddleware } from "type-graphql";
 import { ModelBase } from "../../../shared/utils/model-base";
 import { Injector } from "@graphql-modules/di";
 import { ModelFieldResolver } from "../../../types";
+import { ObjectType, Field } from "@nestjs/graphql";
 
 @ObjectType()
 export class User extends ModelBase {

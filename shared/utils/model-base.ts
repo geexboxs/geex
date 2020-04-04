@@ -1,5 +1,5 @@
 import { pre, prop, Typegoose } from "@typegoose/typegoose";
-import { Field } from "type-graphql";
+import { Field } from "@nestjs/graphql";
 import { ObjectId } from "mongodb";
 import { ModelFieldResolver } from "../../types";
 

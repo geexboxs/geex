@@ -1,9 +1,7 @@
-import { Inject, Injector } from "@graphql-modules/di";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { promises } from "dns";
 import { request } from "express";
 import { ClientSession, Document } from "mongoose";
-import { Arg, Args, Authorized, FieldResolver, Mutation, Query, Resolver, ResolverInterface, Root, UseMiddleware, ID, Ctx } from "type-graphql";
 import { Session, SessionStore } from "./models/session.model";
 import { UserModelToken } from "../../shared/tokens";
 import passport = require("passport");
@@ -19,6 +17,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcryptjs from "bcryptjs";
 import { AccessControl } from "@geexbox/accesscontrol";
 import { JwtService } from "@nestjs/jwt";
+import { Resolver, Mutation, Args } from "@nestjs/graphql";
+import { Authorized } from "type-graphql";
+import { Ctx } from "type-graphql/dist/decorators";
+import { PasswordHasher } from "../account/utils/password-hasher";
+import { Inject } from "@nestjs/common";
 
 @Resolver((of) => Session)
 export class SessionResolver {
@@ -27,6 +30,8 @@ export class SessionResolver {
         private userModel: ModelType<User>,
         @Inject(ioredis)
         private redis: ioredis.Redis,
+        @Inject(PasswordHasher)
+        private passwordHasher: PasswordHasher,
         @Inject(SessionStore)
         private sessionStore: SessionStore,
         @Inject(AccessControl)
@@ -41,27 +46,27 @@ export class SessionResolver {
     }
 
     @Mutation(() => Session)
-    public async externalAuthenticate(@Arg("provider") provider: string, @Arg("userIdentifier") userIdentifier: string) {
+    public async externalAuthenticate(@Args("provider") provider: string, @Args("userIdentifier") userIdentifier: string) {
         // todo:
         throw Error("todo");
     }
 
     @Mutation(() => Session)
-    public async authenticate(@Arg("userIdentifier") userIdentifier: string, @Arg("password") password: string, @Ctx() context: IGeexContext) {
+    public async authenticate(@Args("userIdentifier") userIdentifier: string, @Args("password") password: string, @Ctx() context: IGeexContext) {
         const user = await this.userModel.findOne({ username: userIdentifier })
         if (!user) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
         const sessionCache = await this.sessionStore.createOrRefresh(user.toUserContext());
-        const valid = await bcryptjs.compare(password, user.passwordHash);
+        const valid = this.passwordHasher.verify(password, user.passwordHash);
         if (!valid) {
-            throw Error('Email or password incorrect');
+            throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
         return sessionCache;
     }
 
     @Mutation(() => Boolean)
-    public async impersonate(@Arg("userIdentifier") userIdentifier: string) {
+    public async impersonate(@Args("userIdentifier") userIdentifier: string) {
         // todo:
         throw Error("todo");
     }

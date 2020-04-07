@@ -1,4 +1,3 @@
-import { ObjectType, Field, ID } from "type-graphql";
 import { prop } from "@typegoose/typegoose";
 import { DateTimeResolver, IPv4Resolver } from "graphql-scalars";
 import { IUserContext } from "../../../types";
@@ -7,6 +6,7 @@ import { Jwt, JwtPayload } from "../../../shared/utils/jwt";
 import { Inject } from "@graphql-modules/di";
 import json5 = require("json5");
 import { JwtService } from "@nestjs/jwt";
+import { ObjectType, Field, ID } from "@nestjs/graphql";
 
 @ObjectType()
 export class Session {

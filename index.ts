@@ -1,5 +1,6 @@
 import "./utils/array.extension";
 import "./utils/date.extension";
+import "./utils/typegoose.extension";
 import "reflect-metadata";
 import express = require("express");
 import { appConfig } from "./configs/app-config";

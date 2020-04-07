@@ -20,6 +20,9 @@ export class User extends ModelBase {
     @Field()
     public username!: string;
     @prop()
+    @Field()
+    public test!: number;
+    @prop()
     public passwordHash!: string;
     @prop({
         ref: UserClaims,
@@ -40,6 +43,7 @@ export class User extends ModelBase {
         super();
         this.username = username;
         this.passwordHash = passwordHash;
+        this.test = 5;
     }
 
     toUserContext(this: DocumentType<User>) {
@@ -49,8 +53,8 @@ export class User extends ModelBase {
         return { username: this.username, id: this.id, ...this.claims } as IUserContext;
     }
     async setRoles(this: DocumentType<User>, roles: string[]) {
-        await this.model(nameof(UserRole)).deleteMany({ userId: this._id }).exec();
-        let roleEntities = await Promise.all(roles.map(async x => await this.model(nameof(Role)).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
-        this.userRoles = (await this.model(nameof(UserRole)).create(roleEntities.map(x => new UserRole({ userId: this._id, roleId: x._id })))) as DocumentType<UserRole>[];
+        await this.model(UserRole).deleteMany({ userId: this._id }).exec();
+        let roleEntities = await Promise.all(roles.map(async x => await this.model(Role).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
+        this.userRoles = (await this.model(UserRole).create(roleEntities.map(x => new UserRole({ userId: this._id, roleId: x._id })))) as DocumentType<UserRole>[];
     }
 }

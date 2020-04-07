@@ -2,6 +2,9 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Use JavaScript Date object for date/time fields."""
+scalar DateTime
+
 type Mutation {
   register(registerInput: RegisterInput!): ID!
   verify(code: String!): Boolean!
@@ -11,6 +14,10 @@ type Mutation {
   changePassword(newPassword: String!, oldPassword: String!): Boolean!
   setTwoFactor(code: String!, key: String!): Boolean!
   unsetTwoFactor(code: String!): Boolean!
+  signOut: Boolean!
+  externalAuthenticate(userIdentifier: String!, provider: String!): Session!
+  authenticate(password: String!, userIdentifier: String!): Session!
+  impersonate(userIdentifier: String!): Boolean!
   assignRole(roles: [String!]!, identifier: String!): Boolean!
 }
 
@@ -21,6 +28,12 @@ type Query {
 input RegisterInput {
   username: String!
   password: String!
+}
+
+type Session {
+  userId: ID!
+  accessToken: String!
+  expireAt: DateTime!
 }
 
 """verify types, email or sms"""

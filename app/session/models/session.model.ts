@@ -6,6 +6,7 @@ import ioredis = require("ioredis");
 import { Jwt, JwtPayload } from "../../../shared/utils/jwt";
 import { Inject } from "@graphql-modules/di";
 import json5 = require("json5");
+import { JwtService } from "@nestjs/jwt";
 
 @ObjectType()
 export class Session {
@@ -33,7 +34,9 @@ export class SessionStore {
      *
      */
 
-    constructor(@Inject(ioredis) private redis: ioredis.Redis, @Inject(Jwt) private jwt: Jwt) {
+    constructor(@Inject(ioredis) private redis: ioredis.Redis,
+        private jwtService: JwtService,
+    ) {
         this.ttl = 3600 * 24 * 10;
     }
     async del(userId: any) {
@@ -41,7 +44,7 @@ export class SessionStore {
     }
     async createOrRefresh(user: IUserContext) {
         const session = new Session({
-            accessToken: this.jwt.sign(new JwtPayload(user)),
+            accessToken: this.jwtService.sign({ ...user}),
             user,
             expireAt: new Date().add({ seconds: this.ttl }),
         });

@@ -30,11 +30,12 @@ export class AccountResolver {
         @Optional()
         @Inject(EmailSender)
         private emailSender: EmailSender,
-        @Inject(REQUEST) private request: ExecutionContext,
+        @Inject(REQUEST)
+        private request: ExecutionContext,
     ) { }
 
     @Mutation(() => ID)
-    public async register(@Args("registerInput") { username, password }: RegisterInput) {
+    public async register(@Args("registerInput") { username: username, password }: RegisterInput) {
         const newUser = new User(username, this.passwordHasher.hash(password));
         const result = await this.userModel.create(newUser);
         return result.id;

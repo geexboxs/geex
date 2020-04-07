@@ -11,6 +11,7 @@ type Mutation {
   changePassword(newPassword: String!, oldPassword: String!): Boolean!
   setTwoFactor(code: String!, key: String!): Boolean!
   unsetTwoFactor(code: String!): Boolean!
+  assignRole(roles: [String!]!, identifier: String!): Boolean!
 }
 
 type Query {

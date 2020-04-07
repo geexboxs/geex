@@ -1,11 +1,11 @@
-import { IGeexServerConfig, ILoggerConfig, IAuthConfig } from "../types";
+import { IGeexServerConfig } from "./types";
 
 export const appConfig: IGeexServerConfig = {
     hostname: "127.0.0.1",
     port: 4000,
     connections: {
         mongo: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
-        redis: "redis://localhost:6379/0?password=P@ssw0rd",
+        redis: "redis://localhost:6379/1",
         smtp: undefined,
         // smtp: {
         //     host: "smtp-mail.outlook.com",

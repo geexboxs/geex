@@ -29,75 +29,14 @@ export interface IUserContext {
     id: string;
     username: string;
     roles: string[];
-    permissions: string[];
     email: string;
     phone: string;
     avatarUrl: string;
-
 }
 
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 type LogTarget = "console" | "file" | "remote";
-
-
-export interface IAuthConfig {
-    tokenSecret: string;
-}
-
-export interface ILoggerConfig {
-    /**
-     * log target
-     *
-     * @type {LogTarget}
-     * @default "console"
-     * @memberof LoggerConfig
-     */
-    target?: LogTarget;
-    /**
-     * minimal level to log
-     *
-     * @type {LogLevel}
-     * @default "info"
-     * @memberof LoggerConfig
-     */
-    filterLevel?: LogLevel;
-    consoleConfig?: {};
-    fileConfig?: {};
-    remoteConfig?: {};
-    /**
-     * metadata to be logged in every log entry
-     *
-     * @type {{}}
-     * @memberof LoggerConfig
-     */
-    metadata?: {};
-}
-
-type ISmtpConfig = {
-    secure: boolean;
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-    sendAs: {
-        name: string;
-        address: string;
-    };
-};
-
-export interface IGeexServerConfig {
-    hostname: string;
-    port: number;
-    connections: {
-        mongo: string;
-        redis: string;
-        smtp?: ISmtpConfig
-    }
-    traceConfig: TracingConfig;
-    loggerConfig: ILoggerConfig;
-    authConfig: IAuthConfig;
-}
 
 export interface IGeexRequestStart<TContext = IGeexContext> extends RequestStart<TContext> {
     extensions?: any;
@@ -109,14 +48,6 @@ export interface IGeexRequestEnd<TContext = IGeexContext> {
     graphqlResponse: GraphQLResponse;
     context: TContext;
 }
-
-
-
-
-
-
-
-
 
 declare module "type-graphql" {
     export function Ctx<T extends IGeexContext = IGeexContext>(propertyName?: keyof T): ParameterDecorator;

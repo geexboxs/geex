@@ -21,7 +21,8 @@
         "align": false,
         "member-access": false,
         "ban-types": false,
-        "prefer-const": false
+        "prefer-const": false,
+        "array-type":false
     },
     "rulesDirectory": [],
     "linterOptions": {

@@ -7,23 +7,30 @@ import { Arg, Args, Authorized, FieldResolver, Mutation, Query, Resolver, Resolv
 import { Session, SessionStore } from "./models/session.model";
 import { UserModelToken } from "../../shared/tokens";
 import passport = require("passport");
-import { IGeexContext } from "../../types";
+import { IGeexContext, IUserContext } from "../../types";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
 import { Enforcer } from "casbin";
 import { EmailSender } from "../../shared/utils/email-sender";
 import { permission } from "../session/rules/permission.rule";
+import { User } from "../account/models/user.model";
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcryptjs from "bcryptjs";
+import { AccessControl } from "@geexbox/accesscontrol";
+import { JwtService } from "@nestjs/jwt";
 
 @Resolver((of) => Session)
 export class SessionResolver {
     constructor(
-        @Inject(UserModelToken)
-        private userModel: ModelType<Session>,
+        @InjectModel(nameof(User))
+        private userModel: ModelType<User>,
         @Inject(ioredis)
         private redis: ioredis.Redis,
         @Inject(SessionStore)
         private sessionStore: SessionStore,
+        @Inject(AccessControl)
+        private ac: AccessControl,
     ) { }
     @Mutation(() => Boolean)
     @Authorized()
@@ -41,12 +48,16 @@ export class SessionResolver {
 
     @Mutation(() => Session)
     public async authenticate(@Arg("userIdentifier") userIdentifier: string, @Arg("password") password: string, @Ctx() context: IGeexContext) {
-        const { user } = await context.session.authenticate("local", { username: userIdentifier, password });
-        if (user) {
-            const sessionCache = await this.sessionStore.createOrRefresh(user);
-            return sessionCache;
+        const user = await this.userModel.findOne({ username: userIdentifier })
+        if (!user) {
+            throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
-        throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
+        const sessionCache = await this.sessionStore.createOrRefresh(user.toUserContext());
+        const valid = await bcryptjs.compare(password, user.passwordHash);
+        if (!valid) {
+            throw Error('Email or password incorrect');
+        }
+        return sessionCache;
     }
 
     @Mutation(() => Boolean)

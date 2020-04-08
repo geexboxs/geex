@@ -5,7 +5,7 @@ import { AccountModule } from './account/account.module';
 import { join } from 'lodash';
 import { appConfig } from '../configs/app-config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SessionModule } from './session/session.module';
+import { SessionModule } from './authentication/authentication.module';
 import { UserManageModule } from './user-manage/user-manage.module';
 
 @Module({

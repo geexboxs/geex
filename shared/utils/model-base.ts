@@ -1,4 +1,4 @@
-import { pre, prop, Typegoose } from "@typegoose/typegoose";
+import { pre, prop, Typegoose, DocumentType } from "@typegoose/typegoose";
 import { Field } from "@nestjs/graphql";
 import { ObjectId } from "mongodb";
 import { ModelFieldResolver } from "../../types";
@@ -13,7 +13,7 @@ import { ModelFieldResolver } from "../../types";
     this.updateAt = new Date();
     next();
 })
-export abstract class ModelBase {
+export abstract class ModelBase<T = any> {
     // tslint:disable-next-line: variable-name
     public _id!: ObjectId;
 
@@ -28,4 +28,8 @@ export abstract class ModelBase {
     @prop()
     @Field()
     public updateAt!: Date;
+
+    public get _documentContext() {
+        return this as unknown as DocumentType<T>;
+    }
 }

@@ -20,7 +20,7 @@ type IPassportContext = {
     logout: () => any
 }
 
-export interface IGeexContext  {
+export interface IGeexContext {
     session: ExpressContext & ISubscriptionContext & IPassportContext;
     injector: Injector;
 }
@@ -48,50 +48,4 @@ export interface IGeexRequestEnd<TContext = IGeexContext> {
     graphqlResponse: GraphQLResponse;
     context: TContext;
 }
-
-declare module "type-graphql" {
-    export function Ctx<T extends IGeexContext = IGeexContext>(propertyName?: keyof T): ParameterDecorator;
-}
-
-declare global {
-    namespace Express {
-        // tslint:disable-next-line:no-empty-interface
-        interface AuthInfo { }
-        // tslint:disable-next-line:no-empty-interface
-        interface User extends IUserContext { }
-
-        interface Request {
-            authInfo?: AuthInfo;
-            user?: User;
-
-            // These declarations are merged into express's Request type
-            login(user: User, done: (err: any) => void): void;
-            login(user: User, options: any, done: (err: any) => void): void;
-            logIn(user: User, done: (err: any) => void): void;
-            logIn(user: User, options: any, done: (err: any) => void): void;
-
-            logout(): void;
-            logOut(): void;
-
-            isAuthenticated(): boolean;
-            isUnauthenticated(): boolean;
-        }
-    }
-}
-
-type ModelFieldResolver<T, TKey extends keyof T = any> = (this: T, ...params: T[TKey] extends (...args: any) => any ? Parameters<T[TKey]> : never) => T[TKey];
-
-
-
-/** fields not in base class of mongoose Document. */
-// export type GeexEntityIntersection<T = any> = Partial<Omit<T, keyof Document>>;
-// export type GeexPrimitive = string | number | bigint | boolean | symbol | String | Number | Date | Boolean | BigInt | Symbol | ObjectId | undefined;
-
-// export type PrimitiveIntersection<T> = {
-//     [key in keyof T]: T[key] extends GeexPrimitive ? key : never
-// }[keyof T];
-
-// /** concrete fields that can be used in doc query. */
-// export type QueryableIntersection<T> = Omit<{
-//     [key in PrimitiveIntersection<T>]?: T[key]
-// }, keyof Omit<Document, keyof { id }>>
+export type RequiredPartial<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>

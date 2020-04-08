@@ -3,6 +3,7 @@ import { LogTarget } from "../types";
 import { LogLevel } from "@nestjs/common";
 export interface IAuthConfig {
     tokenSecret: string;
+    expiresIn: string | number;
 }
 export interface ILoggerConfig {
     /**

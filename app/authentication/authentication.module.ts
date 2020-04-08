@@ -4,7 +4,7 @@ import { getModelForClass } from '@typegoose/typegoose';
 import { appConfig } from '../../configs/app-config';
 import { EmailSender } from '../../shared/utils/email-sender';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SessionResolver } from './session.resolver';
+import { AuthenticationResolver } from './authentication.resolver';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessControl } from "@geexbox/accesscontrol";
@@ -19,9 +19,9 @@ import ioredis = require("ioredis");
         PassportModule,
         JwtModule.register({
             secret: appConfig.authConfig.tokenSecret,
-            signOptions: { expiresIn: '60s' },
+            signOptions: { expiresIn: appConfig.authConfig.expiresIn },
         })],
-    providers: [SessionResolver,
+    providers: [AuthenticationResolver,
         SessionStore,
         {
             provide: ioredis,

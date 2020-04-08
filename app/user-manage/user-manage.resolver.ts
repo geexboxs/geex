@@ -36,9 +36,13 @@ export class UserManageResolver {
         return true;
     }
 
-    @Query(() => String)
-    public async twoFactorKey() {
-        // todo:
-        throw Error("todo");
+    @Mutation(() => Boolean)
+    public async assignPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+        let user = await this.userModel.findOne({ $or: [{ username: identifier }, { _id: identifier }] });
+        if (user == null) {
+            throw Error("user not found");
+        }
+        await user.setUserPermissions(permissions);
+        return true;
     }
 }

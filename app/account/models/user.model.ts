@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
 import { ModelBase } from "../../../shared/utils/model-base";
 import { Injector } from "@graphql-modules/di";
-import { ModelFieldResolver, IUserContext } from "../../../types";
+import { IUserContext } from "../../../types";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { Role } from "../../user-manage/model/role.model";
@@ -14,14 +14,11 @@ import { UserRole } from "../../user-manage/model/user-role.model";
 
 
 @ObjectType()
-export class User extends ModelBase {
+export class User extends ModelBase<User> {
 
     @prop()
     @Field()
     public username!: string;
-    @prop()
-    @Field()
-    public test!: number;
     @prop()
     public passwordHash!: string;
     @prop({
@@ -36,6 +33,9 @@ export class User extends ModelBase {
         foreignField: nameof(UserRole.prototype.userId),
     })
     public userRoles?: Array<Ref<UserRole>>;
+    @prop()
+    @Field()
+    public permissions: string[] = [];
     /**
      *
      */
@@ -43,18 +43,21 @@ export class User extends ModelBase {
         super();
         this.username = username;
         this.passwordHash = passwordHash;
-        this.test = 5;
     }
 
-    toUserContext(this: DocumentType<User>) {
+    toUserContext() {
         if (!isDocument(this)) {
             throw Error("entity is not attached to database");
         }
         return { username: this.username, id: this.id, ...this.claims } as IUserContext;
     }
-    async setRoles(this: DocumentType<User>, roles: string[]) {
-        await this.model(UserRole).deleteMany({ userId: this._id }).exec();
-        let roleEntities = await Promise.all(roles.map(async x => await this.model(Role).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
-        this.userRoles = (await this.model(UserRole).create(roleEntities.map(x => new UserRole({ userId: this._id, roleId: x._id })))) as DocumentType<UserRole>[];
+    async setRoles(roles: string[]) {
+        await this._documentContext.model(UserRole).deleteMany({ userId: this._id }).exec();
+        let roleEntities = await Promise.all(roles.map(async x => await this._documentContext.model(Role).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
+        this.userRoles = (await this._documentContext.model(UserRole).create(roleEntities.map(x => new UserRole({ userId: this._id, roleId: x._id })))) as DocumentType<UserRole>[];
+    }
+    async setUserPermissions(permissions: string[]) {
+        this.permissions = permissions;
+        await this._documentContext.save();
     }
 }

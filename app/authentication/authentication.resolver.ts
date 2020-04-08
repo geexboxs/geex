@@ -11,7 +11,7 @@ import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
 import { Enforcer } from "casbin";
 import { EmailSender } from "../../shared/utils/email-sender";
-import { permission } from "../session/rules/permission.rule";
+import { permission } from "./rules/permission.rule";
 import { User } from "../account/models/user.model";
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcryptjs from "bcryptjs";
@@ -24,7 +24,7 @@ import { PasswordHasher } from "../account/utils/password-hasher";
 import { Inject } from "@nestjs/common";
 
 @Resolver((of) => Session)
-export class SessionResolver {
+export class AuthenticationResolver {
     constructor(
         @InjectModel(nameof(User))
         private userModel: ModelType<User>,

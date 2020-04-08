@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
 import { ModelBase } from "../../../shared/utils/model-base";
 import { Injector } from "@graphql-modules/di";
-import { ModelFieldResolver, IUserContext } from "../../../types";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { User } from "../../account/models/user.model";

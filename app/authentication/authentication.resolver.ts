@@ -5,7 +5,6 @@ import { ClientSession, Document } from "mongoose";
 import { Session, SessionStore } from "./models/session.model";
 import { UserModelToken } from "../../shared/tokens";
 import passport = require("passport");
-import { IGeexContext, IUserContext } from "../../types";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
@@ -21,7 +20,7 @@ import { Resolver, Mutation, Args } from "@nestjs/graphql";
 import { Authorized } from "type-graphql";
 import { Ctx } from "type-graphql/dist/decorators";
 import { PasswordHasher } from "../account/utils/password-hasher";
-import { Inject } from "@nestjs/common";
+import { Inject, ExecutionContext } from "@nestjs/common";
 
 @Resolver((of) => Session)
 export class AuthenticationResolver {
@@ -39,8 +38,8 @@ export class AuthenticationResolver {
     ) { }
     @Mutation(() => Boolean)
     @Authorized()
-    public async signOut(@Ctx() context: IGeexContext) {
-        await this.sessionStore.del(context.session.getUser().id);
+    public async signOut(@Ctx() context: ExecutionContext) {
+        // await this.sessionStore.del(context.session.getUser().id);
         // context.session.logout();
         return true;
     }
@@ -52,7 +51,7 @@ export class AuthenticationResolver {
     }
 
     @Mutation(() => Session)
-    public async authenticate(@Args("userIdentifier") userIdentifier: string, @Args("password") password: string, @Ctx() context: IGeexContext) {
+    public async authenticate(@Args("userIdentifier") userIdentifier: string, @Args("password") password: string, @Ctx() context: ExecutionContext) {
         const user = await this.userModel.findOne({ username: userIdentifier })
         if (!user) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);

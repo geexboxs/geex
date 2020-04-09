@@ -4,19 +4,23 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { AccountModule } from './account/account.module';
 import { join } from 'lodash';
 import { appConfig } from '../configs/app-config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { SessionModule } from './authentication/authentication.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 import { UserManageModule } from './user-manage/user-manage.module';
+import { AuthorizationModule } from './authorization/authorization.module';
+import { SharedModule } from './shared.module';
+import { ServiceLocator } from '../shared/utils/service-locator';
 
 @Module({
     imports: [
+        SharedModule,
         AccountModule,
-        SessionModule,
+        AuthenticationModule,
+        AuthorizationModule,
         UserManageModule,
-        MongooseModule.forRoot(appConfig.connections.mongo, { useNewUrlParser: true, useUnifiedTopology: true }),
         GraphQLModule.forRoot({
             installSubscriptionHandlers: true,
             autoSchemaFile: 'schema.gql',
+            context: (args) => ({ ...args, injector: ServiceLocator.instance }),
         }),
     ],
 })

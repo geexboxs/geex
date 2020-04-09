@@ -1,7 +1,7 @@
 import { pre, prop, Typegoose, DocumentType } from "@typegoose/typegoose";
 import { Field } from "@nestjs/graphql";
 import { ObjectId } from "mongodb";
-import { ModelFieldResolver } from "../../types";
+import { RefType } from "@typegoose/typegoose/lib/types";
 
 @pre<ModelBase>("save", function (next) {
     if (!this) {
@@ -15,11 +15,11 @@ import { ModelFieldResolver } from "../../types";
 })
 export abstract class ModelBase<T = any> {
     // tslint:disable-next-line: variable-name
-    public _id!: ObjectId;
+    public _id!: RefType;
 
     @Field((returns) => String)
     public get id() {
-        return this._id.toHexString();
+        return this._id.toString();
     }
 
     @prop()

@@ -8,7 +8,6 @@ import { Session, SessionStore } from "../authentication/models/session.model";
 import { VerifyType } from "./models/verify-type";
 import { RegisterInput } from "./models/register.input";
 import passport = require("passport");
-import { IGeexContext } from "../../types";
 import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";

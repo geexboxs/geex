@@ -2,15 +2,15 @@ import { GraphQLModule } from "@graphql-modules/core";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { buildSchemaSync, ClassType } from "type-graphql";
 import { appConfig } from "../../configs/app-config";
-import { IGeexContext } from "../../types";
 import { AuditLogResolver } from "./audit-log.resolver";
 import { GeexLogger } from "../../shared/utils/logger";
 import { LoggerConfigToken } from "../../shared/tokens";
 import { RbacAuthChecker } from "../../shared/utils/rbac-auth-checker";
 import { ILoggerConfig } from "../../configs/types";
+import { ExecutionContext } from "@nestjs/common";
 
 const resolvers: [ClassType] = [AuditLogResolver];
-export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, IGeexContext>({
+export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, ExecutionContext>({
     providers: [GeexLogger, {
         provide: LoggerConfigToken,
         useValue: appConfig.loggerConfig,
@@ -19,7 +19,7 @@ export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, Expre
         resolvers,
         container: {
             get: (someClass, resolverData) => {
-                return (resolverData.context as IGeexContext).injector.get(someClass);
+                return (resolverData.context as ExecutionContext).injector.get(someClass);
             },
         },
         authChecker: RbacAuthChecker,

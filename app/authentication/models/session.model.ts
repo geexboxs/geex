@@ -1,6 +1,5 @@
 import { prop } from "@typegoose/typegoose";
 import { DateTimeResolver, IPv4Resolver } from "graphql-scalars";
-import { IUserContext } from "../../../types";
 import ioredis = require("ioredis");
 import { Jwt, JwtPayload } from "../../../shared/utils/jwt";
 import { Inject } from "@graphql-modules/di";
@@ -13,13 +12,13 @@ export class Session {
 
     @Field(() => ID)
     public get userId() {
-        return this.user.id;
+        return this.user.userId;
     }
     @Field(() => String)
     public accessToken!: string;
     @Field(() => DateTimeResolver)
     public expireAt!: Date;
-    user!: IUserContext;
+    user!: Express.User;
     /**
      *
      */
@@ -42,13 +41,13 @@ export class SessionStore {
     async del(userId: any) {
         await this.redis.del(`session:${userId}`);
     }
-    async createOrRefresh(user: IUserContext) {
+    async createOrRefresh(user: Express.User) {
         const session = new Session({
             accessToken: this.jwtService.sign({ ...user}),
             user,
             expireAt: new Date().add({ seconds: this.ttl }),
         });
-        await this.redis.setex(`session:${user.id}`, this.ttl, json5.stringify(session));
+        await this.redis.setex(`session:${user.userId}`, this.ttl, json5.stringify(session));
         return session;
     }
     async get(userId: string): Promise<Session | null> {

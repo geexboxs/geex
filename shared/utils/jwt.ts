@@ -1,6 +1,5 @@
 import _ = require("lodash");
 import { Netmask } from "netmask";
-import { IGeexContext, IUserContext } from "../../types";
 import { Request } from "express";
 import jwt = require("jsonwebtoken");
 
@@ -52,7 +51,7 @@ export class JwtPayload {
 
     /**
      * Creates an instance of JwtPayload.
-     * @param {(Pick<IGeexContext, "session" | "user">)} context
+     * @param {(Pick<ExecutionContext, "session" | "user">)} context
      * @param {("accessToken" | "refreshToken")} aud
      * @param {string} [iss]
      * @param {string} [ipr]
@@ -60,12 +59,12 @@ export class JwtPayload {
      * @memberof JwtPayload
      */
     constructor(
-        user: IUserContext,
+        user: Express.User,
         public aud: string = "accessToken",
         public iss?: string,
         public alg?: string) {
         this.name = user.username;
-        this.sub = user.id;
+        this.sub = user.userId;
         this.role = user.roles.join(",");
         this.email = user.email;
         this.phone_number = user.phone;

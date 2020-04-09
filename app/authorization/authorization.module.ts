@@ -3,24 +3,23 @@ import { UserModelToken } from '../../shared/tokens';
 import { getModelForClass } from '@typegoose/typegoose';
 import { appConfig } from '../../configs/app-config';
 import { EmailSender } from '../../shared/utils/email-sender';
-import { MongooseModule } from '@nestjs/mongoose';
-import { SessionResolver } from './authentication.resolver';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessControl } from "@geexbox/accesscontrol";
 import { User } from '../account/models/user.model';
 import { PasswordHasher } from '../account/utils/password-hasher';
 import ioredis = require("ioredis");
+import { SharedModule } from '../shared.module';
+import { AuthorizationResolver } from './authorization.resolver';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: nameof(User), schema: getModelForClass(User).schema }]),
-        PassportModule,
+        SharedModule,
         JwtModule.register({
             secret: appConfig.authConfig.tokenSecret,
             signOptions: { expiresIn: appConfig.authConfig.expiresIn },
         })],
-    providers: [SessionResolver,
+    providers: [AuthorizationResolver,
         {
             provide: ioredis,
             useValue: new ioredis(appConfig.connections.redis),
@@ -28,8 +27,8 @@ import ioredis = require("ioredis");
         AccessControl,
         {
             provide: PasswordHasher,
-            useFactory: (injector) => new PasswordHasher(appConfig.authConfig.tokenSecret),
+            useFactory: () => new PasswordHasher(appConfig.authConfig.tokenSecret),
         },
     ],
 })
-export class SessionModule { }
+export class AuthorizationModule { }

@@ -1,10 +1,10 @@
 import { GraphQLExtension } from "graphql-extensions";
-import { IGeexRequestStart, IGeexContext } from "../../types";
 import { getComplexity, simpleEstimator, fieldConfigEstimator } from "graphql-query-complexity";
 import { request } from "http";
 import { separateOperations, ExecutionArgs } from "graphql";
+import { ExecutionContext } from "@nestjs/common";
 
-export class ComplexityExtension implements GraphQLExtension<IGeexContext> {
+export class ComplexityExtension implements GraphQLExtension<ExecutionContext> {
     public executionDidStart?({ executionArgs }: { executionArgs: ExecutionArgs; }) {
         const complexity = getComplexity({
             // Our built schema

@@ -4,7 +4,7 @@ export const appConfig: IGeexServerConfig = {
     hostname: "127.0.0.1",
     port: 4000,
     connections: {
-        mongo: "mongodb://XxusernamexX:XxpasswordxX@localhost:27017/test?authSource=admin",
+        mongo: `mongodb://${encodeURIComponent("u5ern@me")}:${encodeURIComponent("P@ssw0rd")}@localhost:27017/test?authSource=admin`,
         redis: "redis://localhost:6379/1",
         smtp: undefined,
         // smtp: {
@@ -19,7 +19,7 @@ export const appConfig: IGeexServerConfig = {
         //     },
         // },
     },
-    authConfig: { tokenSecret: "test" },
+    authConfig: { tokenSecret: "test", expiresIn: 3600 * 24 },
     loggerConfig: {},
     traceConfig: {
         serviceName: "geex",

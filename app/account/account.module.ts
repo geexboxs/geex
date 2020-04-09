@@ -6,10 +6,10 @@ import { User } from './models/user.model';
 import { PasswordHasher } from './utils/password-hasher';
 import { appConfig } from '../../configs/app-config';
 import { EmailSender } from '../../shared/utils/email-sender';
-import { MongooseModule } from '@nestjs/mongoose';
+import { SharedModule } from '../shared.module';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: nameof(User), schema: getModelForClass(User).schema }])],
+    imports: [SharedModule],
     providers: [AccountResolver,
         {
             provide: PasswordHasher,
@@ -17,7 +17,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         },
         {
             provide: EmailSender,
-            useValue: appConfig.connections.smtp && new EmailSender(appConfig.connections.smtp.sendAs, {
+            useFactory: (injector) => appConfig.connections.smtp && new EmailSender(appConfig.connections.smtp.sendAs, {
                 secure: appConfig.connections.smtp.secure,
                 auth: {
                     user: appConfig.connections.smtp.username,

@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
 import { ModelBase } from "../../../shared/utils/model-base";
 import { Injector } from "@graphql-modules/di";
-import { IUserContext } from "../../../types";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { Role } from "../../user-manage/model/role.model";
@@ -34,7 +33,7 @@ export class User extends ModelBase<User> {
     })
     public userRoles?: Array<Ref<UserRole>>;
     @prop()
-    @Field()
+    @Field(_ => [String])
     public permissions: string[] = [];
     /**
      *
@@ -49,7 +48,7 @@ export class User extends ModelBase<User> {
         if (!isDocument(this)) {
             throw Error("entity is not attached to database");
         }
-        return { username: this.username, id: this.id, ...this.claims } as IUserContext;
+        return { username: this.username, userId: this.id, ...this.claims } as Express.User;
     }
     async setRoles(roles: string[]) {
         await this._documentContext.model(UserRole).deleteMany({ userId: this._id }).exec();

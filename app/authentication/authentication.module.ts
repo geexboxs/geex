@@ -3,7 +3,6 @@ import { UserModelToken } from '../../shared/tokens';
 import { getModelForClass } from '@typegoose/typegoose';
 import { appConfig } from '../../configs/app-config';
 import { EmailSender } from '../../shared/utils/email-sender';
-import { MongooseModule } from '@nestjs/mongoose';
 import { AuthenticationResolver } from './authentication.resolver';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -12,10 +11,12 @@ import { User } from '../account/models/user.model';
 import { PasswordHasher } from '../account/utils/password-hasher';
 import { SessionStore } from './models/session.model';
 import ioredis = require("ioredis");
+import { SharedModule } from '../shared.module';
+import { JwtStrategy } from './utils/jwt.stratage';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: nameof(User), schema: getModelForClass(User).schema }]),
+        SharedModule,
         PassportModule,
         JwtModule.register({
             secret: appConfig.authConfig.tokenSecret,
@@ -27,6 +28,7 @@ import ioredis = require("ioredis");
             provide: ioredis,
             useValue: new ioredis(appConfig.connections.redis),
         },
+        JwtStrategy,
         AccessControl,
         {
             provide: PasswordHasher,
@@ -34,4 +36,4 @@ import ioredis = require("ioredis");
         },
     ],
 })
-export class SessionModule { }
+export class AuthenticationModule { }

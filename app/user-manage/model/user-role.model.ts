@@ -9,6 +9,7 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { User } from "../../account/models/user.model";
 import { Role } from "./role.model";
+import { RefType } from "@typegoose/typegoose/lib/types";
 
 
 @ObjectType()
@@ -28,16 +29,16 @@ export class UserRole extends ModelBase {
     @prop({
         index: true,
     })
-    roleId: ObjectId;
+    roleId: RefType;
     @prop({
         index: true,
     })
-    userId: ObjectId;
+    userId: RefType;
 
     /**
      *
      */
-    constructor({ userId, roleId }: { userId: ObjectId, roleId: ObjectId }) {
+    constructor({ userId, roleId }: { userId: RefType, roleId: RefType }) {
         super();
         this.roleId = roleId;
         this.userId = userId;

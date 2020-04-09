@@ -1,10 +1,12 @@
 import OpentracingExtension, { RequestStart, ExtendedGraphQLResolveInfo } from "apollo-opentracing";
-import { IGeexContext, IGeexRequestStart, IGeexRequestEnd, IGeexServerConfig } from "../../types";
 import { Inject, Injectable, ProviderScope } from "@graphql-modules/di";
 import { GeexServerConfigToken } from "../tokens";
 import { initTracer, TracingConfig, Reporter } from "jaeger-client";
 import { GeexLogger } from "../utils/logger";
 import { Span } from "opentracing";
+import { ExecutionContext } from "@nestjs/common";
+import { IGeexServerConfig } from "../../configs/types";
+import { IGeexRequestStart, IGeexRequestEnd } from "../../types";
 
 @Injectable({
     scope: ProviderScope.Request,
@@ -47,17 +49,17 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
             rootSpan.setOperationName(operation);
             rootSpan.addTags({
                 operation,
-                ip: infos.context.session.req.connection.remoteAddress,
+                ip: infos.context.req.connection.remoteAddress,
             });
             rootSpan.log({
                 request: infos.requestContext.request,
             });
             // tslint:disable-next-line: no-string-literal
-            infos.context.session.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
+            infos.context.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
             // tslint:disable-next-line: no-string-literal
             this["willSendResponse"] = (res: IGeexRequestEnd) => {
                 rootSpan.log({
-                    headers: res.context.session.res.getHeaders(),
+                    headers: res.context.res.getHeaders(),
                 });
                 rootSpan.log({
                     response: res.graphqlResponse,
@@ -70,7 +72,7 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
     willResolveField(source: any,
         args: { [argName: string]: any },
         // tslint:disable-next-line: align
-        context: IGeexContext,
+        context: ExecutionContext,
         info: ExtendedGraphQLResolveInfo) {
         if (info.span) {
             info.span.log({ args });

@@ -3,7 +3,7 @@ import mongodb = require('mongodb');
 import { Document } from "mongoose";
 import { User } from "../app/account/models/user.model";
 import { UserRole } from "../app/user-manage/model/user-role.model";
-import { ModelType } from "@typegoose/typegoose/lib/types";
+import { ModelType, RefType } from "@typegoose/typegoose/lib/types";
 import { MongooseDocument } from "mongoose";
 import { Connection } from "mongoose";
 import { Schema } from "mongoose";
@@ -30,8 +30,14 @@ export type QuerySelector<T> = {
         $ne?: T[key],
         $in?: T[key][],
         $nin?: T[key][],
+
     }
-};
+} | {
+        [key in keyof T]: {
+            $regex?: RegExp,
+            $options?: any
+        }
+    };
 type FieldKeys<T> = Exclude<keyof PrimitiveProps<T>, keyof Document> | PrimitiveKeys<{ _id?: ObjectId, id?: string, __v?: number }>;
 type FieldProps<T> = Omit<PrimitiveProps<T>, keyof Document> | PrimitiveProps<{ _id?: ObjectId, id?: string, __v?: number }>;
 type OperationProps<T> = QuerySelector<FieldProps<T>>;
@@ -48,13 +54,6 @@ export type ConditionObject<T> =
     OperationProps<T> |
     // 逻辑运算查询
     LogicOperationProps<T>;
-type a = Record<"age", Number>;
-type b<T> = { [key in keyof T]: T[key] };
-type c = b<User>;
-type hehe = keyof FieldProps<User>
-type d = OperationProps<User>;
-let a: d = { id: { $gt: "1" } };
-type test = ConditionObject<User>
 
 declare module "mongoose" {
     export interface Model<T extends Document, QueryHelpers = {}> extends NodeJS.EventEmitter, ModelProperties {
@@ -64,11 +63,11 @@ declare module "mongoose" {
          * @param id value of _id to query by
          * @param projection optional fields to return
          */
-        findById(id: any | string | number,
+        findById(id: RefType,
             callback?: (err: any, res: T | null) => void): DocumentQuery<T | null, T> & QueryHelpers;
-        findById(id: any | string | number, projection: any,
+        findById(id: RefType, projection: any,
             callback?: (err: any, res: T | null) => void): DocumentQuery<T | null, T> & QueryHelpers;
-        findById(id: any | string | number, projection: any, options: any,
+        findById(id: RefType, projection: any, options: any,
             callback?: (err: any, res: T | null) => void): DocumentQuery<T | null, T> & QueryHelpers;
 
         /** Counts number of matching documents in a database collection. */

@@ -6,7 +6,7 @@ import { ModelType } from "@typegoose/typegoose/lib/types";
 import { Inject, ExecutionContext, UseGuards } from "@nestjs/common";
 import { Permission } from "./models/permission.model";
 import { REQUEST } from "@nestjs/core";
-import { GqlAuthGuard } from "./utils/jwt.guard";
+import { AuthGuard } from "./utils/jwt.guard";
 
 
 @Resolver((of) => Permission)
@@ -21,12 +21,12 @@ export class AuthorizationResolver {
         @Inject(CONTEXT)
         private context: ExecutionContext,
     ) { }
-    @UseGuards(GqlAuthGuard)
+    @UseGuards(AuthGuard)
     @Query(() => [Permission])
     public async getAllPermissions() {
         return (await this.permissionModel.find().exec());
     }
-    @UseGuards(GqlAuthGuard)
+    @UseGuards(AuthGuard)
     @Mutation(() => [Permission])
     public async createPermissions(@Args({ name: "permissions", type: () => [String] }) permissions: [string]) {
         return await Promise.all(permissions.map(async x => {
@@ -38,13 +38,13 @@ export class AuthorizationResolver {
         }));
     }
 
-    @UseGuards(GqlAuthGuard)
+    @UseGuards(AuthGuard)
     @Query(() => [Permission])
     public async getMyPermissions() {
         return (await this.userModel.findById(this.context.req.user?.userId).exec())?.permissions;
     }
 
-    @UseGuards(GqlAuthGuard)
+    @UseGuards(AuthGuard)
     @ResolveField(() => [Permission])
     async childPermissions(@Parent() parent: Permission): Promise<Permission[]> {
         return await parent.childPermissions();

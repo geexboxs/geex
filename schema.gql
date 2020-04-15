@@ -19,7 +19,8 @@ type Mutation {
   authenticate(password: String!, userIdentifier: String!): Session!
   impersonate(userIdentifier: String!): Boolean!
   assignRole(roles: [String!]!, identifier: String!): Boolean!
-  assignPermission(permissions: [String!]!, identifier: String!): Boolean!
+  assignUserPermission(permissions: [String!]!, identifier: String!): Boolean!
+  assignRolePermission(permissions: [String!]!, roles: [String!]!): Boolean!
   createPermissions(permissions: [String!]!): [Permission!]!
 }
 

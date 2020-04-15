@@ -37,12 +37,21 @@ export class UserManageResolver {
     }
 
     @Mutation(() => Boolean)
-    public async assignPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+    public async assignUserPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
         let user = await this.userModel.findOne({ $or: [{ username: identifier }, { _id: identifier }] });
         if (user == null) {
             throw Error("user not found");
         }
         await user.setUserPermissions(permissions);
         return true;
+    }
+    @Mutation(() => Boolean)
+    public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roleNames: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+        let roles = await this.roleModel.find({ name: { $in: roleNames } }).exec();
+        if (roles?.length > 1) {
+            await Promise.all(roles.map(x => x.setRolePermissions(permissions)));
+            return true;
+        }
+        throw Error("user not found");
     }
 }

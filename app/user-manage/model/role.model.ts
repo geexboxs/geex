@@ -26,6 +26,9 @@ export class Role extends ModelBase {
     })
     @Field()
     public name!: string;
+    @prop()
+    @Field(_ => [String])
+    permissions: string[] = [];
 
     /**
      *
@@ -33,5 +36,9 @@ export class Role extends ModelBase {
     constructor(name: string) {
         super();
         this.name = name;
+    }
+    async setRolePermissions(permissions: string[]) {
+        this.permissions = permissions;
+        await this._documentContext.save();
     }
 }

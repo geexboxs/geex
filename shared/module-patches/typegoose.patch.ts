@@ -1,8 +1,8 @@
 import { ObjectId } from "bson";
 import mongodb = require('mongodb');
 import { Document } from "mongoose";
-import { User } from "../app/account/models/user.model";
-import { UserRole } from "../app/user-manage/model/user-role.model";
+import { User } from "../../app/account/models/user.model";
+import { UserRole } from "../../app/user-manage/model/user-role.model";
 import { ModelType, RefType } from "@typegoose/typegoose/lib/types";
 import { MongooseDocument } from "mongoose";
 import { Connection } from "mongoose";

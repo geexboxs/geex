@@ -1,7 +1,7 @@
 import { INestApplicationContext, IUserContext, Type, Abstract } from "@nestjs/common";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { ModelBase } from "../shared/utils/model-base";
+import { ModelBase } from "../utils/model-base";
 import { NestApplication } from "@nestjs/core";
 
 

@@ -9,8 +9,6 @@ import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
 import { Enforcer } from "casbin";
-import { EmailSender } from "../../shared/utils/email-sender";
-import { permission } from "./rules/permission.rule";
 import { User } from "../account/models/user.model";
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcryptjs from "bcryptjs";
@@ -56,7 +54,7 @@ export class AuthenticationResolver {
         if (!user) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
-        const sessionCache = await this.sessionStore.createOrRefresh(user.toUserContext());
+        const sessionCache = await this.sessionStore.createOrRefresh(await user.toExpressUser());
         const valid = this.passwordHasher.verify(password, user.passwordHash);
         if (!valid) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);

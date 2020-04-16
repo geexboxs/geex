@@ -1,6 +1,8 @@
 import { prop } from "@typegoose/typegoose";
 import { Field, ObjectType } from "@nestjs/graphql";
+ 
 
+ 
 @ObjectType()
 export class AuditLog {
     @Field()

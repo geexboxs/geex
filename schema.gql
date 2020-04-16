@@ -21,18 +21,20 @@ type Mutation {
   assignRole(roles: [String!]!, identifier: String!): Boolean!
   assignUserPermission(permissions: [String!]!, identifier: String!): Boolean!
   assignRolePermission(permissions: [String!]!, roles: [String!]!): Boolean!
-  createPermissions(permissions: [String!]!): [Permission!]!
 }
 
-type Permission {
-  name: String!
-  childPermissions: [Permission!]!
+type PermissionNode {
+  name: PermissionScalar!
+  childPermissions: [PermissionNode!]!
 }
+
+"""PermissionScalar"""
+scalar PermissionScalar
 
 type Query {
   twoFactorKey: String!
-  getAllPermissions: [Permission!]!
-  getMyPermissions: [Permission!]!
+  getAllPermissions: [PermissionScalar!]!
+  getMyPermissions: [PermissionScalar!]!
 }
 
 input RegisterInput {

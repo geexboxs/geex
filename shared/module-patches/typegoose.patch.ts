@@ -1,15 +1,16 @@
 import { ObjectId } from "bson";
-import mongodb = require('mongodb');
-import { Document } from "mongoose";
+import mongodb = require("mongodb");
+import { Document, Query, ModelUpdateOptions } from "mongoose";
 import { User } from "../../app/account/models/user.model";
-import { UserRole } from "../../app/user-manage/model/user-role.model";
-import { ModelType, RefType } from "@typegoose/typegoose/lib/types";
+import { ModelType, RefType, IObjectWithTypegooseFunction } from "@typegoose/typegoose/lib/types";
 import { MongooseDocument } from "mongoose";
 import { Connection } from "mongoose";
 import { Schema } from "mongoose";
 import { ResolverTypeFn } from "@nestjs/graphql";
 import { Type } from "@nestjs/common";
 import { Model } from "mongoose";
+import { Base } from "@typegoose/typegoose/lib/defaultClasses";
+import { mongoose } from "@typegoose/typegoose";
 
 /** fields not in base class of mongoose Document. */
 export type GeexEntityIntersection<T = any> = Partial<Omit<T, keyof Document>>;
@@ -54,6 +55,28 @@ export type ConditionObject<T> =
     OperationProps<T> |
     // 逻辑运算查询
     LogicOperationProps<T>;
+/* 
+$currentDate	Sets the value of a field to current date, either as a Date or a Timestamp.
+"$inc"|	Increments the value of the field by the specified amount.
+"$min"|	Only updates the field if the specified value is less than the existing field value.
+"$max"|	Only updates the field if the specified value is greater than the existing field value.
+"$mul"|	Multiplies the value of the field by the specified amount.
+"$rename"|	Renames a field.
+"$set"|	Sets the value of a field in a document.
+"$set"|OnInsert	Sets the value of a field if an update results in an insert of a document. Has no effect on update operations that modify existing documents.
+"$unset"|	Removes the specified field from a document.
+*/
+export type UpdateOperator<T> = FieldProps<T> | {
+    [key in "$currentDate" |
+    "$inc" |
+    "$min" |
+    "$max" |
+    "$mul" |
+    "$rename" |
+    "$set" |
+    "$OnInsert" |
+    "$unset"]: any
+};
 
 declare module "mongoose" {
     export interface Model<T extends Document, QueryHelpers = {}> extends NodeJS.EventEmitter, ModelProperties {
@@ -279,9 +302,9 @@ declare module "mongoose" {
             callback?: (err: any, res: T) => void): Promise<T>;
 
         /** Removes documents from the collection. */
-        remove(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
-        deleteOne(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
-        deleteMany(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject['result'] & { deletedCount?: number }> & QueryHelpers;
+        remove(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject["result"] & { deletedCount?: number }> & QueryHelpers;
+        deleteOne(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject["result"] & { deletedCount?: number }> & QueryHelpers;
+        deleteMany(conditions: ConditionObject<T>, callback?: (err: any) => void): Query<mongodb.DeleteWriteOpResultObject["result"] & { deletedCount?: number }> & QueryHelpers;
 
         /**
          * Same as update(), except MongoDB replace the existing document with the given document (no atomic operators like $set).
@@ -334,6 +357,7 @@ declare module "mongoose" {
         __v?: number;
     }
 }
+
 const oldModel = Model.prototype.model;
 Model.prototype.model = function model<T>(ctor: Type<T> | string, schema?: Schema<any> | undefined, collection?: string | undefined) {
     if (typeof ctor == "string") {
@@ -342,4 +366,4 @@ Model.prototype.model = function model<T>(ctor: Type<T> | string, schema?: Schem
     else {
         return oldModel.bind(this)(ctor.name, schema, collection);
     }
-}
+};

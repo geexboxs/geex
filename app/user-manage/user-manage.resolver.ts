@@ -10,6 +10,8 @@ import { RegisterInput } from "../account/models/register.input";
 import { VerifyType } from "../account/models/verify-type";
 import { I18N } from "../../shared/utils/i18n";
 import { Role } from "./model/role.model";
+import { ObjectID } from "mongodb";
+import { SessionStore } from "../authentication/models/session.model";
 
 
 @Resolver((of) => User)
@@ -20,8 +22,10 @@ export class UserManageResolver {
         @InjectModel(nameof(Role))
         private roleModel: ModelType<Role>,
         @Optional()
-        @Inject(EmailSender)
-        private emailSender: EmailSender,
+        // @Inject(EmailSender)
+        // private emailSender: EmailSender,
+        @Inject(SessionStore)
+        private sessionStore: SessionStore,
         @Inject(REQUEST)
         private request: ExecutionContext,
     ) { }
@@ -33,12 +37,18 @@ export class UserManageResolver {
             throw Error("user not found");
         }
         await user.setRoles(roles);
+        // await this.sessionStore.createOrRefresh(await user.toExpressUser());
         return true;
     }
 
     @Mutation(() => Boolean)
     public async assignUserPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-        let user = await this.userModel.findOne({ $or: [{ username: identifier }, { _id: identifier }] });
+        let user;
+        if (ObjectID.isValid(identifier)) {
+            user = await this.userModel.findOne({ _id: identifier });
+        } else {
+            user = await this.userModel.findOne({ username: identifier });
+        }
         if (user == null) {
             throw Error("user not found");
         }
@@ -48,10 +58,10 @@ export class UserManageResolver {
     @Mutation(() => Boolean)
     public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roleNames: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
         let roles = await this.roleModel.find({ name: { $in: roleNames } }).exec();
-        if (roles?.length > 1) {
+        if (roles?.length > 0) {
             await Promise.all(roles.map(x => x.setRolePermissions(permissions)));
             return true;
         }
-        throw Error("user not found");
+        throw Error("role not found");
     }
 }

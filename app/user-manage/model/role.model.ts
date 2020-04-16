@@ -8,18 +8,18 @@ import { Injector } from "@graphql-modules/di";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { User } from "../../account/models/user.model";
-import { UserRole } from "./user-role.model";
+ 
 
 
+ 
 @ObjectType()
-
 export class Role extends ModelBase {
     @prop({
         ref: Role,
-        localField: nameof(Role.prototype._id),
-        foreignField: nameof(UserRole.prototype.roleId),
+        localField: nameof(User.prototype._id),
+        foreignField: nameof(Role.prototype._id),
     })
-    public userRoles?: Ref<UserRole>[];
+    public users?: Ref<User>[];
 
     @prop({
         unique: true,

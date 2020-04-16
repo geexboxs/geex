@@ -1,0 +1,27 @@
+diff --git a/node_modules/@types/mongoose/index.d.ts b/node_modules/@types/mongoose/index.d.ts
+index 0852c68..3854bbc 100644
+--- a/node_modules/@types/mongoose/index.d.ts
++++ b/node_modules/@types/mongoose/index.d.ts
+@@ -1398,14 +1398,14 @@ declare module "mongoose" {
+     replaceOne(replacement: any, callback?: (err: any, raw: any) => void): Query<any>;
+ 
+     /** Sends an update command with this document _id as the query selector.  */
+-    update(doc: any, callback?: (err: any, raw: any) => void): Query<any>;
+-    update(doc: any, options: ModelUpdateOptions,
+-      callback?: (err: any, raw: any) => void): Query<any>;
+-
+-    /** Sends an updateOne command with this document _id as the query selector.  */
+-    updateOne(doc: any, callback?: (err: any, raw: any) => void): Query<any>;
+-    updateOne(doc: any, options: ModelUpdateOptions,
+-      callback?: (err: any, raw: any) => void): Query<any>;
++    // update(doc: any, callback?: (err: any, raw: any) => void): Query<any>;
++    // update(doc: any, options: ModelUpdateOptions,
++    //   callback?: (err: any, raw: any) => void): Query<any>;
++
++    // /** Sends an updateOne command with this document _id as the query selector.  */
++    // updateOne(doc: any, callback?: (err: any, raw: any) => void): Query<any>;
++    // updateOne(doc: any, options: ModelUpdateOptions,
++    //   callback?: (err: any, raw: any) => void): Query<any>;
+ 
+     /**
+      * Executes registered validation rules for this document.

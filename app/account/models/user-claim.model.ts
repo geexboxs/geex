@@ -3,6 +3,8 @@ import { Field } from "@nestjs/graphql";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { User } from "./user.model";
 import { ModelBase } from "../../../shared/utils/model-base";
+ 
+
 
 export class UserClaims extends ModelBase {
     @prop()

@@ -21,6 +21,7 @@ declare module "@nestjs/common" {
         userId: string;
         username: string;
         roles: string[];
+        scopes: string[];
         email: string;
         phone: string;
         avatarUrl: string;
@@ -39,10 +40,13 @@ declare module "@nestjs/core" {
         get<TInput = any, TResult = TInput>(typeOrToken: Type<TInput> | Abstract<TInput> | string | symbol, options?: {
             strict: boolean;
         }): TResult;
-        getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>
+        getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>;
     }
     export interface INestApplication {
-        getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>
+        getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>;
+        get<TInput = any, TResult = TInput>(typeOrToken: Type<TInput> | Abstract<TInput> | string | symbol, options?: {
+            strict: boolean;
+        }): TResult;
     }
 }
 

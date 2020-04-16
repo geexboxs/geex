@@ -13,7 +13,6 @@ import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
 import { EmailSender } from "../../shared/utils/email-sender";
-import { permission } from "../authentication/rules/permission.rule";
 import { Resolver, Mutation, ID, Args, Query } from "@nestjs/graphql";
 import { REQUEST } from "@nestjs/core";
 import { ExecutionContext, Optional } from "@nestjs/common";

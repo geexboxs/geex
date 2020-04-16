@@ -7,6 +7,8 @@ import json5 = require("json5");
 import { JwtService } from "@nestjs/jwt";
 import { ObjectType, Field, ID } from "@nestjs/graphql";
 
+
+
 @ObjectType()
 export class Session {
 
@@ -43,7 +45,7 @@ export class SessionStore {
     }
     async createOrRefresh(user: Express.User) {
         const session = new Session({
-            accessToken: this.jwtService.sign({ ...user}),
+            accessToken: this.jwtService.sign({ ...user }),
             user,
             expireAt: new Date().add({ seconds: this.ttl }),
         });

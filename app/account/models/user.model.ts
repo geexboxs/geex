@@ -9,7 +9,9 @@ import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { Role } from "../../user-manage/model/role.model";
 import { UserClaims } from "./user-claim.model";
-import { UserRole } from "../../user-manage/model/user-role.model";
+import { RefType } from "@typegoose/typegoose/lib/types";
+
+
 
 
 @ObjectType()
@@ -22,16 +24,20 @@ export class User extends ModelBase<User> {
     public passwordHash!: string;
     @prop({
         ref: UserClaims,
+        autopopulate: true,
         localField: nameof(User.prototype._id),
-        foreignField: nameof(UserClaims.prototype.userId),
+        foreignField: nameof(UserClaims.prototype._id),
     })
     public claims?: Ref<UserClaims>;
     @prop({
         ref: Role,
-        localField: nameof(Role.prototype._id),
-        foreignField: nameof(UserRole.prototype.userId),
+        autopopulate: true,
+        localField: nameof(User.prototype.roleIds),
+        foreignField: nameof(Role.prototype._id),
     })
-    public userRoles?: Array<Ref<UserRole>>;
+    public readonly roles?: Array<Role>;
+    @prop()
+    public roleIds?: RefType[];
     @prop()
     @Field(_ => [String])
     public permissions: string[] = [];
@@ -44,16 +50,23 @@ export class User extends ModelBase<User> {
         this.passwordHash = passwordHash;
     }
 
-    toUserContext() {
+    async toExpressUser() {
         if (!isDocument(this)) {
             throw Error("entity is not attached to database");
         }
-        return { username: this.username, userId: this.id, ...this.claims } as Express.User;
+
+        // let rolePermissions = await Promise.all(this.roles?.map(async x => {
+        //     await x._documentContext.populate("role").execPopulate();
+        //     return (x.role as Role).permissions;
+        // }));
+        let rolePermissions = this.roles?.mapMany(x => x.permissions) ?? [];
+        return { username: this.username, userId: this.id, ...this.claims, roles: this.roles?.map(x => x.name), scopes: this.permissions.concat(rolePermissions) } as Express.User;
     }
     async setRoles(roles: string[]) {
-        await this._documentContext.model(UserRole).deleteMany({ userId: this._id }).exec();
         let roleEntities = await Promise.all(roles.map(async x => await this._documentContext.model(Role).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
-        this.userRoles = (await this._documentContext.model(UserRole).create(roleEntities.map(x => new UserRole({ userId: this._id, roleId: x._id })))) as DocumentType<UserRole>[];
+        this.roleIds = roleEntities.map(x => x._id);
+        await this._documentContext.save();
+        // await this._documentContext.update({ $set: { roleIds: roleEntities.map(x => x._id) } }).exec();
     }
     async setUserPermissions(permissions: string[]) {
         this.permissions = permissions;

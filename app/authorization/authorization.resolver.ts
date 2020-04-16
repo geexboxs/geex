@@ -4,49 +4,40 @@ import { InjectModel } from "@nestjs/mongoose";
 import { User } from "../account/models/user.model";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { Inject, ExecutionContext, UseGuards } from "@nestjs/common";
-import { Permission } from "./models/permission.model";
 import { REQUEST } from "@nestjs/core";
 import { AuthGuard } from "./utils/jwt.guard";
+import { PermissionScalar } from "./scalars/permission.scalar";
+import { AppPermission, APP_PERMISSIONS } from "./permissions.const";
+import { PermissionNode } from "./models/permission.model";
 
 
-@Resolver((of) => Permission)
+@Resolver((of) => PermissionNode)
 export class AuthorizationResolver {
     constructor(
         @InjectModel(nameof(User))
         private userModel: ModelType<User>,
-        @InjectModel(nameof(Permission))
-        private permissionModel: ModelType<Permission>,
         @Inject(AccessControl)
         private ac: AccessControl,
         @Inject(CONTEXT)
         private context: ExecutionContext,
     ) { }
-    @UseGuards(AuthGuard)
-    @Query(() => [Permission])
-    public async getAllPermissions() {
-        return (await this.permissionModel.find().exec());
-    }
-    @UseGuards(AuthGuard)
-    @Mutation(() => [Permission])
-    public async createPermissions(@Args({ name: "permissions", type: () => [String] }) permissions: [string]) {
-        return await Promise.all(permissions.map(async x => {
-            try {
-                return await this.permissionModel.create(new Permission({ name: x }));
-            } catch (error) {
-                return new Permission({ name: x });
-            }
-        }));
+    @UseGuards(AuthGuard("permission.read"))
+    @Query(() => [PermissionScalar])
+    public getAllPermissions() {
+        return Object.values(APP_PERMISSIONS);
     }
 
-    @UseGuards(AuthGuard)
-    @Query(() => [Permission])
+    @UseGuards(AuthGuard())
+    @Query(() => [PermissionScalar])
     public async getMyPermissions() {
-        return (await this.userModel.findById(this.context.req.user?.userId).exec())?.permissions;
+        let user = await this.userModel.findById(this.context.req.user?.userId).exec();
+        return user?.permissions
+            .concat(user.roles?.mapMany(x => x.permissions) ?? []);
     }
 
-    @UseGuards(AuthGuard)
-    @ResolveField(() => [Permission])
-    async childPermissions(@Parent() parent: Permission): Promise<Permission[]> {
-        return await parent.childPermissions();
+    @UseGuards(AuthGuard())
+    @ResolveField(() => [PermissionNode])
+    async childPermissions(@Parent() parent: PermissionNode) {
+        return parent.childPermissions;
     }
 }

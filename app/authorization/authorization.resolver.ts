@@ -9,6 +9,7 @@ import { AuthGuard } from "./utils/jwt.guard";
 import { PermissionScalar } from "./scalars/permission.scalar";
 import { AppPermission, APP_PERMISSIONS } from "./permissions.const";
 import { PermissionNode } from "./models/permission.model";
+import { Role } from "../user-manage/model/role.model";
 
 
 @Resolver((of) => PermissionNode)
@@ -21,7 +22,7 @@ export class AuthorizationResolver {
         @Inject(CONTEXT)
         private context: ExecutionContext,
     ) { }
-    @UseGuards(AuthGuard("permission.read"))
+    @UseGuards(AuthGuard("query:permission:any"))
     @Query(() => [PermissionScalar])
     public getAllPermissions() {
         return Object.values(APP_PERMISSIONS);
@@ -31,8 +32,7 @@ export class AuthorizationResolver {
     @Query(() => [PermissionScalar])
     public async getMyPermissions() {
         let user = await this.userModel.findById(this.context.req.user?.userId).exec();
-        return user?.permissions
-            .concat(user.roles?.mapMany(x => x.permissions) ?? []);
+        return this.ac.getPermissionsOf(user?.id, true);
     }
 
     @UseGuards(AuthGuard())

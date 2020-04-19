@@ -25,8 +25,6 @@ export class AuthenticationResolver {
     constructor(
         @InjectModel(nameof(User))
         private userModel: ModelType<User>,
-        @Inject(ioredis)
-        private redis: ioredis.Redis,
         @Inject(PasswordHasher)
         private passwordHasher: PasswordHasher,
         @Inject(SessionStore)
@@ -54,7 +52,7 @@ export class AuthenticationResolver {
         if (!user) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
         }
-        const sessionCache = await this.sessionStore.createOrRefresh(await user.toExpressUser());
+        const sessionCache = await this.sessionStore.createOrRefresh(await user.toContextUser());
         const valid = this.passwordHasher.verify(password, user.passwordHash);
         if (!valid) {
             throw Error(I18N.message.userIdentifierOrPasswordIncorrect);

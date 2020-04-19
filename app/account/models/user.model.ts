@@ -10,6 +10,11 @@ import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { Role } from "../../user-manage/model/role.model";
 import { UserClaims } from "./user-claim.model";
 import { RefType } from "@typegoose/typegoose/lib/types";
+import { ServiceLocator } from "../../../shared/utils/service-locator";
+import { CommandBus } from "@nestjs/cqrs";
+import { UserPermissionChangeCommand } from "../../authorization/commands/change-user-role.command";
+import { AccessControl } from "@geexbox/accesscontrol";
+import { APP_PERMISSIONS } from "../../authorization/permissions.const";
 
 
 
@@ -29,18 +34,6 @@ export class User extends ModelBase<User> {
         foreignField: nameof(UserClaims.prototype._id),
     })
     public claims?: Ref<UserClaims>;
-    @prop({
-        ref: Role,
-        autopopulate: true,
-        localField: nameof(User.prototype.roleIds),
-        foreignField: nameof(Role.prototype._id),
-    })
-    public readonly roles?: Array<Role>;
-    @prop()
-    public roleIds?: RefType[];
-    @prop()
-    @Field(_ => [String])
-    public permissions: string[] = [];
     /**
      *
      */
@@ -50,7 +43,7 @@ export class User extends ModelBase<User> {
         this.passwordHash = passwordHash;
     }
 
-    async toExpressUser() {
+    async toContextUser() {
         if (!isDocument(this)) {
             throw Error("entity is not attached to database");
         }
@@ -59,17 +52,20 @@ export class User extends ModelBase<User> {
         //     await x._documentContext.populate("role").execPopulate();
         //     return (x.role as Role).permissions;
         // }));
-        let rolePermissions = this.roles?.mapMany(x => x.permissions) ?? [];
-        return { username: this.username, userId: this.id, ...this.claims, roles: this.roles?.map(x => x.name), scopes: this.permissions.concat(rolePermissions) } as Express.User;
+        let roles = ServiceLocator.instance.get(AccessControl).getInheritedRolesOf(this.id);
+        return { username: this.username, userId: this.id, ...this.claims, roles } as Express.User;
     }
     async setRoles(roles: string[]) {
-        let roleEntities = await Promise.all(roles.map(async x => await this._documentContext.model(Role).findOneAndUpdate({ name: x }, { name: x }, { upsert: true, new: true }).exec()));
-        this.roleIds = roleEntities.map(x => x._id);
-        await this._documentContext.save();
-        // await this._documentContext.update({ $set: { roleIds: roleEntities.map(x => x._id) } }).exec();
+        let acc = ServiceLocator.instance.get(AccessControl);
+        acc.grant(this.id);
+        acc.grant(roles);
+        acc.extendRole(this.id, roles, true);
     }
     async setUserPermissions(permissions: string[]) {
-        this.permissions = permissions;
-        await this._documentContext.save();
+        let acc = ServiceLocator.instance.get(AccessControl);
+        permissions.forEach(x => {
+            acc.grant(this.id).do(x)
+        });
+        await ServiceLocator.instance.get(CommandBus).execute(new UserPermissionChangeCommand(this));
     }
 }

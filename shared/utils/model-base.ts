@@ -15,7 +15,7 @@ import { RefType } from "@typegoose/typegoose/lib/types";
 })
 export abstract class ModelBase<T = any> {
     // tslint:disable-next-line: variable-name
-    public _id!: RefType;
+    public _id!: ObjectId;
 
     @Field((returns) => String)
     public get id() {

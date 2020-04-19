@@ -12,18 +12,18 @@ import { I18N } from "../../shared/utils/i18n";
 import { Role } from "./model/role.model";
 import { ObjectID } from "mongodb";
 import { SessionStore } from "../authentication/models/session.model";
-
+import { AccessControl } from "@geexbox/accesscontrol";
 
 @Resolver((of) => User)
 export class UserManageResolver {
     constructor(
         @InjectModel(nameof(User))
         private userModel: ModelType<User>,
-        @InjectModel(nameof(Role))
-        private roleModel: ModelType<Role>,
-        @Optional()
+        // @Optional()
         // @Inject(EmailSender)
         // private emailSender: EmailSender,
+        @Inject(AccessControl)
+        private ac: AccessControl,
         @Inject(SessionStore)
         private sessionStore: SessionStore,
         @Inject(REQUEST)
@@ -56,12 +56,16 @@ export class UserManageResolver {
         return true;
     }
     @Mutation(() => Boolean)
-    public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roleNames: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-        let roles = await this.roleModel.find({ name: { $in: roleNames } }).exec();
-        if (roles?.length > 0) {
-            await Promise.all(roles.map(x => x.setRolePermissions(permissions)));
+    public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+        if (roles?.any() && permissions?.any()) {
+            roles.forEach(role => {
+                permissions.forEach(permission => {
+                    this.ac.grant(role).do(permission);
+                });
+            });
             return true;
         }
+
         throw Error("role not found");
     }
 }

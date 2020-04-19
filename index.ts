@@ -1,7 +1,7 @@
-import "./shared/module-patches/array.patch";
-import "./shared/module-patches/date.patch";
-import "./shared/module-patches/typegoose.patch";
-import "./shared/module-patches/nestjs.patch";
+import "./patches/custom-patches/array.patch";
+import "./patches/custom-patches/date.patch";
+import "./patches/custom-patches/typegoose.patch";
+import "./patches/custom-patches/nestjs.patch";
 import "reflect-metadata";
 import express = require("express");
 import { appConfig } from "./configs/app-config";

@@ -4,6 +4,7 @@ import { GqlExecutionContext } from "@nestjs/graphql";
 import { SessionStore } from "../../authentication/models/session.model";
 import { ServiceLocator } from "../../../shared/utils/service-locator";
 import { AppPermission } from "../permissions.const";
+import { AccessControl } from "@geexbox/accesscontrol";
 
 export const AuthGuard = function (...scopes: AppPermission[]) {
     return mixin(class AuthGuard extends NestAuthGuard("jwt") {
@@ -20,24 +21,22 @@ export const AuthGuard = function (...scopes: AppPermission[]) {
         }
 
         async canActivate(context: ExecutionContext) {
-            await super.canActivate(context);
+            let result = await super.canActivate(context);
             let user = this.getRequest(context).user;
             if (!user) {
                 throw new UnauthorizedException();
             }
 
             if (this.scopes?.any() == false) {
-                return true;
+                return result && true;
             }
 
-            let session = await this.sessionStore.get(user.userId);
+            let permissions = ServiceLocator.instance.get(AccessControl).getPermissionsOf(user.userId);
 
-            let scopes = session?.user.scopes;
-
-            if (scopes && this.scopes.intersect(scopes).any()) {
-                return true;
+            if (permissions && this.scopes.intersect(permissions).any()) {
+                return result && true;
             }
-            
+
             throw new UnauthorizedException(`Required scopes (${this.scopes.join(',')})`);
         }
         getRequest(context: ExecutionContext) {

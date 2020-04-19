@@ -8,37 +8,40 @@ import { Injector } from "@graphql-modules/di";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { User } from "../../account/models/user.model";
- 
+import { ServiceLocator } from "../../../shared/utils/service-locator";
+import { CommandBus } from "@nestjs/cqrs";
+import { UserPermissionChangeCommand } from "../../authorization/commands/change-user-role.command";
+import { RefType } from "@typegoose/typegoose/lib/types";
+import { AccessControl } from "@geexbox/accesscontrol";
 
 
- 
+
+
 @ObjectType()
-export class Role extends ModelBase {
-    @prop({
-        ref: Role,
-        localField: nameof(User.prototype._id),
-        foreignField: nameof(Role.prototype._id),
-    })
-    public users?: Ref<User>[];
-
-    @prop({
-        unique: true,
-    })
+export class Role {
     @Field()
     public name!: string;
-    @prop()
-    @Field(_ => [String])
-    permissions: string[] = [];
 
     /**
      *
      */
     constructor(name: string) {
-        super();
         this.name = name;
     }
     async setRolePermissions(permissions: string[]) {
-        this.permissions = permissions;
-        await this._documentContext.save();
+        let acc = ServiceLocator.instance.get(AccessControl);
+        permissions.forEach(x => acc.grant(this.name).do(x));
+        await ServiceLocator.instance.get(CommandBus).execute(new UserPermissionChangeCommand(this));
+    }
+    public async getOwnedUsers() {
+        let acc = ServiceLocator.instance.get(AccessControl);
+        let userIds = acc.getInheritedRolesOf(this.name);
+        let users = await ServiceLocator.instance.getModel(User).find({ _id: { $in: userIds } }).exec();
+        return users;
+    }
+
+    public async getPermissions() {
+        let acc = ServiceLocator.instance.get(AccessControl);
+        return acc.getPermissionsOf(this.name);
     }
 }

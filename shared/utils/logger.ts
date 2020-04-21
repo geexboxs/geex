@@ -1,7 +1,9 @@
 import { Inject, Injectable } from "@graphql-modules/di";
 import winston = require("winston");
-import { LoggerConfigToken } from "../tokens";
-import { LogTarget, LogLevel, ILoggerConfig } from "../../types";
+import { ILoggerConfig, IGeexServerConfig } from "../../configs/types";
+import { LogLevel } from "@nestjs/common";
+import { LogTarget } from "../../types";
+import { GeexServerConfigToken } from "../tokens";
 
 @Injectable()
 export class GeexLogger {
@@ -12,7 +14,8 @@ export class GeexLogger {
     /**
      *
      */
-    constructor(@Inject(LoggerConfigToken) config?: ILoggerConfig) {
+    constructor(@Inject(GeexServerConfigToken) serverConfig?: IGeexServerConfig) {
+        let config = serverConfig?.loggerConfig;
         if (config && config.target) {
             this.target = config.target;
         }
@@ -28,7 +31,6 @@ export class GeexLogger {
                             winston.format.timestamp(),
                             winston.format.json(),
                         ),
-                        // levels: ["debug", "error", "info", "warn"],
                         level: this.filterLevel,
                         defaultMeta: config ? config.metadata : undefined,
                         transports: [
@@ -44,36 +46,16 @@ export class GeexLogger {
         }
     }
     public error(error?: Error, ...args: any[]) {
-        this.log("error", error, args);
+        this.logger.error(error?.message ?? "error", error, args);
     }
     public debug(...args: any[]) {
-        this.log("debug", args);
+        this.logger.debug(args);
     }
-    public info(...args: any[]) {
-        this.log("info", args);
+    public log(message: string, ...args: any[]) {
+        this.logger.log("info", message, args);
     }
     public warn(...args: any[]);
     public warn(error?: Error, ...args: any[]) {
-        this.log("warn", error, args);
-    }
-    public log(level: LogLevel, ...args: any[]) {
-        // const NowDate = new Date().toISOString();
-        // replace with more sophisticated solution :)
-        switch (level) {
-            case "debug":
-                this.logger.debug(args);
-                break;
-            case "info":
-                this.logger.info(args);
-                break;
-            case "warn":
-                this.logger.warn(args);
-                break;
-            case "error":
-                this.logger.error(args);
-                break;
-            default:
-                break;
-        }
+        this.logger.warn("warn", error, args);
     }
 }

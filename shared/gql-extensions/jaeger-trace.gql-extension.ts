@@ -8,9 +8,7 @@ import { ExecutionContext } from "@nestjs/common";
 import { IGeexServerConfig } from "../../configs/types";
 import { IGeexRequestStart, IGeexRequestEnd } from "../../types";
 
-@Injectable({
-    scope: ProviderScope.Request,
-})
+@Injectable()
 export class JaegerTraceExtension extends OpentracingExtension<any> {
 
     /**
@@ -20,7 +18,7 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
         const tracer = initTracer(config.traceConfig, {
             logger: {
                 error: (msg) => logger.error(new Error(msg)),
-                info: (msg) => logger.info(msg),
+                info: (msg) => logger.log(msg),
             },
             tags: {
                 serverAddress: config.hostname,

@@ -9,6 +9,8 @@ import { UserManageModule } from './user-manage/user-manage.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { SharedModule } from './shared.module';
 import { ServiceLocator } from '../shared/utils/service-locator';
+import { JaegerTraceExtension } from '../shared/gql-extensions/jaeger-trace.gql-extension';
+import { ComplexityExtension } from '../shared/gql-extensions/complexity.gql-extension';
 
 @Module({
     imports: [
@@ -21,7 +23,12 @@ import { ServiceLocator } from '../shared/utils/service-locator';
             installSubscriptionHandlers: true,
             autoSchemaFile: 'schema.gql',
             context: (args) => ({ ...args, injector: ServiceLocator.instance }),
+            extensions: [
+                () => ServiceLocator.instance.get(JaegerTraceExtension),
+                () => ServiceLocator.instance.get(ComplexityExtension),
+            ],
         }),
     ],
+    providers: [JaegerTraceExtension, ComplexityExtension],
 })
 export class AppModule { }

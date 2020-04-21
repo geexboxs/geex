@@ -13,6 +13,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { SessionStore } from './authentication/models/session.model';
 import ioredis = require("ioredis");
 import { AccessControl } from '@geexbox/accesscontrol';
+import { GeexServerConfigToken } from '../shared/tokens';
+import { GeexLogger } from '../shared/utils/logger';
 
 const REEXPORTS = [
     PassportModule,
@@ -35,6 +37,11 @@ const REEXPORTS = [
     ])];
 
 const PROVIDERS: Provider[] = [
+    GeexLogger,
+    {
+        provide: GeexServerConfigToken,
+        useValue: appConfig,
+    },
     PermissionScalar,
     SessionStore,
     {

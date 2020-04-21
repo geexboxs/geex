@@ -8,8 +8,6 @@ import { ObjectId } from "bson";
 import { Injector } from "@nestjs/core/injector/injector";
 import { INestApplicationContext, ExecutionContext, IUserContext } from "@nestjs/common";
 
-type LogLevel = "debug" | "info" | "warn" | "error";
-
 type LogTarget = "console" | "file" | "remote";
 
 export interface IGeexRequestStart<TContext = ExecutionContext> extends RequestStart<TContext> {

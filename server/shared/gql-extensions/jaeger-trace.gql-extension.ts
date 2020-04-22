@@ -35,8 +35,18 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
         const onRequestResolve = this["onRequestResolve"];
         // tslint:disable-next-line: no-string-literal
         this["onRequestResolve"] = (rootSpan: Span, infos: IGeexRequestStart) => {
+            
             // tslint:disable-next-line: no-unnecessary-initializer
             let operation: string = "__unknown__";
+            if (infos.operationName === "IntrospectionQuery") {
+                operation = "IntrospectionQuery";
+                rootSpan.setOperationName(operation);
+                rootSpan.addTags({
+                    operation,
+                    ip: infos.context.req.connection.remoteAddress,
+                });
+                return onRequestResolve(rootSpan, infos);
+            }
             if (infos.requestContext.request.query!.startsWith("{")) {
                 operation = "query";
             } else if (infos.requestContext.request.query!.startsWith("mutation")) {

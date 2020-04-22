@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@graphql-modules/di";
 import winston = require("winston");
-import { ILoggerConfig, IGeexServerConfig } from "../../configs/types";
 import { LogLevel } from "@nestjs/common";
-import { LogTarget } from "../../types";
 import { GeexServerConfigToken } from "../tokens";
+import { LogTarget } from "../../types";
+import { IGeexServerConfig } from "../../configs/types";
 
 @Injectable()
 export class GeexLogger {

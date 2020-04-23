@@ -2,6 +2,7 @@ import { AlipayCircleOutlined, TaobaoCircleOutlined, WeiboCircleOutlined } from 
 import { Alert, Checkbox } from 'antd';
 import React, { useState } from 'react';
 import { Dispatch, Link, connect } from 'umi';
+import { useMutation, gql } from '@apollo/client';
 import { StateType } from './model';
 import styles from './style.less';
 import { LoginParamsType } from './service';
@@ -32,16 +33,25 @@ const Login: React.FC<LoginProps> = (props) => {
   const { status, type: loginType } = userAndlogin;
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
+  const [authenticate, accessToken] = useMutation(gql`
+    mutation authenticate($password: String!, $userId: String!) {
+      authenticate(password: $password, userIdentifier: $userId) {
+        accessToken
+      }
+    }
+  `);
 
-  const handleSubmit = (values: LoginParamsType) => {
-    const { dispatch } = props;
-    dispatch({
-      type: 'userAndlogin/login',
-      payload: {
-        ...values,
-        type,
-      },
-    });
+  const handleSubmit = async (values: LoginParamsType) => {
+    let token = await authenticate({ variables: { password: 'test12', userId: 'test1' } });
+    console.log(token);
+    // const { dispatch } = props;
+    // dispatch({
+    //   type: 'userAndlogin/login',
+    //   payload: {
+    //     ...values,
+    //     type,
+    //   },
+    // });
   };
   return (
     <div className={styles.main}>

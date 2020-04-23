@@ -63,8 +63,10 @@
     "bizcharts": "^3.5.3-beta.0",
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "classnames": "^2.2.6",
+    "core-js": "3.6.4",
     "dva": "^2.4.0",
     "gg-editor": "^2.0.2",
+    "graphql": "^15.0.0",
     "lodash": "^4.17.11",
     "lodash-decorators": "^6.0.0",
     "lodash.debounce": "^4.0.8",
@@ -84,12 +86,10 @@
     "react-router": "^4.3.1",
     "umi": "^3.0.14",
     "umi-request": "^1.0.8",
-    "use-merge-value": "^1.0.1",
-    "core-js": "3.6.4"
+    "use-merge-value": "^1.0.1"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^1.0.18",
-    "eslint-plugin-react-hooks": "^3.0.0",
     "@types/classnames": "^2.2.7",
     "@types/express": "^4.17.0",
     "@types/history": "^4.7.2",
@@ -111,6 +111,7 @@
     "detect-installer": "^1.0.1",
     "enzyme": "^3.11.0",
     "eslint": "^6.8.0",
+    "eslint-plugin-react-hooks": "^3.0.0",
     "express": "^4.17.1",
     "gh-pages": "^2.0.1",
     "husky": "^4.0.7",

@@ -6,6 +6,6 @@
     "REACT_APP_ENV": true
   },
   "rules": {
-    "no-unused-expressions": "warn"
+    "no-unused-expressions": "off"
   }
 }

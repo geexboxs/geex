@@ -1,7 +1,8 @@
 {
     "vsicons.presets.nestjs": true,
     "vsicons.presets.angular": false,
-    "files.exclude": {
-        "submodules": true
-    },
+    "eslint.workingDirectories": [
+        "./client",
+        "./server"
+    ],
 }

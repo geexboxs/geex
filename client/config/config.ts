@@ -291,6 +291,12 @@ export default defineConfig({
               authority: ['admin', 'user'],
             },
             {
+              name: 'test',
+              icon: 'smile',
+              path: '/test',
+              component: './test',
+            },
+            {
               component: '404',
             },
           ],

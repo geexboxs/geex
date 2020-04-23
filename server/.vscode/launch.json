@@ -1,0 +1,35 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "server:Debug",
+            "cwd": "${workspaceRoot}/server",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "${workspaceRoot}/server/node_modules/.bin/ts-node-dev",
+            "args": [
+                "-C",
+                "ttypescript",
+                "${workspaceRoot}/server/index"
+            ],
+            "restart": true
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "server:Run",
+            "cwd": "${workspaceRoot}/server",
+            "console": "integratedTerminal",
+            "runtimeExecutable": "${workspaceRoot}/server/node_modules/.bin/ts-node",
+            "args": [
+                "-C",
+                "ttypescript",
+                "${workspaceRoot}/server/index"
+            ],
+        }
+    ]
+}

@@ -6,6 +6,7 @@ import { Optional, Inject } from "@nestjs/common";
 import { EmailSender } from "../../shared/utils/email-sender";
 import { REQUEST } from "@nestjs/core";
 import { ExecutionContext } from "graphql/execution/execute";
+import { RegisterInput } from "../../../shared/contracts/inputs/register.input";
 import { VerifyType } from "../account/models/verify-type";
 import { I18N } from "../../shared/utils/i18n";
 import { Role } from "./model/role.model";

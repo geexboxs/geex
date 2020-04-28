@@ -68,7 +68,7 @@
     "include": [
         "**/*",
         ".kiwi/zh-CN",
-        ".kiwi/index.ts"
+        ".kiwi/index.ts", "../shared/contracts/inputs/register.input.ts"
     ],
     "exclude": [
         "node_modules",

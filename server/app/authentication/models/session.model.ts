@@ -6,11 +6,11 @@ import { Inject } from "@graphql-modules/di";
 import json5 = require("json5");
 import { JwtService } from "@nestjs/jwt";
 import { ObjectType, Field, ID } from "@nestjs/graphql";
-
+import { Session as ISession } from "@geex/shared";
 
 
 @ObjectType()
-export class Session {
+export class Session implements ISession {
 
     @Field(() => ID)
     public get userId() {

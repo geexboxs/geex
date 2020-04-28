@@ -33,25 +33,26 @@ const Login: React.FC<LoginProps> = (props) => {
   const { status, type: loginType } = userAndlogin;
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
-  const [authenticate, accessToken] = useMutation(gql`
-    mutation authenticate($password: String!, $userId: String!) {
-      authenticate(password: $password, userIdentifier: $userId) {
+  const [authenticate, { loading, data, error }] = useMutation(gql`
+    mutation Login($password: String!, $userIdentifier: String!) {
+      authenticate(password: $password, userIdentifier: $userIdentifier) {
         accessToken
       }
     }
   `);
 
   const handleSubmit = async (values: LoginParamsType) => {
-    let token = await authenticate({ variables: { password: 'test12', userId: 'test1' } });
-    console.log(token);
-    // const { dispatch } = props;
-    // dispatch({
-    //   type: 'userAndlogin/login',
-    //   payload: {
-    //     ...values,
-    //     type,
-    //   },
-    // });
+    await authenticate({
+      variables: { password: values.password, userIdentifier: values.userName },
+    });
+    const { dispatch } = props;
+    dispatch({
+      type: 'userAndlogin/login',
+      payload: {
+        accessToken: data?.accessToken,
+        type,
+      },
+    });
   };
   return (
     <div className={styles.main}>

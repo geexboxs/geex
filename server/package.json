@@ -86,9 +86,10 @@
     },
     "license": "ISC",
     "main": "index.ts",
-    "name": "geex",
+    "name": "@geex/server",
     "scripts": {
         "test": "test",
+        "start": "ts-node-dev -C ttypescript ./index.ts",
         "postinstall": "patch-package"
     },
     "version": "1.0.0"

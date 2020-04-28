@@ -30,6 +30,18 @@
                 "ttypescript",
                 "${workspaceRoot}/server/index"
             ],
-        }
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "client:Debug",
+            "port": 9222,
+            "urlFilter": "http://localhost:8000/*",
+            "webRoot": "${workspaceFolder/client}",
+            "sourceMaps": true,
+            "skipFiles": [
+                "node_modules/**/*.js",
+            ],
+        },
     ]
 }

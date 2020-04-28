@@ -3,6 +3,7 @@ import { Subscription, Reducer, Effect } from 'umi';
 import { NoticeIconData } from '@/components/NoticeIcon';
 import { queryNotices } from '@/services/user';
 import { ConnectState } from './connect.d';
+import { ApolloClient, NormalizedCacheObject, HttpLink, InMemoryCache } from '@apollo/client';
 
 export interface NoticeItem extends NoticeIconData {
   id: string;

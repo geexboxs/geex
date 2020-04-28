@@ -1,5 +1,4 @@
 import { Effect, Reducer } from 'umi';
-
 import { fakeRegister } from './service';
 
 export interface StateType {

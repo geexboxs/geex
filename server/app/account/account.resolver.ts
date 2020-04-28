@@ -6,7 +6,6 @@ import { User } from "./models/user.model";
 import { UserModelToken } from "../../shared/tokens";
 import { Session, SessionStore } from "../authentication/models/session.model";
 import { VerifyType } from "./models/verify-type";
-import { RegisterInput } from "./models/register.input";
 import passport = require("passport");
 import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
@@ -17,6 +16,7 @@ import { Resolver, Mutation, ID, Args, Query } from "@nestjs/graphql";
 import { REQUEST } from "@nestjs/core";
 import { ExecutionContext, Optional } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
+import { RegisterInput } from "../../contracts/inputs/register.input";
 
 @Resolver((of) => User)
 export class AccountResolver {

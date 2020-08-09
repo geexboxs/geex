@@ -1,32 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoEquality" Version="0.5.4" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
-    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
-    <PackageReference Include="Casbin.NET" Version="1.2.3" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="10.2.0" />
+    <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="6.0.0" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="5.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="10.5.2" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.0-preview.58" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.2.0" />
-    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.2.0" />
-    <PackageReference Include="HotChocolate.Stitching" Version="10.2.0" />
-    <PackageReference Include="HotChocolate.Types.Filters" Version="10.2.0" />
-    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.2.0" />
-    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
-    <PackageReference Include="IdentityModel" Version="4.1.1" />
-    <PackageReference Include="IdentityServer4" Version="3.0.2" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Stitching" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Filters" Version="10.5.2" />
+    <PackageReference Include="HotChocolate.Types.Sorting" Version="10.5.2" />
+    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+    <PackageReference Include="IdentityServer4" Version="4.0.4" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageReference Include="IdentityServer4.Storage" Version="3.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="MongoDB.Bson" Version="2.9.3" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.3" />
+    <PackageReference Include="IdentityServer4.Storage" Version="4.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.6" />
+    <PackageReference Include="MongoDB.Bson" Version="2.11.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
     <PackageReference Include="Oddz.IdentityServer4.Contrib.MongoDB" Version="3.0.1" />
     <PackageReference Include="Repository.Mongo" Version="2.2.1" />
+    <PackageReference Include="Volo.Abp.Auditing" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.Data" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.EventBus" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.Features" Version="3.0.5" />
+    <PackageReference Include="Volo.Abp.MultiTenancy" Version="3.0.5" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,6 @@ using Autofac;
 using Geex.Core.Users.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
-using Geex.Shared._ShouldMigrateToLib.Middlewares;
 using Geex.Shared.Roots;
 using HotChocolate;
 using IdentityModel;
@@ -40,7 +39,6 @@ namespace Geex.Core.Users
         {
             return userCollection.Collection.AsQueryable();
         }
-        [UnitOfWork]
         public async Task<bool> Register([Parent] Mutation mutation,
             [Service]IComponentContext componentContext,
             RegisterUserInput input)
@@ -54,38 +52,7 @@ namespace Geex.Core.Users
             return true;
         }
 
-        //public async Task<TokenResponse> Authenticate([Parent] Mutation mutation,
-        //    [Service]IComponentContext componentContext,
-
-        //    AuthenticateInput input)
-        //{
-        //    IMongoCollection<AppUser> userCollection = componentContext.Resolve<IMongoCollection<AppUser>>();
-        //    IHttpContextAccessor httpContextAccessor = componentContext.Resolve<IHttpContextAccessor>();
-        //    IPasswordHasher<AppUser> passwordHasher = componentContext.Resolve<IPasswordHasher<AppUser>>();
-        //    IHostEnvironment env = componentContext.Resolve<IHostEnvironment>();
-        //    if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authentication", out var authValue))
-        //    {
-        //        await httpContextAccessor.HttpContext.AuthenticateAsync();
-        //    }
-        //    var client = new HttpClient() { BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("HOST_NAME")}") };
-        //    var tokenResponse = await client.RequestTokenAsync(new TokenRequest()
-        //    {
-        //        Address = "http://localhost:8000/connect/token",
-        //        ClientId = env.ApplicationName,
-        //        ClientSecret = env.ApplicationName,
-        //        GrantType = GrantType.ResourceOwnerPassword,
-        //        Parameters = new Dictionary<string, string>() {
-        //            { "username", input.UserIdentifier },
-        //            { "password", input.Password },
-        //            { "scope",$"{env.ApplicationName}" }
-        //        }
-        //    });
-        //    if (tokenResponse.HttpStatusCode == HttpStatusCode.OK)
-        //    {
-        //        return tokenResponse;
-        //    }
-        //    throw tokenResponse.Exception;
-        //}
+        
 
 
         public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]Repository<AppUser> userCollection, AssignRoleInput input)

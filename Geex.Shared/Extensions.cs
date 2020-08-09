@@ -52,7 +52,7 @@ namespace Geex.Shared
 
             services.AddSingleton(schemaBuilder);
             containerBuilder.Populate(services);
-            RegisterModule(typeof(T), containerBuilder, schemaBuilder);
+            services.AddApplication<T>();
         }
         public static void UseGeexGraphQL(this IApplicationBuilder app)
         {
@@ -61,36 +61,16 @@ namespace Geex.Shared
             app.UsePlayground();
         }
 
-        private static void RegisterModule(Type module, ContainerBuilder containerBuilder,
-            ISchemaBuilder schemaBuilder)
-        {
-            var dependModules = module.GetCustomAttribute<DependsOnAttribute>()?.DependedModuleTypes;
-            if (dependModules != null)
-            {
-                foreach (var dependModule in dependModules)
-                {
-                    RegisterModule(dependModule, containerBuilder, schemaBuilder);
-                }
-            }
-
-            var ctor = module.GetMatchingConstructor(new Type[] { });
-            if (ctor == null)
-            {
-                throw new Exception($"Cannot construct module:{module}, please ensure a public default constructor for module class.");
-            }
-
-            var moduleInstance = ctor.Invoke(null) as IGraphQLModule;
-            moduleInstance.PreInitialize(containerBuilder, schemaBuilder);
-            containerBuilder.RegisterBuildCallback(x =>
-            {
-                moduleInstance.PostInitialize(x);
-            });
-        }
-
         public static ISchemaBuilder AddModuleTypes<TModule>(this ISchemaBuilder schemaBuilder)
         {
             return schemaBuilder
                 .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.Types")).ToArray());
+        }
+
+        public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder,Type gqlModuleType)
+        {
+            return schemaBuilder
+                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{gqlModuleType.Namespace}.Types")).ToArray());
         }
 
         public static bool IsValidEmail(this string str)

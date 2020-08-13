@@ -25,13 +25,13 @@ namespace Geex.Shared
     {
 
     }
-
+    [DependsOn(typeof(FrameworkFixModule))]
     public class GraphQLModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
-            context.Services.GetObject<ISchemaBuilder>().AddModuleTypes(this.GetType());
+            context.Services.GetSingletonInstance<ISchemaBuilder>().AddModuleTypes(this.GetType());
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using CommonServiceLocator;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Repository.Mongo;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class AuthUser : Entity
+    public class AuthUser : ActiveRecordAggregateRoot<AuthUser>
     {
         /// <summary>
         /// Gets or sets the username.
@@ -41,7 +41,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         private void CheckDuplicateUser()
         {
-            var users = ServiceLocator.Current.GetService<Repository<AuthUser>>();
+            var users = this.Repository;
             if (users
                 .Any(o => o.Username == this.Username || o.Email == this.Email || o.PhoneNumber == this.PhoneNumber))
             {

@@ -2,7 +2,7 @@
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace Geex.Core.Users.Types.RootExtensions
+namespace Geex.Core.Users.GqlSchemas.Types.RootExtensions
 {
     public class QueryExtension : ObjectTypeExtension
     {

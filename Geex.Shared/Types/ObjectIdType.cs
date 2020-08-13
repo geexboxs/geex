@@ -11,7 +11,7 @@ using MongoDB.Bson;
 
 namespace Geex.Shared.Types
 {
-    public class ObjectIdType : ScalarType<ObjectId>
+    public class ObjectIdType : ScalarType
     {
         public ObjectIdType() : base("ObjectId")
         {
@@ -64,17 +64,6 @@ namespace Geex.Shared.Types
             throw new ScalarSerializationException("");
         }
 
-        public override bool TrySerialize(object value, out object serialized)
-        {
-            if (value is ObjectId s)
-            {
-                serialized = s;
-                return true;
-            }
-            serialized = ObjectId.Empty;
-            return false;
-        }
-
         public override bool TryDeserialize(object serialized, out object value)
         {
             if (serialized is string str)
@@ -92,5 +81,7 @@ namespace Geex.Shared.Types
             value = null;
             return false;
         }
+
+        public override Type ClrType { get; } = typeof(ObjectId);
     }
 }

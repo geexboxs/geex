@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using NetCasbin.Model;
 using NetCasbin.Persist;
@@ -23,6 +24,11 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             var collection = RuleCollection.Invoke();
             var list = collection.Collection.AsQueryable().ToList();
             LoadPolicyData(model, Helper.LoadPolicyLine, list);
+        }
+
+        public Task LoadPolicyAsync(Model model)
+        {
+            throw new NotImplementedException();
         }
 
         public void RemovePolicy(string pType, IList<string> rule)
@@ -93,9 +99,21 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             RuleCollection.Invoke().Insert(source);
         }
 
+        public Task SavePolicyAsync(Model model)
+        {
+            this.SavePolicy(model);
+            return Task.CompletedTask;
+        }
+
         void IAdapter.AddPolicy(string sec, string ptype, IList<string> rule)
         {
             this.AddPolicy(ptype, rule);
+        }
+
+        public Task AddPolicyAsync(string sec, string ptype, IList<string> rule)
+        {
+            this.AddPolicy(ptype, rule);
+            return Task.CompletedTask;
         }
 
         void IAdapter.RemovePolicy(string sec, string ptype, IList<string> rule)
@@ -103,9 +121,21 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             this.RemovePolicy(ptype, rule);
         }
 
+        public Task RemovePolicyAsync(string sec, string ptype, IList<string> rule)
+        {
+            this.RemovePolicy(ptype, rule);
+            return Task.CompletedTask;
+        }
+
         void IAdapter.RemoveFilteredPolicy(string sec, string ptype, int fieldIndex, params string[] fieldValues)
         {
             this.RemoveFilteredPolicy(ptype, fieldIndex, fieldValues);
+        }
+
+        public Task RemoveFilteredPolicyAsync(string sec, string ptype, int fieldIndex, params string[] fieldValues)
+        {
+            this.RemoveFilteredPolicy(ptype, fieldIndex, fieldValues);
+            return Task.CompletedTask;
         }
 
         public void AddPolicy(string pType, IList<string> rule)

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Autofac;
-using Geex.Core.Users.Inputs;
+using Geex.Core.Users.GqlSchemas.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
@@ -23,10 +23,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
-using Repository.Mongo;
+using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Core.Users
 {
@@ -35,35 +34,35 @@ namespace Geex.Core.Users
     public class UserResolver
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<AppUser> QueryUsers([Parent] Query query, [Service]Repository<AppUser> userCollection)
+        public IQueryable<AppUser> QueryUsers([Parent] Query query, [Service]IRepository<AppUser> userCollection)
         {
-            return userCollection.Collection.AsQueryable();
+            return userCollection;
         }
         public async Task<bool> Register([Parent] Mutation mutation,
             [Service]IComponentContext componentContext,
             RegisterUserInput input)
         {
             var user = new AuthUser(input.PhoneOrEmail, input.Password, input.UserName);
-            var authUserCollection = componentContext.Resolve<Repository<AuthUser>>();
-            authUserCollection.Insert(user);
+            var authUserCollection = componentContext.Resolve<IRepository<AuthUser>>();
+            await authUserCollection.InsertAsync(user);
             var appUser = new AppUser(user);
-            var appUserCollection = componentContext.Resolve<Repository<AppUser>>();
-            appUserCollection.Insert(appUser);
+            var appUserCollection = componentContext.Resolve<IRepository<AppUser>>();
+            await appUserCollection.InsertAsync(appUser);
             return true;
         }
 
         
 
 
-        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]Repository<AppUser> userCollection, AssignRoleInput input)
+        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service]IRepository<AppUser> userCollection, AssignRoleInput input)
         {
-            var user = userCollection.Get(input.UserId);
+            var user = await userCollection.GetAsync(x=>x.Id == input.UserId);
             user.Roles.Clear();
             foreach (var role in input.Roles)
             {
                 user.Roles.Add(new Role(role));
             }
-            userCollection.Update(user, x => x.Roles, user.Roles);
+            await userCollection.UpdateAsync(user);
             return true;
         }
     }

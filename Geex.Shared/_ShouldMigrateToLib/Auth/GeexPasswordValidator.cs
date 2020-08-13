@@ -6,23 +6,23 @@ using IdentityServer4.Models;
 using IdentityServer4.Validation;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Repository.Mongo;
+using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class GeexPasswordValidator : IResourceOwnerPasswordValidator
     {
-        private readonly Repository<AuthUser> _userCollection;
+        private readonly IRepository<AuthUser> _userRepository;
         private readonly Enforcer _enforcer;
 
-        public GeexPasswordValidator(Repository<AuthUser> userCollection, Enforcer enforcer)
+        public GeexPasswordValidator(IRepository<AuthUser> userRepository, Enforcer enforcer)
         {
-            _userCollection = userCollection;
+            _userRepository = userRepository;
             _enforcer = enforcer;
         }
         public async Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
-            var user = _userCollection.First(x => (x.Username == context.UserName || x.Email == context.UserName || x.PhoneNumber == context.UserName));
+            var user = _userRepository.First(x => (x.Username == context.UserName || x.Email == context.UserName || x.PhoneNumber == context.UserName));
             if (user != default)
             {
                 if (user.CheckPassword(context.Password))

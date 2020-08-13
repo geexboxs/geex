@@ -17,18 +17,38 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
+using Humanizer;
+using IdentityServer4.MongoDB.Entities;
+using IdentityServer4.MongoDB.Mappers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
+using Volo.Abp;
+using Volo.Abp.AspNetCore;
+using Volo.Abp.Identity;
 
 namespace Geex.Core.Authentication
 {
+    [DependsOn(
+        typeof(AbpAspNetCoreModule)
+    )]
     public class AuthenticationModule : GraphQLModule<AuthenticationModule>
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+        public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
         {
-            base.ConfigureServices(context);
+            base.OnPreApplicationInitialization(context);
+            var app = context.GetApplicationBuilder();
+            InitializeIdentityServerDatabase(app);
+        }
+
+        public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            base.PostConfigureServices(context);
             var env = context.Services.GetHostingEnvironment();
             var configuration = context.Services.GetConfiguration();
             var services = context.Services;
+
+
             //services.AddTransient<IPasswordHasher<AuthUser>, PasswordHasher<AuthUser>>();
             services.AddCasbinAuthorization();
             services.AddScoped<GeexCookieAuthenticationEvents>();
@@ -83,12 +103,54 @@ namespace Geex.Core.Authentication
                 .AddResourceOwnerValidator<GeexPasswordValidator>()
                 // lulus:此处添加正式证书,不知道证书加密类型,未作处理
                 //.AddSigningCredential()
-                .AddMongoRepository(configuration.GetConnectionString("Default"))
+                .AddMongoRepository(configuration.GetConnectionString("Geex"))
                 .AddRedirectUriValidator<RegexRedirectUriValidator>()
                 .AddCorsPolicyService<RegexCorsPolicyService>();
             services.AddSingleton<IdentityServerSeedConfig>();
             //bug :idsr的bug
             //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
         }
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            base.ConfigureServices(context);
+            
+        }
+
+        private static void InitializeIdentityServerDatabase(IApplicationBuilder app)
+        {
+
+            bool createdNewRepository = false;
+            var repository = app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<Client>(nameof(Client).Humanize().Pluralize());
+            if (repository.AsQueryable().Any())
+            {
+                return;
+            }
+
+            //  --Client
+            IdentityServerSeedConfig identityServerSeedConfig = app.ApplicationServices.GetService<IdentityServerSeedConfig>();
+            foreach (var client in identityServerSeedConfig.Clients)
+            {
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<Client>(nameof(Client).Humanize().Pluralize()).InsertOne(client.ToEntity());
+            }
+            foreach (var res in identityServerSeedConfig.IdentityResources)
+            {
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<IdentityResource>(nameof(IdentityResource).Humanize().Pluralize()).InsertOne(res.ToEntity());
+            }
+            foreach (var api in identityServerSeedConfig.ApiResources)
+            {
+                app.ApplicationServices.GetService<IMongoDatabase>().GetCollection<ApiResource>(nameof(ApiResource).Humanize().Pluralize()).InsertOne((api.ToEntity()));
+            }
+            createdNewRepository = true;
+
+
+            // If it's a new Repository (database), need to restart the website to configure Mongo to ignore Extra Elements.
+            if (createdNewRepository)
+            {
+                var newRepositoryMsg = $"Mongo Repository created/populated! Please restart you website, so Mongo driver will be configured  to ignore Extra Elements - e.g. IdentityServer \"_id\" ";
+                throw new Exception(newRepositoryMsg);
+            }
+        }
+
     }
 }

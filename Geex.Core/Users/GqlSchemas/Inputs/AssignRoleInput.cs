@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using MongoDB.Bson;
 
-namespace Geex.Core.Users.Inputs
+namespace Geex.Core.Users.GqlSchemas.Inputs
 {
     public class AssignRoleInput
     {
-        public string UserId { get; set; }
+        public ObjectId UserId { get; set; }
         public List<string> Roles { get; set; }
     }
 }

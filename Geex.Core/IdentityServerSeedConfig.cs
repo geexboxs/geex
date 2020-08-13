@@ -47,7 +47,7 @@ namespace Geex.Core
                 {
                     ApiSecrets = new List<Secret>(){new Secret(_env.ApplicationName) },
                     Name = _env.ApplicationName,
-                    Scopes = new List<string>(){_env.ApplicationName,IdentityServerConstants.StandardScopes.Profile,IdentityServerConstants.StandardScopes.OpenId },
+                    Scopes = new List<Scope>(){new Scope(_env.ApplicationName),new Scope(IdentityServerConstants.StandardScopes.Profile),new Scope(IdentityServerConstants.StandardScopes.OpenId) },
                 }
             };
         }

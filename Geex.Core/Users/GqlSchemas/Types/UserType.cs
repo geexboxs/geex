@@ -1,6 +1,6 @@
 ﻿using HotChocolate.Types;
 
-namespace Geex.Core.Users.Types
+namespace Geex.Core.Users.GqlSchemas.Types
 {
     public class UserType : ObjectType<AppUser>
     {

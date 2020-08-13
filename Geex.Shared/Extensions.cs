@@ -16,23 +16,41 @@ using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
 using HotChocolate.Types;
 using IdentityServer4.MongoDB.Configuration;
+using IdentityServer4.MongoDB.Stores;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Volo.Abp.Autofac;
 
 namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static void AddGeexGraphQL<T>(this ContainerBuilder containerBuilder) where T : GraphQLEntryModule<T>
+        public static IHostBuilder ConfigureGeexServer<T>(this IHostBuilder hostBuilder, string connectionStringName = "Geex") where T : GraphQLEntryModule<T>
         {
+            var containerBuilder = new ContainerBuilder();
+
+            return hostBuilder.ConfigureServices((_, services) =>
+                {
+                    services.AddObjectAccessor(containerBuilder);
+                    services.AddGeexGraphQL<T>(connectionStringName);
+                })
+                .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder));
+        }
+
+        public static void AddGeexGraphQL<T>(this IServiceCollection services, string connectionStringName = "Geex") where T : GraphQLEntryModule<T>
+        {
+            services.AddStorage(connectionStringName);
+
             var schemaBuilder = SchemaBuilder.New()
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddSubscriptionType<SubscriptionType>()
                 .AddType<ObjectIdType>();
-            var services = new ServiceCollection();
             services.AddGraphQL(provider =>
             {
                 var schema = schemaBuilder
@@ -51,7 +69,6 @@ namespace Geex.Shared
             });
 
             services.AddSingleton(schemaBuilder);
-            containerBuilder.Populate(services);
             services.AddApplication<T>();
         }
         public static void UseGeexGraphQL(this IApplicationBuilder app)
@@ -64,13 +81,13 @@ namespace Geex.Shared
         public static ISchemaBuilder AddModuleTypes<TModule>(this ISchemaBuilder schemaBuilder)
         {
             return schemaBuilder
-                .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.Types")).ToArray());
+                .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.GqlSchemas")).ToArray());
         }
 
         public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder,Type gqlModuleType)
         {
             return schemaBuilder
-                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{gqlModuleType.Namespace}.Types")).ToArray());
+                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{gqlModuleType.Namespace}.GqlSchemas")).ToArray());
         }
 
         public static bool IsValidEmail(this string str)
@@ -93,8 +110,23 @@ namespace Geex.Shared
             .AddOperationalStore(options =>
             {
                 options.ConnectionString = connectionString;
-            });
+            })
+            .AddResourceStore<ResourceStore>()
+            .AddClientStore<ClientStore>()
+            .AddPersistedGrantStore<PersistedGrantStore>()
+            ;
 
+            return builder;
+        }
+
+        public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "Geex")
+        {
+            var pack = new ConventionPack();
+            pack.Add(new IgnoreExtraElementsConvention(true));
+            ConventionRegistry.Register("My Solution Conventions", pack, t => true);
+            builder.AddTransient(x => new MongoUrl(x.GetService<IConfiguration>().GetConnectionString(connectionStringName)));
+            builder.AddTransient<IMongoClient>(x => new MongoClient(x.GetService<MongoUrl>()));
+            builder.AddTransient(x => x.GetService<IMongoClient>().GetDatabase(x.GetService<MongoUrl>().DatabaseName));
             return builder;
         }
     }

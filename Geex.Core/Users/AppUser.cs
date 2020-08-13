@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using Autofac;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using IdentityModel;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
-using Repository.Mongo;
 
 namespace Geex.Core.Users
 {
-    public class AppUser : Entity
+    public class AppUser : ActiveRecordAggregateRoot<AppUser>
     {
         
 

@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Autofac.Core.Lifetime;
+
+using CommonServiceLocator;
+
+using HotChocolate;
 
 using MongoDB.Bson;
 
@@ -12,53 +19,54 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
-    public abstract class ActiveRecordEntity<T> : Entity<ObjectId> where T : Entity<ObjectId>
+    public class ActiveRecordEntity<T> : Entity<ObjectId>, IActiveRecord<T> where T : Entity<ObjectId>
     {
-        private Func<IRepository<T>> _repositoryProvider;
+        public IRepository<T, ObjectId> _repository { get; set; }
+    }
 
-        public IRepository<T> Repository => _repositoryProvider.Invoke();
 
-        public T AttachRepository(Func<IRepository<T>> repositoryProvider)
+    public interface IActiveRecord<T> : IEntity<ObjectId> where T : Entity<ObjectId>
+    {
+        public static IRepository<T, ObjectId> StaticRepository => ServiceLocator.Current.GetInstance<IRepository<T, ObjectId>>();
+        public IRepository<T, ObjectId> _repository { get; set; }
+
+        public virtual IRepository<T, ObjectId> Repository
         {
-            _repositoryProvider = repositoryProvider;
+            get
+            {
+                if (_repository == default)
+                {
+                    this.AttachRepository(ServiceLocator.Current.GetInstance<IRepository<T, ObjectId>>());
+                }
+                return _repository;
+            }
+        }
+
+        public T AttachRepository(IRepository<T, ObjectId> repositoryProvider)
+        {
+            _repository = repositoryProvider;
             return this as T;
         }
 
         public virtual Task SaveAsync(bool autoSave = false, CancellationToken cancellationToken = default)
         {
+            if (this.Id == ObjectId.Empty)
+            {
+                return Repository.InsertAsync(this as T, autoSave, cancellationToken);
+            }
             return Repository.UpdateAsync(this as T, autoSave, cancellationToken);
         }
 
         public virtual Task DeleteAsync(bool autoSave = false, CancellationToken cancellationToken = default)
         {
             var task = Repository.DeleteAsync(this as T, autoSave, cancellationToken);
-            this._repositoryProvider = null;
+            this._repository = null;
             return task;
         }
     }
 
-    public abstract class ActiveRecordAggregateRoot<T> : AggregateRoot<ObjectId> where T : AggregateRoot<ObjectId>
+    public abstract class ActiveRecordAggregateRoot<T> : AggregateRoot<ObjectId>, IActiveRecord<T> where T : AggregateRoot<ObjectId>
     {
-        private Func<IRepository<T>> _repositoryProvider;
-
-        public IRepository<T> Repository => _repositoryProvider.Invoke();
-
-        public T AttachRepository(Func<IRepository<T>> repositoryProvider)
-        {
-            _repositoryProvider = repositoryProvider;
-            return this as T;
-        }
-
-        public virtual Task SaveAsync(bool autoSave = false, CancellationToken cancellationToken = default)
-        {
-            return Repository.UpdateAsync(this as T, autoSave, cancellationToken);
-        }
-
-        public virtual Task DeleteAsync(bool autoSave = false, CancellationToken cancellationToken = default)
-        {
-            var task = Repository.DeleteAsync(this as T, autoSave, cancellationToken);
-            this._repositoryProvider = null;
-            return task;
-        }
+        public IRepository<T, ObjectId> _repository { get; set; }
     }
 }

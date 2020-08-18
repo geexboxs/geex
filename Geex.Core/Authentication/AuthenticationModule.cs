@@ -25,12 +25,15 @@ using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Volo.Abp;
 using Volo.Abp.AspNetCore;
-using Volo.Abp.Identity;
+using Volo.Abp.MongoDB;
+using Volo.Abp.Uow;
 
 namespace Geex.Core.Authentication
 {
     [DependsOn(
-        typeof(AbpAspNetCoreModule)
+        typeof(AbpAspNetCoreModule),
+        typeof(AbpUnitOfWorkModule),
+        typeof(AbpMongoDbModule)
     )]
     public class AuthenticationModule : GraphQLModule<AuthenticationModule>
     {
@@ -48,8 +51,11 @@ namespace Geex.Core.Authentication
             var configuration = context.Services.GetConfiguration();
             var services = context.Services;
 
-
-            //services.AddTransient<IPasswordHasher<AuthUser>, PasswordHasher<AuthUser>>();
+            services.AddTransient<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+            services.AddMongoDbContext<AuthenticationDbContext>(options =>
+            {
+                options.AddDefaultRepositories();
+            });
             services.AddCasbinAuthorization();
             services.AddScoped<GeexCookieAuthenticationEvents>();
             services

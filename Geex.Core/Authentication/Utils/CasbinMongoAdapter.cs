@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using MongoDB.Driver;
+
 using NetCasbin.Model;
 using NetCasbin.Persist;
-using Repository.Mongo;
+
+using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class CasbinMongoAdapter : IAdapter
     {
-        public Func<Repository<CasbinRule>> RuleCollection { get; }
+        public Func<IRepository<CasbinRule>> RuleCollection { get; }
 
-        public CasbinMongoAdapter(Func<Repository<CasbinRule>> ruleCollection)
+        public CasbinMongoAdapter(Func<IRepository<CasbinRule>> ruleCollection)
         {
             RuleCollection = ruleCollection;
         }
 
         public void LoadPolicy(Model model)
         {
-            var collection = RuleCollection.Invoke();
-            var list = collection.Collection.AsQueryable().ToList();
+            var repository = RuleCollection.Invoke();
+            var list = repository.ToList();
             LoadPolicyData(model, Helper.LoadPolicyLine, list);
         }
 
@@ -33,10 +36,10 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         public void RemovePolicy(string pType, IList<string> rule)
         {
-            RemoveFilteredPolicy(pType, 0, rule.ToArray());
+            RemoveFilteredPolicyAsync(pType, 0, rule.ToArray());
         }
 
-        public void RemoveFilteredPolicy(
+        public async Task RemoveFilteredPolicyAsync(
             string ptype,
             int fieldIndex,
             params string[] fieldValues)
@@ -60,14 +63,14 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
                 line.V4 = fieldValues[4 - fieldIndex];
             if (fieldIndex <= 5 && 5 < fieldIndex + num)
                 line.V5 = fieldValues[5 - fieldIndex];
-            RuleCollection.Invoke().Delete(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
+            await RuleCollection.Invoke().DeleteAsync(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
                                                     && (fieldIndex <= 1 && 1 < fieldIndex + num && x.V1 == line.V1)
                                                     && (fieldIndex <= 2 && 2 < fieldIndex + num && x.V2 == line.V2)
                                                     && (fieldIndex <= 3 && 3 < fieldIndex + num && x.V3 == line.V3)
                                                     && (fieldIndex <= 4 && 4 < fieldIndex + num && x.V4 == line.V4));
         }
 
-        public void SavePolicy(Model model)
+        public async Task SavePolicyAsync(Model model)
         {
             var source = new List<CasbinRule>();
             if (model.Model.ContainsKey("p"))
@@ -96,23 +99,20 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             }
             if (!source.Any())
                 return;
-            RuleCollection.Invoke().Insert(source);
-        }
-
-        public Task SavePolicyAsync(Model model)
-        {
-            this.SavePolicy(model);
-            return Task.CompletedTask;
+            foreach (var x in source)
+            {
+                await RuleCollection.Invoke().InsertAsync(x);
+            }
         }
 
         void IAdapter.AddPolicy(string sec, string ptype, IList<string> rule)
         {
-            this.AddPolicy(ptype, rule);
+            this.AddPolicyAsync(ptype, rule);
         }
 
         public Task AddPolicyAsync(string sec, string ptype, IList<string> rule)
         {
-            this.AddPolicy(ptype, rule);
+            this.AddPolicyAsync(ptype, rule);
             return Task.CompletedTask;
         }
 
@@ -129,18 +129,18 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         void IAdapter.RemoveFilteredPolicy(string sec, string ptype, int fieldIndex, params string[] fieldValues)
         {
-            this.RemoveFilteredPolicy(ptype, fieldIndex, fieldValues);
+            this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues);
         }
 
         public Task RemoveFilteredPolicyAsync(string sec, string ptype, int fieldIndex, params string[] fieldValues)
         {
-            this.RemoveFilteredPolicy(ptype, fieldIndex, fieldValues);
+            this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues);
             return Task.CompletedTask;
         }
 
-        public void AddPolicy(string pType, IList<string> rule)
+        public async Task AddPolicyAsync(string pType, IList<string> rule)
         {
-            RuleCollection.Invoke().Insert(savePolicyLine(pType, rule));
+            await RuleCollection.Invoke().InsertAsync(savePolicyLine(pType, rule));
         }
 
         private void LoadPolicyData(
@@ -188,6 +188,11 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             if (rule.Count() > 5)
                 casbinRule.V5 = rule[5];
             return casbinRule;
+        }
+
+        public void SavePolicy(Model model)
+        {
+            this.SavePolicyAsync(model).Wait();
         }
     }
 }

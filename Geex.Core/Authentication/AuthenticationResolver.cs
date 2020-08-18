@@ -24,6 +24,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
+using Geex.Shared._ShouldMigrateToLib.Auth;
+using Microsoft.Extensions.Configuration;
 
 namespace Geex.Core.Authentication
 {
@@ -33,13 +35,10 @@ namespace Geex.Core.Authentication
     {
         public async Task<TokenResponse> Authenticate([Parent] Mutation mutation,
             [Service] IComponentContext componentContext,
-
             AuthenticateInput input)
         {
-            IMongoCollection<AppUser> userCollection = componentContext.Resolve<IMongoCollection<AppUser>>();
             IHttpContextAccessor httpContextAccessor = componentContext.Resolve<IHttpContextAccessor>();
-            IPasswordHasher<AppUser> passwordHasher = componentContext.Resolve<IPasswordHasher<AppUser>>();
-            IHostEnvironment env = componentContext.Resolve<IHostEnvironment>();
+            IConfiguration configuration = componentContext.Resolve<IConfiguration>();
             if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authentication", out var authValue))
             {
                 await httpContextAccessor.HttpContext.AuthenticateAsync();
@@ -48,13 +47,13 @@ namespace Geex.Core.Authentication
             var tokenResponse = await client.RequestTokenAsync(new TokenRequest()
             {
                 Address = "http://localhost:8000/connect/token",
-                ClientId = env.ApplicationName,
-                ClientSecret = env.ApplicationName,
+                ClientId = configuration.GetAppName(),
+                ClientSecret = configuration.GetAppName(),
                 GrantType = GrantType.ResourceOwnerPassword,
                 Parameters = new Dictionary<string, string>() {
                     { "username", input.UserIdentifier },
                     { "password", input.Password },
-                    { "scope",$"{env.ApplicationName}" }
+                    { "scope", $"{configuration.GetAppName()}" }
                 }
             });
             if (tokenResponse.HttpStatusCode == HttpStatusCode.OK)
@@ -64,4 +63,5 @@ namespace Geex.Core.Authentication
             throw tokenResponse.Exception;
         }
     }
+
 }

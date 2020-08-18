@@ -7,15 +7,16 @@ using IdentityServer4.Validation;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Domain.Repositories.MongoDB;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class GeexPasswordValidator : IResourceOwnerPasswordValidator
     {
-        private readonly IRepository<AuthUser> _userRepository;
+        private readonly IMongoDbRepository<AppUser> _userRepository;
         private readonly Enforcer _enforcer;
 
-        public GeexPasswordValidator(IRepository<AuthUser> userRepository, Enforcer enforcer)
+        public GeexPasswordValidator(IMongoDbRepository<AppUser> userRepository, Enforcer enforcer)
         {
             _userRepository = userRepository;
             _enforcer = enforcer;

@@ -1,4 +1,5 @@
-﻿using Geex.Shared.Roots;
+﻿using Geex.Shared._ShouldMigrateToLib.Auth;
+using Geex.Shared.Roots;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 

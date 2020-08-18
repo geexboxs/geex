@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using NetCasbin.Model;
-using Repository.Mongo;
+
+using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
@@ -13,7 +14,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             // Replace the default authorization policy provider with our own
             // custom provider which can return authorization policies for given
             // policy names (instead of using the default policy provider)
-            services.AddSingleton<CasbinMongoAdapter>(x => new CasbinMongoAdapter(() => x.GetService<Repository<CasbinRule>>()));
+            services.AddSingleton(x => new CasbinMongoAdapter(() => x.GetService<IRepository<CasbinRule>>()));
             services.AddSingleton<Enforcer>();
             services.AddAuthorization(options =>
             {

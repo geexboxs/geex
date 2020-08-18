@@ -41,10 +41,11 @@ namespace Geex.Server
         {
         }
 
-        //// This is the default if you don't have an environment specific method.
-        //public void ConfigureContainer(ContainerBuilder builder)
-        //{
-        //}
+        // This is the default if you don't have an environment specific method.
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterBuildCallback(x => ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(x.BeginLifetimeScope())));
+        }
 
         // This is the default if you don't have an environment specific method.
         public void Configure(IApplicationBuilder app)

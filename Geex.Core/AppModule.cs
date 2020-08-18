@@ -12,11 +12,14 @@ using Geex.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Geex.Core.Users;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Uow;
 
 namespace Geex.Core
 {
     [DependsOn(
         typeof(AbpAspNetCoreModule),
+        typeof(AbpUnitOfWorkModule),
         typeof(AuthenticationModule),
         typeof(UserModule)
         )]
@@ -32,7 +35,6 @@ namespace Geex.Core
             this._env = context.GetEnvironment();
             this._configuration = context.GetConfiguration();
 
-            ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(app.ApplicationServices.GetAutofacRoot()));
             if (_env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

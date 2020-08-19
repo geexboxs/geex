@@ -5,9 +5,9 @@ using HotChocolate.Types;
 
 namespace Geex.Core.Users.GqlSchemas.Types
 {
-    public class UserType : ObjectType<AppUser>
+    public class UserType : ObjectType<User>
     {
-        protected override void Configure(IObjectTypeDescriptor<AppUser> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<User> descriptor)
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Username);

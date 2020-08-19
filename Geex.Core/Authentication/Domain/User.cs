@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -21,7 +22,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class AppUser : ActiveRecordAggregateRoot<AppUser>
+    public class User : ActiveRecordAggregateRoot<User>
     {
         /// <summary>
         /// Gets or sets the username.
@@ -33,10 +34,11 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
         public string Password { get; set; }
         public ImmutableList<string> Roles { get; set; }
         public IQueryable<UserClaimRef> Claims => ServiceLocator.Current.GetService<IRepository<UserClaimRef>>().Where(x => x.UserId == this.Id);
+        public IQueryable<UserOrgRef> Orgs => ServiceLocator.Current.GetService<IRepository<UserOrgRef>>().Where(x => x.UserId == this.Id);
 
-        public AppUser(string phoneOrEmail, string password, string username = null)
+        public User(string phoneOrEmail, string password, string username = null)
         {
-            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<AppUser>>();
+            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             if (phoneOrEmail.IsValidEmail())
             {
                 this.Email = phoneOrEmail;
@@ -53,7 +55,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         private void CheckDuplicateUser()
         {
-            var users = this.As<IActiveRecord<AppUser>>().Repository;
+            var users = this.As<IActiveRecord<User>>().Repository;
             if (users
                 .Any(o => o.Username == this.Username || o.Email == this.Email || o.PhoneNumber == this.PhoneNumber))
             {
@@ -63,8 +65,15 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
         }
         public bool CheckPassword(string password)
         {
-            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<AppUser>>();
+            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             return passwordHasher.VerifyHashedPassword(this, this.Password, password) == PasswordVerificationResult.Success;
+        }
+
+        public User SetOrgs(List<string> orgs)
+        {
+            
+            IActiveRecord<UserOrgRef>.StaticRepository.DeleteAsync(x => x.UserId == this.Id);
+            return this;
         }
     }
 }

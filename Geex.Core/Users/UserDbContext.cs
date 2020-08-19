@@ -8,16 +8,16 @@ namespace Geex.Core.Users
     [ConnectionStringName("Geex")]
     public class UserDbContext:AbpMongoDbContext
     {
-        public IMongoCollection<AppUser> User { get; set; }
+        public IMongoCollection<User> User { get; set; }
 
         protected override void CreateModel(IMongoModelBuilder modelBuilder)
         {
 
             base.CreateModel(modelBuilder);
 
-            modelBuilder.Entity<AppUser>(b =>
+            modelBuilder.Entity<User>(b =>
             {
-                b.CollectionName = nameof(AppUser); //Sets the collection name
+                b.CollectionName = nameof(Shared._ShouldMigrateToLib.Auth.User); //Sets the collection name
             });
         }
     }

@@ -51,7 +51,7 @@ namespace Geex.Core.Authentication
             var configuration = context.Services.GetConfiguration();
             var services = context.Services;
 
-            services.AddTransient<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+            services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddMongoDbContext<AuthenticationDbContext>(options =>
             {
                 options.AddDefaultRepositories();

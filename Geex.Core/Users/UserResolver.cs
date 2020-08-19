@@ -32,12 +32,12 @@ using Volo.Abp.Domain.Repositories.MongoDB;
 
 namespace Geex.Core.Users
 {
-    [GraphQLResolverOf(typeof(AppUser))]
+    [GraphQLResolverOf(typeof(User))]
     [GraphQLResolverOf(typeof(Query))]
     public class UserResolver
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<AppUser> QueryUsers([Parent] Query query, [Service]IMongoDbRepository<AppUser> userCollection)
+        public IQueryable<User> QueryUsers([Parent] Query query, [Service]IMongoDbRepository<User> userCollection)
         {
             return userCollection;
         }
@@ -45,20 +45,28 @@ namespace Geex.Core.Users
             [Service]IComponentContext componentContext,
             RegisterUserInput input)
         {
-            var user = new AppUser(input.PhoneOrEmail, input.Password, input.UserName);
-            await user.As<IActiveRecord<AppUser>>().SaveAsync();
+            var user = new User(input.PhoneOrEmail, input.Password, input.UserName);
+            await user.As<IActiveRecord<User>>().SaveAsync();
             return true;
         }
 
         public async Task<bool> AssignRoles([Parent] Mutation mutation, AssignRoleInput input)
         {
-            var user = await IActiveRecord<AppUser>.StaticRepository.GetAsync(x=>x.Id == input.UserId);
+            var user = await IActiveRecord<User>.StaticRepository.GetAsync(x=>x.Id == input.UserId);
             user.Roles.Clear();
             foreach (var role in input.Roles)
             {
                 user.Roles.Add(new Role(role));
             }
-            await user.As<IActiveRecord<AppUser>>().SaveAsync();
+            await user.As<IActiveRecord<User>>().SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> AddToOrg([Parent] Mutation mutation, AddToOrgInput input)
+        {
+            var user = await IActiveRecord<User>.StaticRepository.GetAsync(x => x.Id == input.UserId);
+            user.SetOrgs(input.Orgs);
+            await user.As<IActiveRecord<User>>().SaveAsync();
             return true;
         }
     }

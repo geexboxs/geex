@@ -13,10 +13,10 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class GeexPasswordValidator : IResourceOwnerPasswordValidator
     {
-        private readonly IMongoDbRepository<AppUser> _userRepository;
+        private readonly IMongoDbRepository<User> _userRepository;
         private readonly Enforcer _enforcer;
 
-        public GeexPasswordValidator(IMongoDbRepository<AppUser> userRepository, Enforcer enforcer)
+        public GeexPasswordValidator(IMongoDbRepository<User> userRepository, Enforcer enforcer)
         {
             _userRepository = userRepository;
             _enforcer = enforcer;

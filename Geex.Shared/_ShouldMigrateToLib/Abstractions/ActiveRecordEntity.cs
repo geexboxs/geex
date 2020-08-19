@@ -19,54 +19,53 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
-    public class ActiveRecordEntity<T> : Entity<ObjectId>, IActiveRecord<T> where T : Entity<ObjectId>
+    public abstract class ActiveRecordEntity<T> : Entity, IActiveRecord<T> where T : Entity
     {
-        public IRepository<T, ObjectId> _repository { get; set; }
+        public virtual IRepository<T> Repository => IActiveRecord<T>.StaticRepository;
+        public override object[] GetKeys()
+        {
+            return new object[] { Id };
+        }
+
+        public ObjectId Id { get; set; }
     }
 
 
-    public interface IActiveRecord<T> : IEntity<ObjectId> where T : Entity<ObjectId>
+    public interface IActiveRecord<T> : IEntity where T : Entity
     {
-        public static IRepository<T, ObjectId> StaticRepository => ServiceLocator.Current.GetInstance<IRepository<T, ObjectId>>();
-        public IRepository<T, ObjectId> _repository { get; set; }
+        public static IRepository<T> StaticRepository => ServiceLocator.Current.GetInstance<IRepository<T>>();
 
-        public virtual IRepository<T, ObjectId> Repository
-        {
-            get
-            {
-                if (_repository == default)
-                {
-                    this.AttachRepository(ServiceLocator.Current.GetInstance<IRepository<T, ObjectId>>());
-                }
-                return _repository;
-            }
-        }
-
-        public T AttachRepository(IRepository<T, ObjectId> repositoryProvider)
-        {
-            _repository = repositoryProvider;
-            return this as T;
-        }
+        public virtual IRepository<T> Repository => StaticRepository;
 
         public virtual Task SaveAsync(bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            if (this.Id == ObjectId.Empty)
+            if (this.GetKeys().Length == 1 && this.GetKeys()[0] is ObjectId objectId && objectId == ObjectId.Empty)
+            {
+                return Repository.InsertAsync(this as T, autoSave, cancellationToken);
+            }
+            if (this.GetKeys().Any(x => x == x.GetType().Default()))
             {
                 return Repository.InsertAsync(this as T, autoSave, cancellationToken);
             }
             return Repository.UpdateAsync(this as T, autoSave, cancellationToken);
         }
 
+
         public virtual Task DeleteAsync(bool autoSave = false, CancellationToken cancellationToken = default)
         {
             var task = Repository.DeleteAsync(this as T, autoSave, cancellationToken);
-            this._repository = null;
             return task;
         }
     }
 
-    public abstract class ActiveRecordAggregateRoot<T> : AggregateRoot<ObjectId>, IActiveRecord<T> where T : AggregateRoot<ObjectId>
+    public abstract class ActiveRecordAggregateRoot<T> : AggregateRoot, IActiveRecord<T> where T : AggregateRoot
     {
-        public IRepository<T, ObjectId> _repository { get; set; }
+        public virtual IRepository<T> Repository => IActiveRecord<T>.StaticRepository;
+        public override object[] GetKeys()
+        {
+            return new object[] { Id };
+        }
+
+        public ObjectId Id { get; set; }
     }
 }

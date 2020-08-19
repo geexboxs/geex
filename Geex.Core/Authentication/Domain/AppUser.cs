@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Claims;
 
@@ -15,11 +16,8 @@ using IdentityServer4.Stores.Serialization;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-
-using MongoDB.Bson;
 using MongoDB.Driver;
-
-using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
@@ -33,8 +31,8 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         public string Email { get; set; }
         public string Password { get; set; }
-        public IQueryable<Role> Roles { get; set; }
-        public IQueryable<ClaimLite> Claims { get; set; }
+        public ImmutableList<string> Roles { get; set; }
+        public IQueryable<UserClaimRef> Claims => ServiceLocator.Current.GetService<IRepository<UserClaimRef>>().Where(x => x.UserId == this.Id);
 
         public AppUser(string phoneOrEmail, string password, string username = null)
         {

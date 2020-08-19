@@ -5,18 +5,17 @@ using Castle.Core;
 using Geex.Shared._ShouldMigrateToLib;
 using MongoDB.Bson;
 using System;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
+using Microsoft.AspNetCore.Http;
+using Volo.Abp.Domain.Entities;
 
 namespace Geex.Core.Users
 {
-    public class Role : NetCasbin.Rbac.Role, IEquatable<Role>
+    public class Role : Entity, IEquatable<Role>
     {
         public string Name { get; set; }
-        /// <summary>
-        /// Gets or sets the subject identifier.
-        /// </summary>
-        public ObjectId Id { get; set; } = ObjectId.GenerateNewId();
 
-        public Role(string name) : base(name)
+        public Role(string name)
         {
             this.Name = name;
         }
@@ -34,7 +33,23 @@ namespace Geex.Core.Users
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.Name, this.Id);
+            return HashCode.Combine(this.Name);
+        }
+
+        /// <summary>Implicitly calls ToString().</summary>
+        /// <param name="path"></param>
+        public static implicit operator string(Role path)
+        {
+            return path.Name;
+        }
+
+        /// <summary>
+        /// Implicitly creates a new Role from the given string.
+        /// </summary>
+        /// <param name="s"></param>
+        public static implicit operator Role(string s)
+        {
+            return new Role(s);
         }
 
         public static bool operator ==(Role left, Role right)
@@ -45,6 +60,11 @@ namespace Geex.Core.Users
         public static bool operator !=(Role left, Role right)
         {
             return !(left == right);
+        }
+
+        public override object[] GetKeys()
+        {
+            return new[] { this.Name };
         }
     }
 }

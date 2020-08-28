@@ -1,5 +1,6 @@
 {
     "author": "",
+    "type": "module",
     "dependencies": {
         "@elastic.io/casbin-mongoose-adapter": "^1.0.0",
         "@geex/shared": "file:../shared",
@@ -52,6 +53,7 @@
         "mongoose-autopopulate": "^0.12.1",
         "netmask": "^1.0.6",
         "nodemailer": "^6.3.1",
+        "nvm": "^0.0.4",
         "object-hash": "^2.0.0",
         "opentracing": "^0.14.4",
         "passport": "^0.4.1",
@@ -81,17 +83,17 @@
         "patch-package": "^6.2.2",
         "ts-nameof": "^4.2.2",
         "ts-node": "^8.4.1",
-        "ts-node-dev": "^1.0.0-pre.44",
+        "ts-node-dev": "^1.0.0-pre.61",
         "ttypescript": "^1.5.10",
-        "typescript": "^3.6.4"
+        "typescript": "^4.0.2"
     },
     "license": "ISC",
     "main": "index.ts",
     "name": "@geex/server",
     "scripts": {
         "test": "test",
-        "start": "ts-node-dev -C ttypescript ./index.ts",
-        "postinstall": "patch-package"
+        "start": "node --experimental-modules .\\node_modules\\ts-node-dev\\lib\\bin.js -C ttypescript ./index.ts",
+        "postinstall": "patch-package && powershell .\\init-workspace.ps1"
     },
     "version": "1.0.0"
 }

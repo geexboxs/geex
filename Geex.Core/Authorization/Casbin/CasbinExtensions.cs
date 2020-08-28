@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Geex.Shared._ShouldMigrateToLib.Auth;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using NetCasbin.Model;
-
 using Volo.Abp.Domain.Repositories;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authorization.Casbin
 {
     public static class CasbinExtensions
     {

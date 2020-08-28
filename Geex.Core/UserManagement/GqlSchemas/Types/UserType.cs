@@ -3,11 +3,11 @@ using Geex.Shared._ShouldMigrateToLib.Auth;
 
 using HotChocolate.Types;
 
-namespace Geex.Core.Users.GqlSchemas.Types
+namespace Geex.Core.UserManagement.GqlSchemas.Types
 {
-    public class UserType : ObjectType<User>
+    public class UserType : ObjectType<AppUser>
     {
-        protected override void Configure(IObjectTypeDescriptor<User> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<AppUser> descriptor)
         {
             descriptor.BindFieldsExplicitly();
             descriptor.Field(x => x.Username);
@@ -16,6 +16,8 @@ namespace Geex.Core.Users.GqlSchemas.Types
             descriptor.Field(x => x.PhoneNumber);
             descriptor.Field(x => x.Roles);
             descriptor.Field(x => x.Id);
+            descriptor.Ignore(x => x.Claims);
+            descriptor.Ignore(x => x.AuthorizedPermissions);
         }
     }
 }

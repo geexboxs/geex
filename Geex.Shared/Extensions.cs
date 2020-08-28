@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Geex.Shared.Roots.RootTypes;
 using Geex.Shared.Types;
 using HotChocolate;
@@ -87,7 +86,7 @@ namespace Geex.Shared
         public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder,Type gqlModuleType)
         {
             return schemaBuilder
-                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{gqlModuleType.Namespace}.GqlSchemas")).ToArray());
+                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray());
         }
 
         public static bool IsValidEmail(this string str)

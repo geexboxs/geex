@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using MongoDB.Driver;
-
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using NetCasbin.Model;
 using NetCasbin.Persist;
-
 using Volo.Abp.Domain.Repositories;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authorization.Casbin
 {
     public class CasbinMongoAdapter : IAdapter
     {

@@ -1,4 +1,4 @@
-﻿namespace Geex.Core.Users.GqlSchemas.Inputs
+﻿namespace Geex.Core.UserManagement.GqlSchemas.Inputs
 {
     public class RegisterUserInput
     {

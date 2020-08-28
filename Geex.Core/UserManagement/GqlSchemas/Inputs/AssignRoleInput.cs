@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 
-namespace Geex.Core.Users.GqlSchemas.Inputs
+namespace Geex.Core.UserManagement.GqlSchemas.Inputs
 {
     public class AssignRoleInput
     {

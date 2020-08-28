@@ -8,7 +8,7 @@ using System.Security.Claims;
 using Autofac;
 
 using CommonServiceLocator;
-
+using Geex.Core.Authorization;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
@@ -35,6 +35,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
         public ImmutableList<string> Roles { get; set; }
         public IQueryable<UserClaimRef> Claims => ServiceLocator.Current.GetService<IRepository<UserClaimRef>>().Where(x => x.UserId == this.Id);
         public IQueryable<UserOrgRef> Orgs => ServiceLocator.Current.GetService<IRepository<UserOrgRef>>().Where(x => x.UserId == this.Id);
+        public List<AppPermission> AuthorizedPermissions { get; set; }
 
         public User(string phoneOrEmail, string password, string username = null)
         {

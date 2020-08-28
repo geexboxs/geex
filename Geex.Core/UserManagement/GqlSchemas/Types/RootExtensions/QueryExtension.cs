@@ -3,7 +3,7 @@ using Geex.Shared.Roots;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace Geex.Core.Users.GqlSchemas.Types.RootExtensions
+namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
 {
     public class QueryExtension : ObjectTypeExtension
     {
@@ -12,12 +12,12 @@ namespace Geex.Core.Users.GqlSchemas.Types.RootExtensions
             descriptor.Name(nameof(Query));
             descriptor.Field<UserResolver>(x => x.QueryUsers(default, default))// return
                 .UsePaging<UserType>()// paging
-                .UseSorting<User>(x =>
+                .UseSorting<AppUser>(x =>
                 {
                     x.BindFieldsExplicitly();
                     x.Sortable(y => y.Username);
                 })// sort
-                .UseFiltering<User>(x =>
+                .UseFiltering<AppUser>(x =>
                 {
                     x.BindFieldsExplicitly();
                     x.Filter(y => y.Username);

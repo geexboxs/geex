@@ -5,6 +5,7 @@ using Castle.Core;
 using Geex.Shared._ShouldMigrateToLib;
 using MongoDB.Bson;
 using System;
+using Geex.Core.Authorization;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Volo.Abp.Domain.Entities;
@@ -14,6 +15,7 @@ namespace Geex.Core.Users
     public class Role : Entity, IEquatable<Role>
     {
         public string Name { get; set; }
+        //public List<AppPermission> AuthorizedPermissions { get; set; }
 
         public Role(string name)
         {

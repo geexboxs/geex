@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
+using Geex.Core.Authorization.Casbin;
 using Humanizer;
 using IdentityServer4.MongoDB.Entities;
 using IdentityServer4.MongoDB.Mappers;

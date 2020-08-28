@@ -7,6 +7,7 @@ using Volo.Abp.AspNetCore;
 using Volo.Abp.Modularity;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core.Authentication;
+using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +22,7 @@ namespace Geex.Core
         typeof(AbpAspNetCoreModule),
         typeof(AbpUnitOfWorkModule),
         typeof(AuthenticationModule),
-        typeof(UserModule)
+        typeof(UserManagementModule)
         )]
     public class AppModule : GraphQLEntryModule<AppModule>
     {

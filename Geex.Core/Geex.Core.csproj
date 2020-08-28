@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Authorization\GqlSchemas\" />
+  </ItemGroup>
+
 </Project>

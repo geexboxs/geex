@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NetCasbin.Model;
+using Policy = Geex.Shared._ShouldMigrateToLib.Auth.Policy;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authorization.Casbin
 {
     public class Enforcer
     {

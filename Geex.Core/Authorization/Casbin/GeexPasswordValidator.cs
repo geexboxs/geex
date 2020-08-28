@@ -2,21 +2,20 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
 using MongoDB.Bson;
-using MongoDB.Driver;
-using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Repositories.MongoDB;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authorization.Casbin
 {
     public class GeexPasswordValidator : IResourceOwnerPasswordValidator
     {
-        private readonly IMongoDbRepository<User> _userRepository;
+        private readonly IMongoDbRepository<AppUser> _userRepository;
         private readonly Enforcer _enforcer;
 
-        public GeexPasswordValidator(IMongoDbRepository<User> userRepository, Enforcer enforcer)
+        public GeexPasswordValidator(IMongoDbRepository<AppUser> userRepository, Enforcer enforcer)
         {
             _userRepository = userRepository;
             _enforcer = enforcer;

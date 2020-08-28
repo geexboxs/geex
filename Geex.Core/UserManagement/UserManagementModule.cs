@@ -1,23 +1,12 @@
-﻿using System;
-
-using Autofac;
-
-using Geex.Shared;
-using Geex.Shared._ShouldMigrateToLib.Auth;
-
-using HotChocolate;
-
+﻿using Geex.Shared;
 using Microsoft.Extensions.DependencyInjection;
-
-using MongoDB.Driver;
 using Volo.Abp.AspNetCore;
 using Volo.Abp.Autofac;
-using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Modularity;
 using Volo.Abp.MongoDB;
 using Volo.Abp.Uow;
 
-namespace Geex.Core.Users
+namespace Geex.Core.UserManagement
 {
     [DependsOn(
         typeof(AbpAspNetCoreModule),
@@ -25,11 +14,11 @@ namespace Geex.Core.Users
         typeof(AbpUnitOfWorkModule),
         typeof(AbpMongoDbModule)
     )]
-    public class UserModule : GraphQLModule<UserModule>
+    public class UserManagementModule : GraphQLModule<UserManagementModule>
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddMongoDbContext<UserDbContext>(options =>
+            context.Services.AddMongoDbContext<UserManagementDbContext>(options =>
             {
                 options.AddDefaultRepositories();
             });

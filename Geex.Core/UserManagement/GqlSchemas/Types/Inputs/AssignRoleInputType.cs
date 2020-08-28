@@ -1,7 +1,7 @@
-﻿using Geex.Core.Users.GqlSchemas.Inputs;
+﻿using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using HotChocolate.Types;
 
-namespace Geex.Core.Users.GqlSchemas.Types.Inputs
+namespace Geex.Core.UserManagement.GqlSchemas.Types.Inputs
 {
     public class AssignRoleInputType : InputObjectType<AssignRoleInput>
     {

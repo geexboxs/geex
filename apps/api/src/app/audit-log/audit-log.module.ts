@@ -6,7 +6,7 @@ import { AuditLogResolver } from "./audit-log.resolver";
 import { GeexLogger } from "../../shared/utils/logger";
 import { LoggerConfigToken } from "../../shared/tokens";
 import { RbacAuthChecker } from "../../shared/utils/rbac-auth-checker";
-import { ILoggerConfig } from "../../configs/types";
+import { ILoggerConfig } from "../../types";
 import { ExecutionContext } from "@nestjs/common";
 
 const resolvers: [ClassType] = [AuditLogResolver];

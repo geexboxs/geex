@@ -1,11 +1,10 @@
 import OpentracingExtension, { RequestStart, ExtendedGraphQLResolveInfo } from "apollo-opentracing";
-import { Inject, Injectable, ProviderScope } from "@graphql-modules/di";
 import { GeexServerConfigToken } from "../tokens";
 import { initTracer, TracingConfig, Reporter } from "jaeger-client";
 import { GeexLogger } from "../utils/logger";
 import { Span } from "opentracing";
-import { ExecutionContext } from "@nestjs/common";
-import { IGeexServerConfig } from "../../configs/types";
+import { ExecutionContext, Injectable, Inject } from "@nestjs/common";
+import { IGeexServerConfig } from "../../types";
 import { IGeexRequestStart, IGeexRequestEnd } from "../../types";
 
 @Injectable()
@@ -35,7 +34,7 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
         const onRequestResolve = this["onRequestResolve"];
         // tslint:disable-next-line: no-string-literal
         this["onRequestResolve"] = (rootSpan: Span, infos: IGeexRequestStart) => {
-            
+
             // tslint:disable-next-line: no-unnecessary-initializer
             let operation: string = "__unknown__";
             if (infos.operationName === "IntrospectionQuery") {

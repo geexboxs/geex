@@ -35,12 +35,12 @@ declare module "@nestjs/common" {
 }
 
 declare module "@nestjs/core" {
-    export class NestApplication {
-        get<TInput = any, TResult = TInput>(typeOrToken: Type<TInput> | Abstract<TInput> | string | symbol, options?: {
-            strict: boolean;
-        }): TResult;
-        getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>;
-    }
+    // export class NestApplication {
+    //     get<TInput = any, TResult = TInput>(typeOrToken: Type<TInput> | Abstract<TInput> | string | symbol, options?: {
+    //         strict: boolean;
+    //     }): TResult;
+    //     getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>;
+    // }
     export interface INestApplication {
         getModel<T extends ModelBase<T>>(ctorOrName: Type<T> | string): ModelType<T>;
         get<TInput = any, TResult = TInput>(typeOrToken: Type<TInput> | Abstract<TInput> | string | symbol, options?: {
@@ -49,7 +49,7 @@ declare module "@nestjs/core" {
     }
 }
 
-NestApplication.prototype.getModel = function <T>(this: NestApplication, ctorOrName: Type<T> | string) {
+NestApplication.prototype["getModel"] = function <T>(this: NestApplication, ctorOrName: Type<T> | string) {
     let modelName;
     if (typeof ctorOrName == "string") {
         modelName = ctorOrName;

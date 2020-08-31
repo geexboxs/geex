@@ -1,0 +1,13 @@
+diff --git a/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js b/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js
+index d2c3e44..733b2b7 100644
+--- a/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js
++++ b/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js
+@@ -116,7 +116,7 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
+     } else if (virtual && virtual.options && virtual.options.ref) {
+       let normalizedRef;
+       if (typeof virtual.options.ref === 'function') {
+-        normalizedRef = virtual.options.ref.call(doc, doc);
++        normalizedRef = new virtual.options.ref(doc, doc);
+       } else {
+         normalizedRef = virtual.options.ref;
+       }

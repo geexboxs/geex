@@ -8,13 +8,12 @@
             "type": "node",
             "request": "launch",
             "name": "server:Debug",
-            "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
             "args": [
                 "-C",
                 "ttypescript",
-                "${workspaceRoot}/index"
+                "${workspaceRoot}/main"
             ],
             "restart": true
         },
@@ -22,13 +21,12 @@
             "type": "node",
             "request": "launch",
             "name": "server:Run",
-            "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node",
             "args": [
                 "-C",
                 "ttypescript",
-                "${workspaceRoot}/index"
+                "${workspaceRoot}/main"
             ],
         }
     ]

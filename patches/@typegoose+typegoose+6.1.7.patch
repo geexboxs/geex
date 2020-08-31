@@ -1,0 +1,55 @@
+diff --git a/node_modules/@typegoose/typegoose/lib/types.d.ts b/node_modules/@typegoose/typegoose/lib/types.d.ts
+index a71a2ad..760b9c0 100644
+--- a/node_modules/@typegoose/typegoose/lib/types.d.ts
++++ b/node_modules/@typegoose/typegoose/lib/types.d.ts
+@@ -1,6 +1,32 @@
+ /// <reference types="node" />
+ import * as mongoose from 'mongoose';
+ import { Base } from './defaultClasses';
++import { ObjectId } from 'mongodb';
++type GeexPrimitive = string | number | bigint | boolean | symbol | String | Number | Date | Boolean | BigInt | Symbol | ObjectId | undefined;
++type PrimitiveKeys<T> = {
++    [key in keyof T]: T[key] extends GeexPrimitive ? key : never
++}[keyof T];
++type ComplexKeys<T> = {
++    [key in keyof T]: T[key] extends GeexPrimitive ? never : key
++}[keyof T];
++
++type PrimitiveProps<T> = { [key in PrimitiveKeys<T>]?: T[key] };
++type ComplexProps<T> = { [key in ComplexKeys<T>]?: T[key] };
++
++type FieldKeys<T> = Exclude<keyof PrimitiveProps<T>, keyof mongoose.Document> | PrimitiveKeys<{ _id?: ObjectId, id?: string, __v?: number }>;
++type FieldProps<T> = Omit<PrimitiveProps<T>, keyof mongoose.Document> | PrimitiveProps<{ _id?: ObjectId, id?: string, __v?: number }>;
++export type UpdateOperator<T> = FieldProps<T> | {
++    $set?: ComplexProps<T>
++} | {
++        [key in "$currentDate" |
++        "$inc" |
++        "$min" |
++        "$max" |
++        "$mul" |
++        "$rename" |
++        "$OnInsert" |
++        "$unset"]?: any
++    };
+ /**
+  * Get the Type of an instance of a Document with Class properties
+  * @public
+@@ -12,7 +38,16 @@ import { Base } from './defaultClasses';
+  * const t: DocumentType<Name> = await NameModel.create({} as Partitial<Name>);
+  * ```
+  */
+-export declare type DocumentType<T> = (T extends Base ? Omit<mongoose.Document, '_id'> & T : mongoose.Document & T) & IObjectWithTypegooseFunction;
++export declare type DocumentType<T> = (T extends Base ? Omit<mongoose.Document, '_id'> & T : mongoose.Document & T) & IObjectWithTypegooseFunction & {
++    update(doc: UpdateOperator<T>, callback?: (err: any, raw: any) => void): mongoose.Query<any>;
++    update(doc: UpdateOperator<T>, options: mongoose.ModelUpdateOptions,
++        callback?: (err: any, raw: any) => void): mongoose.Query<any>;
++
++    /** Sends an updateOne command with this document _id as the query selector.  */
++    updateOne(doc: UpdateOperator<T>, callback?: (err: any, raw: any) => void): mongoose.Query<any>;
++    updateOne(doc: UpdateOperator<T>, options: mongoose.ModelUpdateOptions,
++        callback?: (err: any, raw: any) => void): mongoose.Query<any>;
++};
+ /**
+  * Used Internally for ModelTypes
+  * @internal

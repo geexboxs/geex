@@ -13,6 +13,7 @@ import { Role } from "./model/role.model";
 import { ObjectID } from "mongodb";
 import { SessionStore } from "../authentication/models/session.model";
 import { AccessControl } from "@geexbox/accesscontrol";
+import { Uow } from "../../shared/utils/uow.interceptor";
 
 @Resolver((of) => User)
 export class UserManageResolver {
@@ -56,6 +57,7 @@ export class UserManageResolver {
         return true;
     }
     @Mutation(() => Boolean)
+    @Uow()
     public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
         if (roles?.any() && permissions?.any()) {
             roles.forEach(role => {

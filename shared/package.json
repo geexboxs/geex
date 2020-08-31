@@ -1,8 +1,9 @@
 {
-    "name": "@geex/shared",
+    "name": "shared",
     "version": "0.0.1",
     "description": "",
     "author": "",
+    "type": "module",
     "private": true,
     "license": "UNLICENSED",
     "main": "index.ts",

@@ -14,7 +14,7 @@
             "args": [
                 "-C",
                 "ttypescript",
-                "${workspaceRoot}/server/index"
+                "${workspaceRoot}/server/main"
             ],
             "restart": true
         },
@@ -28,7 +28,7 @@
             "args": [
                 "-C",
                 "ttypescript",
-                "${workspaceRoot}/server/index"
+                "${workspaceRoot}/server/main"
             ],
         },
         {

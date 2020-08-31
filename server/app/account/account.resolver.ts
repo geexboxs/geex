@@ -6,7 +6,7 @@ import { User } from "./models/user.model";
 import { UserModelToken } from "../../shared/tokens";
 import { Session, SessionStore } from "../authentication/models/session.model";
 import { VerifyType } from "./models/verify-type";
-import { RegisterInput } from "../../../shared/contracts/inputs/register.input";
+import { RegisterInput } from "@geex/shared/contracts/inputs/register.input";
 import passport = require("passport");
 import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";

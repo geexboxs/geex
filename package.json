@@ -1,0 +1,32 @@
+{
+    "name": "geex",
+    "version": "1.0.0",
+    "description": "grapgql project",
+    "private": true,
+    "main": "server/main.ts",
+    "directories": {
+        "doc": "doc"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "ts-node-dev -C ttypescript ./server/main.ts",
+        "postinstall": "patch-package"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/microexs/geex.git"
+    },
+    "workspaces": [
+        "client",
+        "server",
+        "shared"
+    ],
+    "author": "lulus",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/microexs/geex/issues"
+    },
+    "homepage": "https://github.com/microexs/geex#readme"
+}

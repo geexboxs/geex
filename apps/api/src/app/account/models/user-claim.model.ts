@@ -2,8 +2,8 @@ import { prop } from "@typegoose/typegoose";
 import { Field } from "@nestjs/graphql";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { User } from "./user.model";
-import { ModelBase } from "../../../shared/utils/model-base";
- 
+import { ModelBase } from '@geex/api-shared';
+
 
 
 export class UserClaims extends ModelBase {
@@ -16,7 +16,7 @@ export class UserClaims extends ModelBase {
     @prop()
     @Field()
     public avatarUrl: string = "";
-    @prop({ required: true, ref: nameof(User) })
+    @prop({ required: true, ref: "User" })
     @Field()
     public userId!: string;
     @Field()

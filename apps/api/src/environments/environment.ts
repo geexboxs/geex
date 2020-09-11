@@ -1,6 +1,6 @@
-import { IGeexServerConfig } from '../types';
 
-export const environment: Record<keyof IGeexServerConfig, any> & { [key: string]: any } = {
+import { IGeexServerConfig } from "@geex/api-shared";
+export const environment: IGeexServerConfig & { [key: string]: any } = {
   production: false,
   hostname: "127.0.0.1",
   port: 4000,

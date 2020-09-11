@@ -2,9 +2,9 @@ import { Injectable, ExecutionContext, mixin, UnauthorizedException } from "@nes
 import { AuthGuard as NestAuthGuard } from "@nestjs/passport";
 import { GqlExecutionContext } from "@nestjs/graphql";
 import { SessionStore } from "../../authentication/models/session.model";
-import { ServiceLocator } from "../../../shared/utils/service-locator";
 import { AppPermission } from "../permissions.const";
 import { AccessControl } from "@geexbox/accesscontrol";
+import { ServiceLocator } from '@geex/api-shared';
 
 export const AuthGuard = function (...scopes: AppPermission[]) {
     return mixin(class AuthGuard extends NestAuthGuard("jwt") {

@@ -1,28 +1,25 @@
-import { GraphQLModule } from "@graphql-modules/core";
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { buildSchemaSync, ClassType } from "type-graphql";
-import { environments } from "../../configs/app-config";
-import { AuditLogResolver } from "./audit-log.resolver";
-import { GeexLogger } from "../../shared/utils/logger";
-import { LoggerConfigToken } from "../../shared/tokens";
-import { RbacAuthChecker } from "../../shared/utils/rbac-auth-checker";
-import { ILoggerConfig } from "../../types";
-import { ExecutionContext } from "@nestjs/common";
+// import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+// import { buildSchemaSync, ClassType } from "type-graphql";
+// import { environment } from '@env';
+// import { AuditLogResolver } from "./audit-log.resolver";
+// import { ExecutionContext } from "@nestjs/common";
+// import { GraphQLModule } from '@nestjs/graphql';
+// import { ILoggerConfig, GeexLogger, RbacAuthChecker, LoggerConfigToken } from '@geex/api-shared';
 
-const resolvers: [ClassType] = [AuditLogResolver];
-export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, ExecutionContext>({
-    providers: [GeexLogger, {
-        provide: LoggerConfigToken,
-        useValue: environments.loggerConfig,
-    }, ...resolvers],
-    extraSchemas: () => [buildSchemaSync({
-        resolvers,
-        container: {
-            get: (someClass, resolverData) => {
-                return (resolverData.context as ExecutionContext).injector.get(someClass);
-            },
-        },
-        authChecker: RbacAuthChecker,
-    })],
-    imports: [],
-}, environments.loggerConfig);
+// const resolvers: [ClassType] = [AuditLogResolver];
+// export const AuditLogModule = new GraphQLModule<ILoggerConfig | undefined, ExpressContext, ExecutionContext>({
+//     providers: [, {
+//         provide: LoggerConfigToken,
+//         useValue: environment.loggerConfig,
+//     }, ...resolvers],
+//     extraSchemas: () => [buildSchemaSync({
+//         resolvers,
+//         container: {
+//             get: (someClass, resolverData) => {
+//                 return (resolverData.context as ExecutionContext).injector.get(someClass);
+//             },
+//         },
+//         authChecker: RbacAuthChecker,
+//     })],
+//     imports: [],
+// }, environment.loggerConfig);

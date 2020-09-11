@@ -1,8 +1,7 @@
-import { Inject, Injectable } from "@graphql-modules/di";
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
-import { GeexLogger } from "../../shared/utils/logger";
 import json5 = require("json5");
-import { ExecutionContext } from "@nestjs/common";
+import { ExecutionContext, Injectable, Inject } from "@nestjs/common";
+import { GeexLogger } from '@geex/api-shared';
 
 @Injectable()
 export class AuditLogMiddleware implements MiddlewareInterface<ExecutionContext> {

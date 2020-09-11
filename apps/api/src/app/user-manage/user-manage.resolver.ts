@@ -3,22 +3,20 @@ import { User } from "../account/models/user.model";
 import { InjectModel } from "@nestjs/mongoose";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { Optional, Inject } from "@nestjs/common";
-import { EmailSender } from "../../shared/utils/email-sender";
 import { REQUEST } from "@nestjs/core";
 import { ExecutionContext } from "graphql/execution/execute";
-import { RegisterInput } from "@shared/contracts/inputs/register.input";
 import { VerifyType } from "../account/models/verify-type";
-import { I18N } from "../../shared/utils/i18n";
+import { I18N } from "@geex/api-shared";
 import { Role } from "./model/role.model";
 import { ObjectID } from "mongodb";
 import { SessionStore } from "../authentication/models/session.model";
 import { AccessControl } from "@geexbox/accesscontrol";
-import { Uow } from "../../shared/utils/uow.interceptor";
+import { Uow } from "@geex/api-shared";
 
 @Resolver((of) => User)
 export class UserManageResolver {
     constructor(
-        @InjectModel(nameof(User))
+        @InjectModel(User.name)
         private userModel: ModelType<User>,
         // @Optional()
         // @Inject(EmailSender)

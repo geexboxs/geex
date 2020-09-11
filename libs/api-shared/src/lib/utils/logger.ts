@@ -1,7 +1,7 @@
-import winston = require("winston");
+import * as winston from "winston";
 import { LogLevel, Injectable, Inject } from "@nestjs/common";
-import { GeexServerConfigToken } from "../tokens";
-import { LogTarget, IGeexServerConfig } from "../../types";
+import { IGeexServerConfig, LogTarget } from '../types';
+import { GeexServerConfigToken } from '../tokens';
 
 @Injectable()
 export class GeexLogger {

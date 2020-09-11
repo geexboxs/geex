@@ -1,18 +1,4 @@
-import _ = require("lodash");
 import { addDays, addHours, addMinutes, addSeconds, addMilliseconds, addWeeks, addMonths, addYears } from "date-fns";
-
-declare global {
-    // tslint:disable-next-line: interface-name
-    interface Date {
-        add: (value: { years?: number; months?: number; weeks?: number; days?: number; hours?: number; minutes?: number; seconds?: number; milliseconds?: number; }) => Date;
-        format(format: string): string;
-        epoch(): number;
-    }
-    // tslint:disable-next-line: interface-name
-    interface String {
-        isNotEmpty(): boolean;
-    }
-}
 
 Date.prototype.epoch = function (this: Date) {
     return Math.round(this.getTime() / 1000);

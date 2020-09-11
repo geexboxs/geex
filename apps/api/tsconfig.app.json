@@ -10,13 +10,15 @@
       "esnext"
     ],
     "emitDecoratorMetadata": true,
-    "target": "es5",
-    "module": "commonjs"
+    "target": "es2019",
+    "module": "commonjs",
   },
   "exclude": [
     "**/*.spec.ts"
   ],
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../../libs/api-shared/src/lib/index.ts",
+    "../../libs/contracts/src/lib/index.ts"
   ]
 }

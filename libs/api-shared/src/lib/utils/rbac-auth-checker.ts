@@ -1,8 +1,9 @@
 import { AuthChecker, UnauthorizedError } from "type-graphql";
 import { IRule, allow } from "graphql-shield";
 import { IShieldContext } from "graphql-shield/dist/types";
-import objHash = require("object-hash");
+import * as objHash from "object-hash";
 import { ExecutionContext } from "@nestjs/common";
+
 export const RbacAuthChecker: AuthChecker<ExecutionContext & IShieldContext, IRule> = (
     { root, args, context, info },
     funcs: IRule[],

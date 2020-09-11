@@ -40,9 +40,12 @@
       ]
     },
     "api": {
-      "tags": []
+      "tags": [],
+      "implicitDependencies": [
+        "api-shared"
+      ]
     },
-    "api-interfaces": {
+    "api-shared": {
       "tags": []
     }
   }

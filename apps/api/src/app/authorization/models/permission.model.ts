@@ -1,11 +1,9 @@
-import { RequiredPartial } from "../../../types";
 import { ObjectType, Field, ResolveField } from "@nestjs/graphql";
-import { ServiceLocator } from "../../../shared/utils/service-locator";
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { ModelBase } from "../../../shared/utils/model-base";
 import { prop, plugin } from "@typegoose/typegoose";
 import { AppPermission, APP_PERMISSIONS } from "../permissions.const";
 import { PermissionScalar } from "../scalars/permission.scalar";
+import { RequiredPartial } from '@geex/api-shared';
 
 
 

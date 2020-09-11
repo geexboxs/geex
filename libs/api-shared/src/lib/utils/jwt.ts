@@ -1,6 +1,3 @@
-import _ = require("lodash");
-import { Netmask } from "netmask";
-import { Request } from "express";
 import jwt = require("jsonwebtoken");
 
 export class Jwt {
@@ -21,7 +18,7 @@ export class Jwt {
      * @param {string} payload
      * @param {string} userId
      * @param {("accessToken" | "refreshToken")} audience
-     * @returns 
+     * @returns
      * @memberof Jwt
      */
     verify(payload: string, userId: string, userIp: string, audience: string = "accessToken") {

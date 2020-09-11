@@ -3,12 +3,10 @@ import "./patches/custom-patches/date.patch";
 import "./patches/custom-patches/typegoose.patch";
 import "./patches/custom-patches/nestjs.patch";
 import "reflect-metadata";
-import { environments } from "./configs/app-config";
 import { Passport } from "passport";
-import { ApolloServer } from "apollo-server-express";
 import { ValidationPipe, Logger } from "@nestjs/common";
-import { NestFactory, INestApplication } from "@nestjs/core";
-import { ServiceLocator } from "./shared/utils/service-locator";
+import { NestFactory } from "@nestjs/core";
+import { ServiceLocator } from "@geex/api-shared";
 import { AppModule } from "./app/app.module";
 async function main() {
   const app = await NestFactory.create(AppModule);

@@ -15,7 +15,7 @@ import { Role } from "../user-manage/model/role.model";
 @Resolver((of) => PermissionNode)
 export class AuthorizationResolver {
     constructor(
-        @InjectModel(nameof(User))
+        @InjectModel(User.name)
         private userModel: ModelType<User>,
         @Inject(AccessControl)
         private ac: AccessControl,

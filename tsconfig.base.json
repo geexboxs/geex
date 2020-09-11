@@ -14,14 +14,37 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "target": "esnext",
     "paths": {
-      "@geex/contracts/*": [
-        "libs/contracts/*"
+      "@geex/contracts": [
+        "libs/contracts/src/lib/index.ts"
+      ],
+      "@geex/api-shared": [
+        "libs/api-shared/src/lib/index.ts"
+      ],
+      "@env": [
+        "apps/api/src/environments/environment.ts",
+        "apps/geex-app/src/environments/environment.ts",
+        "apps/geex-app-e2e/src//src/environments/environment.ts"
+      ],
+      "@workspaceRoot/*": [
+        "./*"
       ]
-    }
+    },
   },
   "exclude": [
     "node_modules",
     "tmp"
+  ],
+  "references": [
+    {
+      "path": "./apps/api/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/geex-app/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/geex-app-e2e/tsconfig.app.json"
+    }
   ]
 }

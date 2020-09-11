@@ -1,5 +1,5 @@
 
-import { Inject } from "@graphql-modules/di";
+import { Inject } from "@nestjs/common";
 import { Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { AuditLog } from "./audit-log.model";
 

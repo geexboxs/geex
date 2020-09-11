@@ -3,10 +3,9 @@ import { User } from '../account/models/user.model';
 import { getModelForClass } from '@typegoose/typegoose';
 import { UserManageResolver } from './user-manage.resolver';
 import { Role } from './model/role.model';
-import { SharedModule } from '../shared.module';
 
 @Module({
-    imports: [SharedModule],
+    imports: [],
     providers: [UserManageResolver,
     ],
 })

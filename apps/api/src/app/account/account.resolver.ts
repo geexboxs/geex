@@ -1,27 +1,23 @@
-import { Inject, Injector } from "@graphql-modules/di";
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { promises } from "dns";
 import { request } from "express";
 import { User } from "./models/user.model";
-import { UserModelToken } from "../../shared/tokens";
 import { Session, SessionStore } from "../authentication/models/session.model";
 import { VerifyType } from "./models/verify-type";
-import { RegisterInput } from "@geex/shared/contracts/inputs/register.input";
 import passport = require("passport");
 import { PasswordHasher } from "./utils/password-hasher";
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import { I18N } from "../../shared/utils/i18n";
 import ioredis = require("ioredis");
-import { EmailSender } from "../../shared/utils/email-sender";
 import { Resolver, Mutation, ID, Args, Query } from "@nestjs/graphql";
 import { REQUEST } from "@nestjs/core";
-import { ExecutionContext, Optional } from "@nestjs/common";
+import { ExecutionContext, Optional, Inject } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
+import { EmailSender, I18N } from '@geex/api-shared';
+import { RegisterInput } from "@geex/contracts";
 
 @Resolver((of) => User)
 export class AccountResolver {
     constructor(
-        @InjectModel(nameof(User))
+        @InjectModel(User.name)
         private userModel: ModelType<User>,
         @Inject(PasswordHasher)
         private passwordHasher: PasswordHasher,

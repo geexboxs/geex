@@ -3,16 +3,14 @@ import { prop, DocumentType, plugin, pre, Ref } from "@typegoose/typegoose";
 import { PhoneNumberResolver, EmailAddressResolver } from "graphql-scalars";
 import { ObjectId } from "mongodb";
 import { Document, Model, Schema, Types } from "mongoose";
-import { ModelBase } from "../../../shared/utils/model-base";
-import { Injector } from "@graphql-modules/di";
 import { ObjectType, Field } from "@nestjs/graphql";
 import { NestContainer, ModulesContainer } from "@nestjs/core";
 import { User } from "../../account/models/user.model";
-import { ServiceLocator } from "../../../shared/utils/service-locator";
 import { CommandBus } from "@nestjs/cqrs";
 import { UserPermissionChangeCommand } from "../../authorization/commands/change-user-role.command";
 import { RefType } from "@typegoose/typegoose/lib/types";
 import { AccessControl } from "@geexbox/accesscontrol";
+import { ServiceLocator } from '@geex/api-shared';
 
 
 

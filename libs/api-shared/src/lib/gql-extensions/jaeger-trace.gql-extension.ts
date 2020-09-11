@@ -25,55 +25,110 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
     super({
       server: tracer,
       local: tracer,
-      shouldTraceRequest: (info: Partial<IGeexRequestStart>) => {
+      shouldTraceRequest: (info: IGeexRequestStart) => {
         return true;
       },
-    });
-    // tslint:disable-next-line: no-string-literal
-    const onRequestResolve = this["onRequestResolve"];
-    // tslint:disable-next-line: no-string-literal
-    this["onRequestResolve"] = (rootSpan: Span, infos: IGeexRequestStart) => {
-
-      // tslint:disable-next-line: no-unnecessary-initializer
-      let operation: string = "__unknown__";
-      if (infos.operationName === "IntrospectionQuery") {
-        operation = "IntrospectionQuery";
+      onFieldResolve: (source, args, context, info) => {
+      },
+      onRequestResolve: (rootSpan: Span, infos: IGeexRequestStart) => {
+        // tslint:disable-next-line: no-unnecessary-initializer
+        let operation: string = "__unknown__";
+        if (infos.operationName === "IntrospectionQuery") {
+          operation = "IntrospectionQuery";
+          rootSpan.setOperationName(operation);
+          rootSpan.addTags({
+            operation,
+            ip: infos.context.req.connection.remoteAddress,
+          });
+        }
+        if (infos.requestContext.request.query == undefined) {
+          throw new Error("Empty query detected, jaeger-trace may configured in a wrong way.");
+        }
+        if (infos.requestContext.request.query.startsWith("{")) {
+          operation = "query";
+        } else if (infos.requestContext.request.query.startsWith("mutation")) {
+          operation = "mutation";
+        } else if (infos.requestContext.request.query.startsWith("subscription")) {
+          operation = "subscription";
+        }
         rootSpan.setOperationName(operation);
         rootSpan.addTags({
           operation,
           ip: infos.context.req.connection.remoteAddress,
         });
-        return onRequestResolve(rootSpan, infos);
-      }
-      if (infos.requestContext.request.query!.startsWith("{")) {
-        operation = "query";
-      } else if (infos.requestContext.request.query!.startsWith("mutation")) {
-        operation = "mutation";
-      } else if (infos.requestContext.request.query!.startsWith("subscription")) {
-        operation = "subscription";
-      }
-      rootSpan.setOperationName(operation);
-      rootSpan.addTags({
-        operation,
-        ip: infos.context.req.connection.remoteAddress,
-      });
-      rootSpan.log({
-        request: infos.requestContext.request,
-      });
-      // tslint:disable-next-line: no-string-literal
-      infos.context.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
-      infos.context.res.setHeader("requestId", rootSpan.context()["traceIdStr"]);
-      // tslint:disable-next-line: no-string-literal
-      this["willSendResponse"] = (res: IGeexRequestEnd) => {
         rootSpan.log({
-          headers: res.context.res.getHeaders(),
+          request: infos.requestContext.request,
         });
-        rootSpan.log({
-          response: res.graphqlResponse,
+        // tslint:disable-next-line: no-string-literal
+        infos.context.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
+        infos.context.res.setHeader("requestId", rootSpan.context()["traceIdStr"]);
+        // tslint:disable-next-line: no-string-literal
+        // this["willSendResponse"] = (res: IGeexRequestEnd) => {
+        //   rootSpan.log({
+        //     headers: res.context.res.getHeaders(),
+        //   });
+        //   rootSpan.log({
+        //     response: res.graphqlResponse,
+        //   });
+        // };
+      },
+      shouldTraceFieldResolver: (source, args, context, info) => {
+        return true;
+      },
+      onFieldResolveFinish: (error, result: IGeexRequestEnd, span) => {
+        span.log({
+          headers: result.context.res.getHeaders(),
         });
-      };
-      return onRequestResolve(rootSpan, infos);
-    };
+        span.log({
+          response: result.graphqlResponse,
+        });
+      }
+    });
+    // tslint:disable-next-line: no-string-literal
+    // const onRequestResolve = this["onRequestResolve"];
+    // tslint:disable-next-line: no-string-literal
+    // this["onRequestResolve"] = (rootSpan: Span, infos: IGeexRequestStart) => {
+
+    //   // tslint:disable-next-line: no-unnecessary-initializer
+    //   let operation: string = "__unknown__";
+    //   if (infos.operationName === "IntrospectionQuery") {
+    //     operation = "IntrospectionQuery";
+    //     rootSpan.setOperationName(operation);
+    //     rootSpan.addTags({
+    //       operation,
+    //       ip: infos.context.req.connection.remoteAddress,
+    //     });
+    //     return onRequestResolve(rootSpan, infos);
+    //   }
+    //   if (infos.requestContext.request.query!.startsWith("{")) {
+    //     operation = "query";
+    //   } else if (infos.requestContext.request.query!.startsWith("mutation")) {
+    //     operation = "mutation";
+    //   } else if (infos.requestContext.request.query!.startsWith("subscription")) {
+    //     operation = "subscription";
+    //   }
+    //   rootSpan.setOperationName(operation);
+    //   rootSpan.addTags({
+    //     operation,
+    //     ip: infos.context.req.connection.remoteAddress,
+    //   });
+    //   rootSpan.log({
+    //     request: infos.requestContext.request,
+    //   });
+    //   // tslint:disable-next-line: no-string-literal
+    //   infos.context.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
+    //   infos.context.res.setHeader("requestId", rootSpan.context()["traceIdStr"]);
+    //   // tslint:disable-next-line: no-string-literal
+    //   this["willSendResponse"] = (res: IGeexRequestEnd) => {
+    //     rootSpan.log({
+    //       headers: res.context.res.getHeaders(),
+    //     });
+    //     rootSpan.log({
+    //       response: res.graphqlResponse,
+    //     });
+    //   };
+    //   return onRequestResolve(rootSpan, infos);
+    // };
   }
 
   willResolveField(source: any,

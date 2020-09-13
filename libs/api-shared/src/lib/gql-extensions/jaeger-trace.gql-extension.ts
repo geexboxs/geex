@@ -26,21 +26,14 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
       server: tracer,
       local: tracer,
       shouldTraceRequest: (info: IGeexRequestStart) => {
-        return true;
+        return info?.operationName !== "IntrospectionQuery";
       },
       onFieldResolve: (source, args, context, info) => {
       },
       onRequestResolve: (rootSpan: Span, infos: IGeexRequestStart) => {
         // tslint:disable-next-line: no-unnecessary-initializer
         let operation: string = "__unknown__";
-        if (infos.operationName === "IntrospectionQuery") {
-          operation = "IntrospectionQuery";
-          rootSpan.setOperationName(operation);
-          rootSpan.addTags({
-            operation,
-            ip: infos.context.req.connection.remoteAddress,
-          });
-        }
+
         if (infos.requestContext.request.query == undefined) {
           throw new Error("Empty query detected, jaeger-trace may configured in a wrong way.");
         }
@@ -75,12 +68,9 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
       shouldTraceFieldResolver: (source, args, context, info) => {
         return true;
       },
-      onFieldResolveFinish: (error, result: IGeexRequestEnd, span) => {
+      onFieldResolveFinish: (error, result, span) => {
         span.log({
-          headers: result.context.res.getHeaders(),
-        });
-        span.log({
-          response: result.graphqlResponse,
+          result,
         });
       }
     });

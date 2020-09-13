@@ -8,7 +8,10 @@
       "script": "serve_api",
       "problemMatcher": [],
       "label": "serve_api",
-      "detail": "nx"
+      "detail": "nx",
+      "runOptions": {
+        "instanceLimit": 1
+      }
     }
   ]
 }

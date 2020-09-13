@@ -15,57 +15,57 @@ import { Uow } from "@geex/api-shared";
 
 @Resolver((of) => User)
 export class UserManageResolver {
-    constructor(
-        @InjectModel(User.name)
-        private userModel: ModelType<User>,
-        // @Optional()
-        // @Inject(EmailSender)
-        // private emailSender: EmailSender,
-        @Inject(AccessControl)
-        private ac: AccessControl,
-        @Inject(SessionStore)
-        private sessionStore: SessionStore,
-        @Inject(REQUEST)
-        private request: ExecutionContext,
-    ) { }
+  constructor(
+    @InjectModel(User.name)
+    private userModel: ModelType<User>,
+    // @Optional()
+    // @Inject(EmailSender)
+    // private emailSender: EmailSender,
+    @Inject(AccessControl)
+    private ac: AccessControl,
+    @Inject(SessionStore)
+    private sessionStore: SessionStore,
+    @Inject(REQUEST)
+    private request: ExecutionContext,
+  ) { }
 
-    @Mutation(() => Boolean)
-    public async assignRole(@Args("identifier") identifier: string, @Args({ name: "roles", type: () => [String] }) roles: string[]) {
-        let user = await this.userModel.findOne({ $or: [{ username: identifier }, { _id: identifier }] });
-        if (user == null) {
-            throw Error("user not found");
-        }
-        await user.setRoles(roles);
-        // await this.sessionStore.createOrRefresh(await user.toExpressUser());
-        return true;
+  @Mutation(() => Boolean)
+  public async assignRole(@Args("identifier") identifier: string, @Args({ name: "roles", type: () => [String] }) roles: string[]) {
+    let user = await this.userModel.findOne({ $or: [{ username: identifier }, { _id: identifier }] });
+    if (user == null) {
+      throw Error("user not found");
+    }
+    await user.setRoles(roles);
+    await this.sessionStore.createOrRefresh(await user.toContextUser());
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  public async assignUserPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+    let user;
+    if (ObjectID.isValid(identifier)) {
+      user = await this.userModel.findOne({ _id: identifier });
+    } else {
+      user = await this.userModel.findOne({ username: identifier });
+    }
+    if (user == null) {
+      throw Error("user not found");
+    }
+    await user.setUserPermissions(permissions);
+    return true;
+  }
+  @Mutation(() => Boolean)
+  @Uow()
+  public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
+    if (roles?.any() && permissions?.any()) {
+      roles.forEach(role => {
+        permissions.forEach(permission => {
+          this.ac.grant(role).do(permission);
+        });
+      });
+      return true;
     }
 
-    @Mutation(() => Boolean)
-    public async assignUserPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-        let user;
-        if (ObjectID.isValid(identifier)) {
-            user = await this.userModel.findOne({ _id: identifier });
-        } else {
-            user = await this.userModel.findOne({ username: identifier });
-        }
-        if (user == null) {
-            throw Error("user not found");
-        }
-        await user.setUserPermissions(permissions);
-        return true;
-    }
-    @Mutation(() => Boolean)
-    @Uow()
-    public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-        if (roles?.any() && permissions?.any()) {
-            roles.forEach(role => {
-                permissions.forEach(permission => {
-                    this.ac.grant(role).do(permission);
-                });
-            });
-            return true;
-        }
-
-        throw Error("role not found");
-    }
+    throw Error("role not found");
+  }
 }

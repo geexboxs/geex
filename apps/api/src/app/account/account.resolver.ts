@@ -29,7 +29,7 @@ export class AccountResolver {
     ) { }
 
     @Mutation(() => ID)
-    public async register(@Args("registerInput") { username: username, password }: RegisterInput) {
+    public async register(@Args("registerInput") { username, password }: RegisterInput) {
         const newUser = new User(username, this.passwordHasher.hash(password));
         const result = await this.userModel.create(newUser);
         return result.id;
@@ -82,7 +82,7 @@ export class AccountResolver {
 
     @Mutation(() => Boolean)
     public async changePassword(@Args("oldPassword") oldPassword: string, @Args("newPassword") newPassword: string) {
-        let userDoc = await this.userModel.findById(this.request.switchToHttp().getRequest().session.getUser().id).exec();
+        let userDoc = await this.userModel.findById(this.request.getUser().userId).exec();
         if (userDoc === null) {
             throw new Error(I18N.message.userNotFound);
         }

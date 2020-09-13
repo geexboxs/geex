@@ -20,7 +20,9 @@ import { ModelBase, ServiceLocator } from '@geex/api-shared';
 @ObjectType()
 export class User extends ModelBase<User> {
 
-  @prop()
+  @prop({
+    unique:true
+  })
   @Field()
   public username!: string;
   @prop()
@@ -41,7 +43,7 @@ export class User extends ModelBase<User> {
     this.passwordHash = passwordHash;
   }
 
-  async toContextUser() {
+  async toContextUser(): Promise<Express.User> {
     if (!isDocument(this)) {
       throw Error("entity is not attached to database");
     }
@@ -50,8 +52,12 @@ export class User extends ModelBase<User> {
     //     await x._documentContext.populate("role").execPopulate();
     //     return (x.role as Role).permissions;
     // }));
-    let roles = ServiceLocator.instance.get(AccessControl).getInheritedRolesOf(this.id);
-    return { username: this.username, userId: this.id, ...this.claims, roles } as Express.User;
+    let acl = ServiceLocator.instance.get(AccessControl);
+    if (!acl.hasRole(this.id)) {
+      return { username: this.username, email: this.username + "@geex.com", phone: "", avatarUrl: "", userId: this.id, ...this.claims, roles: [] };
+    }
+    let roles = acl.getInheritedRolesOf(this.id);
+    return { username: this.username, email: this.username + "@geex.com", phone: "", avatarUrl: "", userId: this.id, ...this.claims, roles };
   }
   async setRoles(roles: string[]) {
     let acc = ServiceLocator.instance.get(AccessControl);

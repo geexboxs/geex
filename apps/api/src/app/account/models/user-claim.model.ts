@@ -21,9 +21,4 @@ export class UserClaims extends ModelBase {
     public userId!: string;
     @Field()
     public nickname!: string;
-    constructor(init?: Partial<UserClaims>, ) {
-        super();
-        Object.assign(this, init);
-    }
-
 }

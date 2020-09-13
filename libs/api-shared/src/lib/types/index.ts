@@ -108,7 +108,7 @@ export interface IGeexServerConfig {
 
 declare module "@nestjs/common" {
 
-  export type IPassportContext = {
+  export interface IPassportContext {
     authenticate: (policyName: "local" | "jwt", options: { username: string, password: string }) => { user: IUserContext }
     getUser: () => IUserContext;
     isAuthenticated: () => any

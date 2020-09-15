@@ -66,7 +66,9 @@ const PROVIDERS: Provider[] = [
         return {
           updateOne: {
             filter: { _id: x[0] },
-            update: x[1],
+            update: {
+              $set: x[1],
+            },
             upsert: true,
           },
         };

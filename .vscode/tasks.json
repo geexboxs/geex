@@ -6,12 +6,24 @@
     {
       "type": "npm",
       "script": "serve_api",
-      "problemMatcher": [],
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": {
+            "regexp": "________________"
+          },
+          "background": {
+            "activeOnStart": false,
+            "beginsPattern": "Built at: ",
+            "endsPattern": "^Debugger listening on ws:"
+          },
+        },
+      ],
       "label": "serve_api",
       "detail": "nx",
       "runOptions": {
         "instanceLimit": 1
-      }
+      },
     }
   ]
 }

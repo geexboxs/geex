@@ -1,6 +1,7 @@
-export const APP_PERMISSIONS = {
-    "query:permission:any": "query:permission:any",
-    "query:roles:any": "query:roles:any",
-};
 
-export type AppPermission = keyof typeof APP_PERMISSIONS;
+export const APP_PERMISSIONS = [
+    "permission:query:any",
+    "role:query:any",
+  ] as const;
+
+export type AppPermission = (typeof APP_PERMISSIONS)[number];

@@ -54,18 +54,4 @@ export class UserManageResolver {
     await user.setUserPermissions(permissions);
     return true;
   }
-  @Mutation(() => Boolean)
-  @Uow()
-  public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-    if (roles?.any() && permissions?.any()) {
-      roles.forEach(role => {
-        permissions.forEach(permission => {
-          this.ac.grant(role).do(permission);
-        });
-      });
-      return true;
-    }
-
-    throw Error("role not found");
-  }
 }

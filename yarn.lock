@@ -1826,7 +1826,7 @@
     tslib "2.0.1"
     uuid "8.3.0"
 
-"@nestjs/core@^7.0.7":
+"@nestjs/core@7.4.3":
   version "7.4.3"
   resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-7.4.3.tgz#86ca3d59e788b984cd80c7de5ebeb389aee10f88"
   integrity sha512-YWC4x5G5cHhlBB/6oyw9ug781lSm9s6QqMRNKYjiR47A1HoxOcAJQ8NMrm9axgK9ZET547k0rl473vyjhPwwlg==

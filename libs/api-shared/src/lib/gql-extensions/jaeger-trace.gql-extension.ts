@@ -53,8 +53,11 @@ export class JaegerTraceExtension extends OpentracingExtension<any> {
           request: infos.requestContext.request,
         });
         // tslint:disable-next-line: no-string-literal
-        infos.context.res.setHeader("X-B3-TraceId", rootSpan.context()["traceIdStr"]);
-        infos.context.res.setHeader("requestId", rootSpan.context()["traceIdStr"]);
+        const traceIdStr = rootSpan.context()["traceIdStr"]
+        infos.context.req.headers["X-B3-TraceId"] = traceIdStr;
+        infos.context.req.headers["requestId"] = traceIdStr;
+        infos.context.res.setHeader("X-B3-TraceId", traceIdStr);
+        infos.context.res.setHeader("requestId", traceIdStr);
         // tslint:disable-next-line: no-string-literal
         // this["willSendResponse"] = (res: IGeexRequestEnd) => {
         //   rootSpan.log({

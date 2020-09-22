@@ -17,7 +17,8 @@
       "restart": true,
       "skipFiles": [
         "<node_internals>/**",
-        "cluster.js"
+        "cluster.js",
+        "service.js"
       ],
     },
     // {
@@ -42,7 +43,7 @@
       "name": "client",
       "port": 9222,
       "urlFilter": "http://localhost:8000/*",
-      "webRoot": "${workspaceFolder/client}",
+      "webRoot": "${workspaceFolder}/client",
       "sourceMaps": true,
       "skipFiles": [
         "node_modules/**/*.js",

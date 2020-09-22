@@ -11,7 +11,7 @@ export class UserPermissionChangeHandler implements ICommandHandler<UserPermissi
     constructor(
         @Inject(SessionStore)
         private sessionStore: SessionStore,
-        @InjectModel(User.name)
+        @Inject(User)
         private userModel: ModelType<User>,
     ) { }
 

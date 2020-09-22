@@ -7,6 +7,9 @@ import { LogLevel, Type } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { INestApplicationContext, ExecutionContext, IUserContext, Abstract } from "@nestjs/common";
 import { ModelBase } from '@geex/api-shared';
+import { IncomingMessage, ServerResponse } from 'http';
+import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
+import { GraphQLArgumentsHost, GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 export type RequiredPartial<T, K extends keyof T> = Partial<T> & Required<Pick<T, K>>
 
 declare global {

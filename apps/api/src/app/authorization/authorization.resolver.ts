@@ -16,7 +16,7 @@ import { Uow } from "@geex/api-shared";
 @Resolver((of) => PermissionNode)
 export class AuthorizationResolver {
   constructor(
-    @InjectModel(User.name)
+    @Inject(User)
     private userModel: ModelType<User>,
     @Inject(AccessControl)
     private ac: AccessControl,

@@ -12,7 +12,7 @@
     "@geexbox/accesscontrol": "file:.\\libs\\accesscontrol",
     "@nestjs/common": "^7.0.7",
     "@nestjs/core": "7.4.3",
-    "@nestjs/cqrs": "^6.1.0",
+    "@nestjs/cqrs": "^7.0.1",
     "@nestjs/graphql": "^7.2.0",
     "@nestjs/jwt": "^7.0.7",
     "@nestjs/mongoose": "^6.4.0",
@@ -113,7 +113,7 @@
   "name": "geex",
   "private": true,
   "scripts": {
-    "serve_api": "nx serve api --with-deps --parallel --maxParallel=10",
+    "serve_api": "nx serve api --with-deps --parallel",
     "affected": "nx affected",
     "affected:apps": "nx affected:apps",
     "affected:build": "nx affected:build",

@@ -21,7 +21,7 @@ import { I18N } from '@geex/api-shared';
 @Resolver((of) => Session)
 export class AuthenticationResolver {
   constructor(
-    @InjectModel(User.name)
+    @Inject(User)
     private userModel: ModelType<User>,
     @Inject(PasswordHasher)
     private passwordHasher: PasswordHasher,

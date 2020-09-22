@@ -13,6 +13,7 @@ import { SessionStore } from './authentication/models/session.model';
 import ioredis = require("ioredis");
 import { AccessControl } from '@geexbox/accesscontrol';
 import { GeexLogger, GeexServerConfigToken, LoggerConfigToken, Rbac } from '@geex/api-shared';
+import { Connection } from 'mongoose';
 
 const REEXPORTS = [
   PassportModule,
@@ -21,18 +22,8 @@ const REEXPORTS = [
     secret: environment.authConfig.tokenSecret,
     signOptions: { expiresIn: environment.authConfig.expiresIn },
   }),
-  MongooseModule.forRoot(environment.connections.mongo, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    connectionFactory: (connection) => {
-      connection.plugin(require('mongoose-autopopulate'));
-      return connection;
-    },
-  }),
-  MongooseModule.forFeature([
-    { name: User.name, schema: getModelForClass(User).schema },
-    { name: UserClaims.name, schema: getModelForClass(UserClaims).schema },
-  ])];
+
+];
 
 const PROVIDERS: Provider[] = [
   {
@@ -43,6 +34,29 @@ const PROVIDERS: Provider[] = [
     provide: GeexServerConfigToken,
     useValue: environment,
   },
+  {
+    provide: 'DATABASE_CONNECTION',
+    useFactory: (): Promise<typeof mongoose> =>
+      mongoose.connect(environment.connections.mongo, { useNewUrlParser: true }),
+  },
+  {
+    provide: User,
+    useFactory: (mongooseInstance: typeof mongoose) => {
+      let model = mongooseInstance.model(User.name, getModelForClass(User).schema);
+      // User.prototype = {
+      //   //@ts-ignore
+      //   constructor : model,
+      //   ...User.prototype
+      // }
+      return model;
+    },
+    inject: ['DATABASE_CONNECTION'],
+  },
+  {
+    provide: UserClaims,
+    useFactory: (mongooseInstance: typeof mongoose) => { return mongooseInstance.model(UserClaims.name, getModelForClass(UserClaims).schema) },
+    inject: ['DATABASE_CONNECTION'],
+  },
   GeexLogger,
   PermissionScalar,
   SessionStore,
@@ -52,31 +66,39 @@ const PROVIDERS: Provider[] = [
   },
   {
     provide: Rbac,
-    useFactory: async () => (await mongoose.connect(environment.connections.mongo)).connection.collection("rbac", { autoIndexId: false }),
+    useFactory: async (mongooseInstance: typeof mongoose) => mongooseInstance.connection.collection("rbac", { autoIndexId: false }),
+    inject: ['DATABASE_CONNECTION'],
   },
   {
     provide: AccessControl,
     inject: [Rbac],
-    useFactory: async (store: mongoose.Collection) => new AccessControl(Object.fromEntries((await store.find().toArray()).map(x => {
-      let obj = { ...x };
-      delete obj["_id"];
-      return [x["_id"], obj];
-    })), (grants) => setTimeout(async () => {
-      let ops = Object.entries(grants).map(x => {
-        return {
-          updateOne: {
-            filter: { _id: x[0] },
-            update: {
-              $set: x[1],
-            },
-            upsert: true,
-          },
-        };
-      });
-      if (ops && ops.length) {
-        await store.bulkWrite(ops);
+    useFactory: async (store: mongoose.Collection) => {
+      let entries = [];
+      try {
+        entries = await store.find()?.toArray();
+      } finally {
+        return new AccessControl(Object.fromEntries((entries).map(x => {
+          let obj = { ...x };
+          delete obj["_id"];
+          return [x["_id"], obj];
+        })), (grants) => setTimeout(async () => {
+          let ops = Object.entries(grants).map(x => {
+            return {
+              updateOne: {
+                filter: { _id: x[0] },
+                update: {
+                  $set: x[1],
+                },
+                upsert: true,
+              },
+            };
+          });
+          if (ops && ops.length) {
+            await store.bulkWrite(ops);
+          }
+        }, 1))
       }
-    }, 1)),
+    },
   },
 ]
 

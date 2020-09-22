@@ -5,7 +5,7 @@ export const environment: IGeexServerConfig & { [key: string]: any } = {
   hostname: "127.0.0.1",
   port: 4000,
   connections: {
-    mongo: `mongodb://${encodeURIComponent("u5ern@me")}:${encodeURIComponent("P@ssw0rd")}@localhost:27017/test?authSource=admin`,
+    mongo: `mongodb://${encodeURIComponent("u5ern@me")}:${encodeURIComponent("P@ssw0rd")}@localhost:27017/test?authSource=admin`,//"mongodb://u5ern%40me:P%40ssw0rd@localhost:27017/test?authSource=admin"
     redis: "redis://localhost:6379/1",
     smtp: undefined,
     // smtp: {

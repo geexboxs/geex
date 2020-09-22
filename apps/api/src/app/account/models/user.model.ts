@@ -19,7 +19,6 @@ import { ModelBase, ServiceLocator } from '@geex/api-shared';
 
 @ObjectType()
 export class User extends ModelBase<User> {
-
   @prop({
     unique:true
   })
@@ -37,10 +36,10 @@ export class User extends ModelBase<User> {
   /**
    *
    */
-  constructor(username: string, passwordHash: string) {
-    super();
+  init(username: string, passwordHash: string) {
     this.username = username;
     this.passwordHash = passwordHash;
+    return this;
   }
 
   async toContextUser(): Promise<Express.User> {

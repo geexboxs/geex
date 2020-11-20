@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { getModelForClass } from '@typegoose/typegoose';
-import { environment } from '@env';
+import { AppConfig } from '@geex/api/app/app_config';
 import { AuthenticationResolver } from './authentication.resolver';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from '../account/models/user.model';
@@ -14,7 +14,7 @@ import { JwtStrategy } from './utils/jwt.stratage';
         JwtStrategy,
         {
             provide: PasswordHasher,
-            useFactory: (injector) => new PasswordHasher(environment.authConfig.tokenSecret),
+            useFactory: (injector) => new PasswordHasher(AppConfig.authConfig.tokenSecret),
         },
     ],
 })

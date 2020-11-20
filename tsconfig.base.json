@@ -6,6 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "importHelpers": true,
     "typeRoots": [
@@ -15,19 +16,18 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "target": "es2019",
+    "module": "ES2020",
     "paths": {
+      "@geex/api/*": [
+        "apps/api/src/*"
+      ],
       "@geex/contracts": [
         "libs/contracts/src/lib/index.ts"
       ],
       "@geex/api-shared": [
         "libs/api-shared/src/lib/index.ts"
       ],
-      "@env": [
-        "apps/api/src/environments/environment.ts",
-        "apps/geex-app/src/environments/environment.ts",
-        "apps/geex-app-e2e/src//src/environments/environment.ts"
-      ],
-      "@workspaceRoot/*": [
+      "@workspace/*": [
         "./*"
       ]
     },

@@ -3,14 +3,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User } from './account/models/user.model';
 import { getModelForClass, mongoose } from '@typegoose/typegoose';
 import { Role } from './user-manage/model/role.model';
-import { environment } from '@env';
+import { AppConfig } from '@geex/api/app/app_config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { UserClaims } from './account/models/user-claim.model';
 import { PermissionScalar } from './authorization/scalars/permission.scalar';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SessionStore } from './authentication/models/session.model';
-import ioredis = require("ioredis");
+import * as ioredis  from "ioredis";
 import { AccessControl } from '@geexbox/accesscontrol';
 import { GeexLogger, GeexServerConfigToken, LoggerConfigToken, Rbac } from '@geex/api-shared';
 
@@ -18,10 +18,10 @@ const REEXPORTS = [
   PassportModule,
   CqrsModule,
   JwtModule.register({
-    secret: environment.authConfig.tokenSecret,
-    signOptions: { expiresIn: environment.authConfig.expiresIn },
+    secret: AppConfig.authConfig.tokenSecret,
+    signOptions: { expiresIn: AppConfig.authConfig.expiresIn },
   }),
-  MongooseModule.forRoot(environment.connections.mongo, {
+  MongooseModule.forRoot(AppConfig.connections.mongo, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     connectionFactory: (connection) => {
@@ -37,22 +37,22 @@ const REEXPORTS = [
 const PROVIDERS: Provider[] = [
   {
     provide: LoggerConfigToken,
-    useValue: environment.loggerConfig,
+    useValue: AppConfig.loggerConfig,
   },
   {
     provide: GeexServerConfigToken,
-    useValue: environment,
+    useValue: AppConfig,
   },
   GeexLogger,
   PermissionScalar,
   SessionStore,
   {
     provide: ioredis,
-    useValue: new ioredis(environment.connections.redis),
+    useValue: new ioredis(AppConfig.connections.redis),
   },
   {
     provide: Rbac,
-    useFactory: async () => (await mongoose.connect(environment.connections.mongo)).connection.collection("rbac", { autoIndexId: false }),
+    useFactory: async () => (await mongoose.connect(AppConfig.connections.mongo)).connection.collection("rbac", { autoIndexId: false }),
   },
   {
     provide: AccessControl,

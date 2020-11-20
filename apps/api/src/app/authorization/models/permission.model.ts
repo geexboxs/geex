@@ -3,7 +3,7 @@ import { ModelType } from "@typegoose/typegoose/lib/types";
 import { prop, plugin } from "@typegoose/typegoose";
 import { AppPermission, APP_PERMISSIONS } from "../permissions.const";
 import { PermissionScalar } from "../scalars/permission.scalar";
-import { RequiredPartial } from '@geex/api-shared';
+import type { RequiredPartial } from '@geex/api-shared';
 
 
 

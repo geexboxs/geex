@@ -1,5 +1,5 @@
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
-import json5 = require("json5");
+import * as json5 from "json5"
 import { ExecutionContext, Injectable, Inject } from "@nestjs/common";
 import { GeexLogger } from '@geex/api-shared';
 

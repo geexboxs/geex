@@ -1,5 +1,5 @@
 import { ObjectId } from "bson";
-import mongodb = require("mongodb");
+import * as mongodb  from "mongodb";
 import { Document, Query, ModelUpdateOptions } from "mongoose";
 import { User } from "../../app/account/models/user.model";
 import { ModelType, RefType, IObjectWithTypegooseFunction } from "@typegoose/typegoose/lib/types";
@@ -55,7 +55,7 @@ export type ConditionObject<T> =
     OperationProps<T> |
     // 逻辑运算查询
     LogicOperationProps<T>;
-/* 
+/*
 $currentDate	Sets the value of a field to current date, either as a Date or a Timestamp.
 "$inc"|	Increments the value of the field by the specified amount.
 "$min"|	Only updates the field if the specified value is less than the existing field value.

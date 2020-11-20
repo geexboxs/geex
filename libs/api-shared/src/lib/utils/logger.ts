@@ -1,6 +1,6 @@
 import * as winston from "winston";
 import { LogLevel, Injectable, Inject } from "@nestjs/common";
-import { IGeexServerConfig, LogTarget } from '../types';
+import type { IGeexServerConfig, LogTarget } from '../types';
 import { GeexServerConfigToken } from '../tokens';
 
 @Injectable()

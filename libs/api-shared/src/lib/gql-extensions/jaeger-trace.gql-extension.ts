@@ -4,7 +4,7 @@ import { initTracer, TracingConfig, Reporter } from "jaeger-client";
 import { GeexLogger } from "../utils/logger";
 import { Span } from "opentracing";
 import { ExecutionContext, Injectable, Inject } from "@nestjs/common";
-import { IGeexServerConfig, IGeexRequestStart, IGeexRequestEnd } from '../types';
+import type { IGeexServerConfig, IGeexRequestStart, IGeexRequestEnd } from '../types';
 
 @Injectable()
 export class JaegerTraceExtension extends OpentracingExtension<any> {

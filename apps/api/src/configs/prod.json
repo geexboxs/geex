@@ -1,0 +1,25 @@
+{
+  "production": true,
+  "hostname": "127.0.0.1",
+  "port": "4000",
+  "connections": {
+    "mongo": "mongodb://u5ern%40me:P%40ssw0rd@localhost:27017/prod?authSource=admin",
+    "redis": "redis://localhost:6379/3"
+  },
+  "authConfig": {
+    "tokenSecret": "prod",
+    "expiresIn": 86400
+  },
+  "loggerConfig": {},
+  "traceConfig": {
+    "serviceName": "geex",
+    "sampler": {
+      "type": "const",
+      "param": 1
+    },
+    "reporter": {
+      "logSpans": true,
+      "collectorEndpoint": "http://localhost:14268/api/traces"
+    }
+  }
+}

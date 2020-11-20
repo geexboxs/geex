@@ -9,12 +9,10 @@
       "es2015",
       "esnext"
     ],
-    "emitDecoratorMetadata": true,
-    "target": "es2019",
-    "module": "commonjs",
   },
   "exclude": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.test.ts",
   ],
   "include": [
     "**/*.ts",

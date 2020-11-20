@@ -1,4 +1,4 @@
-import jssha = require("jssha");
+import * as jssha  from "jssha";
 
 export class Hasher {
 

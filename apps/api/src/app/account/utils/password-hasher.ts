@@ -1,4 +1,4 @@
-import jssha = require("jssha");
+import * as jssha from "jssha"
 import { Hasher } from '@geex/api-shared';
 export class PasswordHasher extends Hasher {
 

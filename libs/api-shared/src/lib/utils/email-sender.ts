@@ -1,6 +1,6 @@
-import nodemailer = require("nodemailer");
-import Mail = require("nodemailer/lib/mailer");
-import SMTPConnection = require("nodemailer/lib/smtp-connection");
+import * as nodemailer  from "nodemailer";
+import * as Mail  from "nodemailer/lib/mailer";
+import * as SMTPConnection  from "nodemailer/lib/smtp-connection";
 export class EmailSender {
     displayAs: Mail.Address;
     transport: Mail;

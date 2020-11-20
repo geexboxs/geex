@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { getModelForClass } from '@typegoose/typegoose';
-import { environment } from '@env';
+import { AppConfig } from '@geex/api/app/app_config';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from '../account/models/user.model';
 import { PasswordHasher } from '../account/utils/password-hasher';
-import ioredis = require("ioredis");
+import * as ioredis  from "ioredis";
 import { AuthorizationResolver } from './authorization.resolver';
 import { UserPermissionChangeHandler } from './handlers/user-permission-change.handler';
 const Handlers = [UserPermissionChangeHandler];
@@ -14,11 +14,11 @@ const Handlers = [UserPermissionChangeHandler];
     providers: [AuthorizationResolver,
         {
             provide: ioredis,
-            useValue: new ioredis(environment.connections.redis),
+            useValue: new ioredis(AppConfig.connections.redis),
         },
         {
             provide: PasswordHasher,
-            useFactory: () => new PasswordHasher(environment.authConfig.tokenSecret),
+            useFactory: () => new PasswordHasher(AppConfig.authConfig.tokenSecret),
         },
         ...Handlers
     ],

@@ -1,6 +1,6 @@
 // import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 // import { buildSchemaSync, ClassType } from "type-graphql";
-// import { environment } from '@env';
+// import { environment } from '@geex/api/app/app_config';
 // import { AuditLogResolver } from "./audit-log.resolver";
 // import { ExecutionContext } from "@nestjs/common";
 // import { GraphQLModule } from '@nestjs/graphql';

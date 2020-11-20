@@ -1,0 +1,59 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
+`date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
+8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+type Mutation {
+  register(registerInput: RegisterInput!): ID!
+  verify(code: String!): Boolean!
+  resetPassword(newPassword: String!, code: String!): Boolean!
+  sendVerifyCode(target: String!, type: VerifyType!): Boolean!
+  sendResetPasswordCode(target: String!, type: VerifyType!): Boolean!
+  changePassword(newPassword: String!, oldPassword: String!): Boolean!
+  setTwoFactor(code: String!, key: String!): Boolean!
+  unsetTwoFactor(code: String!): Boolean!
+  signOut: Boolean!
+  externalAuthenticate: Session!
+  authenticate(password: String!, userIdentifier: String!): Session!
+  impersonate: Boolean!
+  assignRole(roles: [String!]!, identifier: String!): Boolean!
+  assignUserPermission(permissions: [String!]!, identifier: String!): Boolean!
+  assignRolePermission(permissions: [String!]!, roles: [String!]!): Boolean!
+}
+
+type PermissionNode {
+  name: PermissionScalar!
+  childPermissions: [PermissionNode!]!
+}
+
+"""PermissionScalar"""
+scalar PermissionScalar
+
+type Query {
+  twoFactorKey: String!
+  getAllPermissions: [PermissionScalar!]!
+  getMyPermissions: [PermissionScalar!]!
+}
+
+input RegisterInput {
+  username: String!
+  password: String!
+}
+
+type Session {
+  userId: ID!
+  accessToken: String!
+  expireAt: DateTime!
+}
+
+"""verify types, email or sms"""
+enum VerifyType {
+  Email
+  Sms
+}

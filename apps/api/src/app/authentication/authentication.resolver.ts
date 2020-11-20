@@ -1,16 +1,8 @@
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { request } from "express";
-import { ClientSession, Document } from "mongoose";
 import { Session, SessionStore } from "./models/session.model";
-import passport = require("passport");
-import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
-import ioredis = require("ioredis");
-import { Enforcer } from "casbin";
 import { User } from "../account/models/user.model";
 import { InjectModel } from '@nestjs/mongoose';
-import * as bcryptjs from "bcryptjs";
 import { AccessControl } from "@geexbox/accesscontrol";
-import { JwtService } from "@nestjs/jwt";
 import { Resolver, Mutation, Args } from "@nestjs/graphql";
 import { Authorized } from "type-graphql";
 import { Ctx } from "type-graphql/dist/decorators";
@@ -18,7 +10,7 @@ import { PasswordHasher } from "../account/utils/password-hasher";
 import { Inject, ExecutionContext } from "@nestjs/common";
 import { I18N } from '@geex/api-shared';
 
-@Resolver((of) => Session)
+@Resolver(() => Session)
 export class AuthenticationResolver {
   constructor(
     @InjectModel(User.name)
@@ -27,25 +19,23 @@ export class AuthenticationResolver {
     private passwordHasher: PasswordHasher,
     @Inject(SessionStore)
     private sessionStore: SessionStore,
-    @Inject(AccessControl)
-    private ac: AccessControl,
   ) { }
   @Mutation(() => Boolean)
   @Authorized()
-  public async signOut(@Ctx() context: ExecutionContext) {
+  public async signOut() {
     // await this.sessionStore.del(context.session.getUser().id);
     // context.session.logout();
     return true;
   }
 
   @Mutation(() => Session)
-  public async externalAuthenticate(@Args("provider") provider: string, @Args("userIdentifier") userIdentifier: string) {
+  public async externalAuthenticate() {
     // todo:
     throw Error("todo");
   }
 
   @Mutation(() => Session)
-  public async authenticate(@Args("userIdentifier") userIdentifier: string, @Args("password") password: string, @Ctx() context: ExecutionContext) {
+  public async authenticate(@Args("userIdentifier") userIdentifier: string, @Args("password") password: string) {
     const user = await this.userModel.findOne({ username: userIdentifier })
     if (!user) {
       throw Error(I18N.message.userIdentifierOrPasswordIncorrect);
@@ -59,7 +49,7 @@ export class AuthenticationResolver {
   }
 
   @Mutation(() => Boolean)
-  public async impersonate(@Args("userIdentifier") userIdentifier: string) {
+  public async impersonate() {
     // todo:
     throw Error("todo");
   }

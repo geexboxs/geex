@@ -16,7 +16,7 @@
         "limit": 200
       }
     },
-    "space-before-function-paren": false,
+    "space-before-function-parent": false,
     "no-console": false,
     "ordered-imports": false,
     "align": false,

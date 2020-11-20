@@ -1,5 +1,5 @@
 
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AccountModule } from './account/account.module';
 import { join } from 'lodash';
@@ -19,7 +19,7 @@ import { SharedModule } from './shared.module';
     UserManageModule,
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
-      autoSchemaFile: 'schema.gql',
+      autoSchemaFile: '.generated/schema.gql',
       context: (args) => {
         return ({ ...args, injector: ServiceLocator.instance });
       },
@@ -31,4 +31,8 @@ import { SharedModule } from './shared.module';
   ],
   providers: [JaegerTraceExtension, ComplexityExtension],
 })
-export class AppModule { }
+export class AppModule implements OnModuleInit {
+  onModuleInit() {
+
+  }
+}

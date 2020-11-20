@@ -1,8 +1,8 @@
 import { prop } from "@typegoose/typegoose";
 import { DateTimeResolver, IPv4Resolver } from "graphql-scalars";
-import ioredis = require("ioredis");
+import * as ioredis  from "ioredis";
 import { Inject } from "@nestjs/common";
-import json5 = require("json5");
+import * as json5  from "json5";
 import { JwtService } from "@nestjs/jwt";
 import { ObjectType, Field, ID } from "@nestjs/graphql";
 

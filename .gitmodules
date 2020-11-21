@@ -1,0 +1,3 @@
+[submodule "libs/accesscontrol"]
+	path = libs/accesscontrol
+	url = https://github.com/geexboxs/accesscontrol.git

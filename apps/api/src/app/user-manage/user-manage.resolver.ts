@@ -1,7 +1,7 @@
 import { Resolver, Mutation, ID, Args, Query } from "@nestjs/graphql";
 import { User } from "../account/models/user.model";
 import { InjectModel } from "@nestjs/mongoose";
-import { ModelType } from "@typegoose/typegoose/lib/types";
+import { DocumentType, ModelType } from "@typegoose/typegoose/lib/types";
 import { Optional, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { ExecutionContext } from "graphql/execution/execute";
@@ -16,7 +16,7 @@ import { Uow } from "@geex/api-shared";
 @Resolver((of) => User)
 export class UserManageResolver {
   constructor(
-    @InjectModel(User.name)
+    @Inject(User)
     private userModel: ModelType<User>,
     // @Optional()
     // @Inject(EmailSender)
@@ -42,7 +42,7 @@ export class UserManageResolver {
 
   @Mutation(() => Boolean)
   public async assignUserPermission(@Args("identifier") identifier: string, @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-    let user;
+    let user: DocumentType<User>;
     if (ObjectID.isValid(identifier)) {
       user = await this.userModel.findOne({ _id: identifier });
     } else {
@@ -53,19 +53,5 @@ export class UserManageResolver {
     }
     await user.setUserPermissions(permissions);
     return true;
-  }
-  @Mutation(() => Boolean)
-  @Uow()
-  public async assignRolePermission(@Args({ name: "roles", type: () => [String] }) roles: [string], @Args({ name: "permissions", type: () => [String] }) permissions: string[]) {
-    if (roles?.any() && permissions?.any()) {
-      roles.forEach(role => {
-        permissions.forEach(permission => {
-          this.ac.grant(role).do(permission);
-        });
-      });
-      return true;
-    }
-
-    throw Error("role not found");
   }
 }

@@ -10,6 +10,52 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: u5ern@me
       MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+    hostname: mongo.rep
+    networks:
+      default:
+         aliases:
+            - mongo.rep
+    command:
+    - --replSet
+    - rep
+    # docker exec -i -t mongo mongo mongodb://u5ern%40me:P%40ssw0rd@localhost:27017/test?authSource=admin --eval "rs.initiate();rs.add('mongo2.repl');rs.addArb('mongo3.repl');"
+    depends_on:
+      - mongo2
+      - mongo3
+  mongo2:
+    image: mongo:latest
+    container_name: mongo2
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: u5ern@me
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+    hostname: mongo2.rep
+    ports:
+      - 27018:27017
+    networks:
+      default:
+         aliases:
+            - mongo2.rep
+    command:
+    - --replSet
+    - rep
+  mongo3:
+    image: mongo:latest
+    container_name: mongo3
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: u5ern@me
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+    hostname: mongo3.rep
+    ports:
+      - 27019:27017
+    networks:
+      default:
+         aliases:
+            - mongo3.rep
+    command:
+    - --replSet
+    - rep
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
@@ -33,7 +79,7 @@ services:
     restart: always
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
-    ports: 
+    ports:
       - 5775:5775/udp
       - 6831:6831/udp
       - 6832:6832/udp

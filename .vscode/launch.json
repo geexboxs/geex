@@ -5,13 +5,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach by Process ID",
-      "request": "attach",
-      "port": 5858,
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "name": "server",
       "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "args": [
+        "run",
+        "serve_api"
+      ],
+      "console": "integratedTerminal",
+      "restart": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "cluster.js",
+        "service.js"
+      ],
     },
     // {
     //   "type": "node",
@@ -35,7 +43,7 @@
       "name": "client",
       "port": 9222,
       "urlFilter": "http://localhost:8000/*",
-      "webRoot": "${workspaceFolder/client}",
+      "webRoot": "${workspaceFolder}/client",
       "sourceMaps": true,
       "skipFiles": [
         "node_modules/**/*.js",

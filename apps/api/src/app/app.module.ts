@@ -8,6 +8,7 @@ import { UserManageModule } from './user-manage/user-manage.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { ServiceLocator, JaegerTraceExtension, ComplexityExtension } from '@geex/api-shared';
 import { SharedModule } from './shared.module';
+import { NotificationModule } from './notification/notification.module';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { SharedModule } from './shared.module';
     AuthenticationModule,
     AuthorizationModule,
     UserManageModule,
+    NotificationModule,
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
       autoSchemaFile: '.generated/schema.gql',

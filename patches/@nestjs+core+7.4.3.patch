@@ -1,0 +1,13 @@
+diff --git a/node_modules/@nestjs/core/injector/injector.js b/node_modules/@nestjs/core/injector/injector.js
+index c942257..2946a01 100644
+--- a/node_modules/@nestjs/core/injector/injector.js
++++ b/node_modules/@nestjs/core/injector/injector.js
+@@ -319,7 +319,7 @@ class Injector {
+     async loadCtorMetadata(metadata, contextId, inquirer, parentInquirer) {
+         const hosts = await Promise.all(metadata.map(async (item) => this.resolveScopedComponentHost(item, contextId, inquirer, parentInquirer)));
+         const inquirerId = this.getInquirerId(inquirer);
+-        return hosts.map(item => item.getInstanceByContextId(contextId, inquirerId).instance);
++        return hosts.map(item => item && item.getInstanceByContextId(contextId, inquirerId).instance);
+     }
+     async loadPropertiesMetadata(metadata, contextId, inquirer) {
+         const dependenciesHosts = await Promise.all(metadata.map(async ({ wrapper: item, key }) => ({

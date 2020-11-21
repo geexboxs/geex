@@ -7,6 +7,9 @@ import { ModelBase } from '@geex/api-shared';
 
 
 export class UserClaims extends ModelBase {
+    public init(...args: any) {
+      throw new Error('Method not implemented.');
+    }
     @prop()
     @Field((type) => PhoneNumberResolver)
     public phone?: string;

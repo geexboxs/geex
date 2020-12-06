@@ -2,21 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Casbin.NET" Version="1.3.1" />
-    <PackageReference Include="Volo.Abp.AspNetCore" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.Autofac" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.Core" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.Uow" Version="3.0.5" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="3.0.5" />
+    <PackageReference Include="Casbin.NET" Version="1.4.0" />
+    <PackageReference Include="Volo.Abp.AspNetCore" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Core" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Uow" Version="3.3.2" />
   </ItemGroup>
 
   <ItemGroup>

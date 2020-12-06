@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Geex.Shared._ShouldMigrateToLib.Auth;
+
 using NetCasbin.Model;
 using NetCasbin.Persist;
+
 using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Core.Authorization.Casbin
@@ -28,12 +31,8 @@ namespace Geex.Core.Authorization.Casbin
 
         public Task LoadPolicyAsync(Model model)
         {
-            throw new NotImplementedException();
-        }
-
-        public void RemovePolicy(string pType, IList<string> rule)
-        {
-            RemoveFilteredPolicyAsync(pType, 0, rule.ToArray());
+            this.LoadPolicy(model);
+            return Task.CompletedTask;
         }
 
         public async Task RemoveFilteredPolicyAsync(
@@ -102,37 +101,63 @@ namespace Geex.Core.Authorization.Casbin
             }
         }
 
-        void IAdapter.AddPolicy(string sec, string ptype, IList<string> rule)
+        public void AddPolicy(string sec, string ptype, IList<string> rule)
         {
-            this.AddPolicyAsync(ptype, rule);
+            this.AddPolicyAsync(ptype, rule).Wait();
         }
 
-        public Task AddPolicyAsync(string sec, string ptype, IList<string> rule)
+        public async Task AddPolicyAsync(string sec, string ptype, IList<string> rule)
         {
-            this.AddPolicyAsync(ptype, rule);
-            return Task.CompletedTask;
+            await this.AddPolicyAsync(ptype, rule);
         }
 
-        void IAdapter.RemovePolicy(string sec, string ptype, IList<string> rule)
+        public void AddPolicies(string sec, string ptype, IEnumerable<IList<string>> rules)
         {
-            this.RemovePolicy(ptype, rule);
+            foreach (var rule in rules)
+            {
+                this.AddPolicyAsync(ptype, rule).Wait();
+            }
+        }
+
+        public async Task AddPoliciesAsync(string sec, string ptype, IEnumerable<IList<string>> rules)
+        {
+            this.AddPolicies(sec, ptype, rules);
+        }
+
+        public void RemovePolicy(string sec, string ptype, IList<string> rule)
+        {
+            RemoveFilteredPolicyAsync(ptype, 0, rule.ToArray()).Wait();
         }
 
         public Task RemovePolicyAsync(string sec, string ptype, IList<string> rule)
         {
-            this.RemovePolicy(ptype, rule);
-            return Task.CompletedTask;
+            return RemoveFilteredPolicyAsync(ptype, 0, rule.ToArray());
         }
 
-        void IAdapter.RemoveFilteredPolicy(string sec, string ptype, int fieldIndex, params string[] fieldValues)
+        public void RemovePolicies(string sec, string ptype, IEnumerable<IList<string>> rules)
         {
-            this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues);
+            foreach (var rule in rules)
+            {
+                RemoveFilteredPolicyAsync(ptype, 0, rule.ToArray()).Wait();
+            }
         }
 
-        public Task RemoveFilteredPolicyAsync(string sec, string ptype, int fieldIndex, params string[] fieldValues)
+        public async Task RemovePoliciesAsync(string sec, string ptype, IEnumerable<IList<string>> rules)
         {
-            this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues);
-            return Task.CompletedTask;
+            foreach (var rule in rules)
+            {
+                await RemoveFilteredPolicyAsync(ptype, 0, rule.ToArray());
+            }
+        }
+
+        public void RemoveFilteredPolicy(string sec, string ptype, int fieldIndex, params string[] fieldValues)
+        {
+            this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues).Wait();
+        }
+
+        public async Task RemoveFilteredPolicyAsync(string sec, string ptype, int fieldIndex, params string[] fieldValues)
+        {
+            await this.RemoveFilteredPolicyAsync(ptype, fieldIndex, fieldValues);
         }
 
         public async Task AddPolicyAsync(string pType, IList<string> rule)

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using HotChocolate;
 using HotChocolate.Language;
 using HotChocolate.Properties;
 using HotChocolate.Types;
+
 using MongoDB.Bson;
 
 namespace Geex.Shared.Types
@@ -29,19 +31,20 @@ namespace Geex.Shared.Types
                 || literal is NullValueNode;
         }
 
-        public override object ParseLiteral(IValueNode literal)
+        public override object? ParseLiteral(IValueNode valueSyntax, bool withDefaults = true)
         {
-            if (literal == null)
+            if (valueSyntax == null)
             {
-                throw new ArgumentNullException(nameof(literal));
+                throw new ArgumentNullException(nameof(valueSyntax));
             }
 
-            if (literal is StringValueNode stringLiteral)
+            if (valueSyntax is StringValueNode stringLiteral)
             {
                 return ObjectId.Parse(stringLiteral.Value);
             }
 
-            throw new ScalarSerializationException("");
+            throw new SerializationException("", new ObjectIdType());
+
         }
 
         public override IValueNode ParseValue(object value)
@@ -51,7 +54,12 @@ namespace Geex.Shared.Types
                 return new StringValueNode(s.ToString());
             }
 
-            throw new ScalarSerializationException("");
+            throw new SerializationException("", new ObjectIdType());
+        }
+
+        public override IValueNode ParseResult(object? resultValue)
+        {
+            return this.ParseValue(resultValue);
         }
 
         public override object Serialize(object value)
@@ -61,10 +69,24 @@ namespace Geex.Shared.Types
                 return s;
             }
 
-            throw new ScalarSerializationException("");
+            throw new SerializationException("", new ObjectIdType());
         }
 
-        public override bool TryDeserialize(object serialized, out object value)
+        public override bool TrySerialize(object? runtimeValue, out object? resultValue)
+        {
+            try
+            {
+                resultValue = this.Serialize(runtimeValue);
+                return true;
+            }
+            catch (Exception)
+            {
+                resultValue = null;
+                return false;
+            }
+        }
+
+        public override bool TryDeserialize(object? serialized, out object value)
         {
             if (serialized is string str)
             {
@@ -82,6 +104,6 @@ namespace Geex.Shared.Types
             return false;
         }
 
-        public override Type ClrType { get; } = typeof(ObjectId);
+        public override Type RuntimeType { get; } = typeof(ObjectId);
     }
 }

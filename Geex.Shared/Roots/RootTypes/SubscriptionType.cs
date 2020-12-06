@@ -15,14 +15,14 @@ namespace Geex.Shared.Roots.RootTypes
 
         }
 
-        protected override void OnCompleteType(ICompletionContext context, ObjectTypeDefinition definition)
+        protected override void OnCompleteType(ITypeCompletionContext context, ObjectTypeDefinition definition)
         {
             if (definition.Fields.IsNullOrEmpty())
             {
                 definition.Fields.Add(new ObjectFieldDefinition()
                 {
                     Name = "__placeHolder",
-                    Type = new ClrTypeReference(typeof(string), TypeContext.Output),
+                    Type = new SchemaTypeReference(new AnyType("__placeHolder"), TypeContext.Output),
                     DeprecationReason = "This field is a placeholder in case of empty type.",
                     Resolver = (resolverContext => throw new Exception("This field is a placeholder in case of empty type."))
                 });

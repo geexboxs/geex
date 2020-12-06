@@ -62,10 +62,10 @@ namespace Geex.Shared
                 }
                 return schema;
             });
-            services.AddQueryRequestInterceptor((context, builder, token) =>
-            {
-                return Task.CompletedTask;
-            });
+            //services.AddQueryRequestInterceptor((context, builder, token) =>
+            //{
+            //    return Task.CompletedTask;
+            //});
 
             services.AddSingleton(schemaBuilder);
             services.AddApplication<T>();

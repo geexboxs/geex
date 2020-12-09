@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using IdentityModel;
+
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.MongoDB.Mappers;
+
 using Microsoft.Extensions.Hosting;
 
 namespace Geex.Core
@@ -47,7 +50,7 @@ namespace Geex.Core
                 {
                     ApiSecrets = new List<Secret>(){new Secret(_env.ApplicationName) },
                     Name = _env.ApplicationName,
-                    Scopes = new List<Scope>(){new Scope(_env.ApplicationName),new Scope(IdentityServerConstants.StandardScopes.Profile),new Scope(IdentityServerConstants.StandardScopes.OpenId) },
+                    Scopes = new List<string>(){_env.ApplicationName,IdentityServerConstants.StandardScopes.Profile,IdentityServerConstants.StandardScopes.OpenId },
                 }
             };
         }

@@ -7,7 +7,9 @@ using MongoDB.Bson;
 using System;
 using Geex.Core.Authorization;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Http;
+using MongoDB.Entities;
 using Volo.Abp.Domain.Entities;
 
 namespace Geex.Core.Users
@@ -15,11 +17,14 @@ namespace Geex.Core.Users
     public class Role : Entity, IEquatable<Role>
     {
         public string Name { get; set; }
+
+        public Many<User> Users { get; set; }
         //public List<AppPermission> AuthorizedPermissions { get; set; }
 
         public Role(string name)
         {
             this.Name = name;
+            this.InitManyToMany(() => Users, user => user.Roles);
         }
 
         public override bool Equals(object obj)
@@ -62,11 +67,6 @@ namespace Geex.Core.Users
         public static bool operator !=(Role left, Role right)
         {
             return !(left == right);
-        }
-
-        public override object[] GetKeys()
-        {
-            return new[] { this.Name };
         }
     }
 }

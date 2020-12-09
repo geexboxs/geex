@@ -14,8 +14,9 @@ using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Types;
 using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Entities;
 
-using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Core.UserManagement
 {
@@ -28,8 +29,8 @@ namespace Geex.Core.UserManagement
             CreateRoleInput input)
         {
             var role = new Role(input.RoleName);
-            var repository = componentContext.Resolve<IRepository<Role>>();
-            await repository.InsertAsync(role);
+            await role.SaveAsync();
+            var repository = componentContext.Resolve<IMongoCollection<Role>>();
             return true;
         }
     }

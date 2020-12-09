@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 using Geex.Shared._ShouldMigrateToLib.Auth;
 
+using MongoDB.Driver;
+using MongoDB.Entities;
+
 using NetCasbin.Model;
 using NetCasbin.Persist;
-
-using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Core.Authorization.Casbin
 {
     public class CasbinMongoAdapter : IAdapter
     {
-        public Func<IRepository<CasbinRule>> RuleCollection { get; }
+        public Func<IMongoCollection<CasbinRule>> RuleCollection { get; }
 
-        public CasbinMongoAdapter(Func<IRepository<CasbinRule>> ruleCollection)
+        public CasbinMongoAdapter(Func<IMongoCollection<CasbinRule>> ruleCollection)
         {
             RuleCollection = ruleCollection;
         }
@@ -25,7 +26,7 @@ namespace Geex.Core.Authorization.Casbin
         public void LoadPolicy(Model model)
         {
             var repository = RuleCollection.Invoke();
-            var list = repository.ToList();
+            var list = repository.AsQueryable().ToList();
             LoadPolicyData(model, Helper.LoadPolicyLine, list);
         }
 
@@ -59,11 +60,11 @@ namespace Geex.Core.Authorization.Casbin
                 line.V4 = fieldValues[4 - fieldIndex];
             if (fieldIndex <= 5 && 5 < fieldIndex + num)
                 line.V5 = fieldValues[5 - fieldIndex];
-            await RuleCollection.Invoke().DeleteAsync(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
+            await RuleCollection.Invoke().AsQueryable().Where(x => (fieldIndex <= 0 && 0 < fieldIndex + num && x.V0 == line.V0)
                                                     && (fieldIndex <= 1 && 1 < fieldIndex + num && x.V1 == line.V1)
                                                     && (fieldIndex <= 2 && 2 < fieldIndex + num && x.V2 == line.V2)
                                                     && (fieldIndex <= 3 && 3 < fieldIndex + num && x.V3 == line.V3)
-                                                    && (fieldIndex <= 4 && 4 < fieldIndex + num && x.V4 == line.V4));
+                                                    && (fieldIndex <= 4 && 4 < fieldIndex + num && x.V4 == line.V4)).DeleteAllAsync();
         }
 
         public async Task SavePolicyAsync(Model model)
@@ -97,7 +98,7 @@ namespace Geex.Core.Authorization.Casbin
                 return;
             foreach (var x in source)
             {
-                await RuleCollection.Invoke().InsertAsync(x);
+                await x.ToDocument().SaveAsync();
             }
         }
 
@@ -162,7 +163,7 @@ namespace Geex.Core.Authorization.Casbin
 
         public async Task AddPolicyAsync(string pType, IList<string> rule)
         {
-            await RuleCollection.Invoke().InsertAsync(savePolicyLine(pType, rule));
+            await savePolicyLine(pType, rule).ToDocument().SaveAsync();
         }
 
         private void LoadPolicyData(

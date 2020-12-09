@@ -3,19 +3,13 @@ using System;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
 using MongoDB.Bson;
-
+using MongoDB.Entities;
 using Volo.Abp.Domain.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class UserClaimRef : IEntity
+    public class UserClaim
     {
-        public object[] GetKeys()
-        {
-            return new object[] { UserId, ClaimType };
-        }
-
-        public ObjectId UserId { get; set; }
         public ClaimType ClaimType { get; set; }
         public string ClaimValue { get; set; }
     }

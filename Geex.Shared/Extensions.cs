@@ -6,23 +6,30 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Autofac;
+
 using Geex.Shared.Roots.RootTypes;
 using Geex.Shared.Types;
+
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
 using HotChocolate.Types;
+
 using IdentityServer4.MongoDB.Configuration;
 using IdentityServer4.MongoDB.Stores;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+
 using Volo.Abp.Autofac;
 
 namespace Geex.Shared
@@ -45,34 +52,40 @@ namespace Geex.Shared
         {
             services.AddStorage(connectionStringName);
 
-            var schemaBuilder = SchemaBuilder.New()
+            
+            services.AddGraphQLServer()
+                .AddAuthorization()
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddSubscriptionType<SubscriptionType>()
-                .AddType<ObjectIdType>();
-            services.AddGraphQL(provider =>
-            {
-                var schema = schemaBuilder
-                .AddServices(provider)
-                .AddAuthorizeDirectiveType()
-                .Create();
-                if (schema.QueryType.Fields.All(x => x.IsIntrospectionField) || schema.MutationType.Fields.All(x => x.IsIntrospectionField))
-                {
-                    throw new Exception($"Query or Mutation must have one field at least!");
-                }
-                return schema;
-            });
+                .AddApolloTracing();
+
+            //services.AddGraphQL(provider =>
+            //{
+            //    var schema = schemaBuilder
+            //    .AddServices(provider)
+            //    .AddAuthorizeDirectiveType()
+            //    .Create();
+            //    if (schema.QueryType.Fields.All(x => x.IsIntrospectionField) || schema.MutationType.Fields.All(x => x.IsIntrospectionField))
+            //    {
+            //        throw new Exception($"Query or Mutation must have one field at least!");
+            //    }
+            //    return schema;
+            //});
             //services.AddQueryRequestInterceptor((context, builder, token) =>
             //{
             //    return Task.CompletedTask;
             //});
 
-            services.AddSingleton(schemaBuilder);
             services.AddApplication<T>();
         }
         public static void UseGeexGraphQL(this IApplicationBuilder app)
         {
-            app.UseGraphQL();
+            app.UseRouting()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapGraphQL();
+                });
             app.UseVoyager();
             app.UsePlayground();
         }
@@ -83,7 +96,7 @@ namespace Geex.Shared
                 .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.GqlSchemas")).ToArray());
         }
 
-        public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder,Type gqlModuleType)
+        public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder, Type gqlModuleType)
         {
             return schemaBuilder
                 .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray());
@@ -92,6 +105,11 @@ namespace Geex.Shared
         public static bool IsValidEmail(this string str)
         {
             return new Regex(@"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}").IsMatch(str);
+        }
+
+        public static bool IsValidPhoneNumber(this string str)
+        {
+            return new Regex(@"\d{11}").IsMatch(str);
         }
 
         public static IIdentityServerBuilder AddMongoRepository(this IIdentityServerBuilder builder,

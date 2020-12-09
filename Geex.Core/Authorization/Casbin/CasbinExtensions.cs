@@ -1,8 +1,8 @@
 ﻿using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using NetCasbin.Model;
-using Volo.Abp.Domain.Repositories;
 
 namespace Geex.Core.Authorization.Casbin
 {
@@ -13,7 +13,7 @@ namespace Geex.Core.Authorization.Casbin
             // Replace the default authorization policy provider with our own
             // custom provider which can return authorization policies for given
             // policy names (instead of using the default policy provider)
-            services.AddSingleton(x => new CasbinMongoAdapter(() => x.GetService<IRepository<CasbinRule>>()));
+            services.AddSingleton(x => new CasbinMongoAdapter(() => x.GetService<IMongoCollection<CasbinRule>>()));
             services.AddSingleton<Enforcer>();
             services.AddAuthorization(options =>
             {

@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Autofac;
 
 using CommonServiceLocator;
+
 using Geex.Core.Authorization;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
@@ -17,12 +18,13 @@ using IdentityServer4.Stores.Serialization;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+
 using MongoDB.Driver;
-using Volo.Abp.Domain.Repositories;
+using MongoDB.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class User : ActiveRecordAggregateRoot<User>
+    public class User : Entity, ICreatedOn, IModifiedOn
     {
         /// <summary>
         /// Gets or sets the username.
@@ -32,21 +34,29 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         public string Email { get; set; }
         public string Password { get; set; }
-        public ImmutableList<string> Roles { get; set; }
-        public IQueryable<UserClaimRef> Claims => ServiceLocator.Current.GetService<IRepository<UserClaimRef>>().Where(x => x.UserId == this.Id);
-        public IQueryable<UserOrgRef> Orgs => ServiceLocator.Current.GetService<IRepository<UserOrgRef>>().Where(x => x.UserId == this.Id);
-        public List<AppPermission> AuthorizedPermissions { get; set; }
+        public UserClaim[] Claims { get; set; }
+        [InverseSide]
+        public Many<Org> Orgs { get; set; }
 
+        [InverseSide]
+        public Many<Role> Roles { get; set; }
+        public List<AppPermission> AuthorizedPermissions { get; set; }
         public User(string phoneOrEmail, string password, string username = null)
         {
+            this.InitManyToMany(() => Orgs, org => org.Users);
+            this.InitManyToMany(() => Roles, role => role.Users);
             var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             if (phoneOrEmail.IsValidEmail())
             {
                 this.Email = phoneOrEmail;
             }
-            else
+            else if (phoneOrEmail.IsValidPhoneNumber())
             {
                 this.PhoneNumber = phoneOrEmail;
+            }
+            else
+            {
+                throw new Exception("invalid input for phoneOrEmail");
             }
             this.Username = username ?? phoneOrEmail;
             this.Password = passwordHasher.HashPassword(this, password);
@@ -56,7 +66,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         private void CheckDuplicateUser()
         {
-            var users = this.As<IActiveRecord<User>>().Repository;
+            var users = DB.Collection<User>().AsQueryable();
             if (users
                 .Any(o => o.Username == this.Username || o.Email == this.Email || o.PhoneNumber == this.PhoneNumber))
             {
@@ -70,11 +80,8 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             return passwordHasher.VerifyHashedPassword(this, this.Password, password) == PasswordVerificationResult.Success;
         }
 
-        public User SetOrgs(List<string> orgs)
-        {
-            
-            IActiveRecord<UserOrgRef>.StaticRepository.DeleteAsync(x => x.UserId == this.Id);
-            return this;
-        }
+        public string ID { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
     }
 }

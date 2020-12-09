@@ -41,7 +41,7 @@ namespace Geex.Core.Authorization
 
     //        if (input.AuthorizeTargetType == AuthorizeTargetType.Role)
     //        {
-    //            var user = await IActiveRecord<AppUser>.StaticRepository.GetAsync(input.TargetId);
+    //            var user = await IActiveRecord<User>.StaticRepository.GetAsync(input.TargetId);
     //            user.AuthorizedPermissions = input.AllowedPermissions;
     //            return true;
     //        }

@@ -1,44 +1,50 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Autofac;
+
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using Geex.Core.Users;
+using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
+
 using HotChocolate;
-using Volo.Abp.Domain.Repositories.MongoDB;
+
+using MongoDB.Driver;
+using MongoDB.Entities;
 
 namespace Geex.Core.UserManagement
 {
-    //[GraphQLResolverOf(typeof(AppUser))]
+    //[GraphQLResolverOf(typeof(User))]
     //[GraphQLResolverOf(typeof(Query))]
     public class UserResolver
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<AppUser> QueryUsers([Parent] Query query, [Service]IMongoDbRepository<AppUser> userCollection)
+        public IQueryable<User> QueryUsers([Parent] Query query, [Service] IMongoCollection<User> userCollection)
         {
-            return userCollection;
+            return userCollection.AsQueryable();
         }
         public async Task<bool> Register([Parent] Mutation mutation,
-            [Service]IComponentContext componentContext,
+            [Service] IComponentContext componentContext,
             RegisterUserInput input)
         {
-            var user = new AppUser(input.PhoneOrEmail, input.Password, input.UserName);
-            await user.As<IActiveRecord<AppUser>>().SaveAsync();
+            var user = new User(input.PhoneOrEmail, input.Password, input.UserName);
+            await user.SaveAsync();
             return true;
         }
 
-        public async Task<bool> AssignRoles([Parent] Mutation mutation, AssignRoleInput input)
+        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service] IMongoCollection<User> userCollection, AssignRoleInput input)
         {
-            var user = await IActiveRecord<AppUser>.StaticRepository.GetAsync(x=>x.Id == input.UserId);
-            user.Roles.Clear();
+            var user = await userCollection.FirstAsync(x => x.ID == input.UserId.ToString());
+            await user.Roles.RemoveAsync(user.Roles.Select(x=>x.ID));
             foreach (var role in input.Roles)
             {
-                user.Roles.Add(new Role(role));
+                await user.Roles.AddAsync(new Role(role));
             }
-            await user.As<IActiveRecord<AppUser>>().SaveAsync();
+            await user.SaveAsync();
             return true;
         }
     }

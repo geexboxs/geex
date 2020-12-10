@@ -8,6 +8,6 @@ namespace Geex.Shared.Roots
 {
     public class Query
     {
-        
+        public string placeHolder { get; set; }
     }
 }

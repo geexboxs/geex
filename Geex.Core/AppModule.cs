@@ -29,6 +29,13 @@ namespace Geex.Core
         private IWebHostEnvironment _env;
         private IConfiguration _configuration;
 
+
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+            context.Services.AddHealthChecks();
+            base.ConfigureServices(context);
+        }
+
         public override void OnApplicationInitialization(
             ApplicationInitializationContext context)
         {
@@ -46,9 +53,6 @@ namespace Geex.Core
             });
 
             app.UseHealthChecks("/health-check");
-
-            //app.UseAuthentication();
-            app.UseIdentityServer();
 
             app.UseGeexGraphQL();
         }

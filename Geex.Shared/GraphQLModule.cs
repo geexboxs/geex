@@ -11,6 +11,7 @@ using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots.RootTypes;
 
 using HotChocolate;
+using HotChocolate.Execution.Configuration;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,7 @@ namespace Geex.Shared
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
-            context.Services.GetSingletonInstance<ISchemaBuilder>().AddModuleTypes(this.GetType());
+            context.Services.GetSingletonInstance<IRequestExecutorBuilder>().AddModuleTypes(this.GetType());
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
@@ -63,6 +64,8 @@ namespace Geex.Shared
         {
             base.PreConfigureServices(context);
         }
+
+        public static HashSet<Assembly> KnownAssembly { get; } = new HashSet<Assembly>();
     }
 
     public abstract class GraphQLEntryModule<T> : GraphQLModule<T> where T : GraphQLModule

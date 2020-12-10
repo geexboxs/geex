@@ -8,6 +8,7 @@ namespace Geex.Shared.Roots
 {
     public class Subscription
     {
+        public string placeHolder { get; set; }
         
     }
 }

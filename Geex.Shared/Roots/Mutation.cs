@@ -8,6 +8,7 @@ namespace Geex.Shared.Roots
 {
     public class Mutation
     {
+        public string placeHolder { get; set; }
         
     }
 }

@@ -11,17 +11,18 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
         {
             descriptor.Name(nameof(Query));
             descriptor.Field<UserResolver>(x => x.QueryUsers(default, default))// return
-                .UsePaging<UserType>()// paging
-                .UseSorting<User>(x =>
-                {
-                    x.BindFieldsExplicitly();
-                    x.Sortable(y => y.Username);
-                })// sort
-                .UseFiltering<User>(x =>
-                {
-                    x.BindFieldsExplicitly();
-                    x.Filter(y => y.Username);
-                })// filter
+                //.UsePaging<UserType>()// paging
+                //.UseFiltering<User>(x =>
+                //{
+                //    x.BindFieldsExplicitly();
+                //    x.Filter(y => y.Username);
+                //})// filter
+                //.UseSorting<User>(x =>
+                //{
+                //    x.BindFieldsExplicitly();
+                //    x.Sortable(y => y.Username);
+                //})// sort
+                
                 ;
             base.Configure(descriptor);
         }

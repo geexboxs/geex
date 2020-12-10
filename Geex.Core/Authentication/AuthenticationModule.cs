@@ -118,6 +118,13 @@ namespace Geex.Core.Authentication
             
         }
 
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        {
+            base.OnApplicationInitialization(context);
+            var app = context.GetApplicationBuilder();
+            app.UseIdentityServer();
+        }
+
         private static void InitializeIdentityServerDatabase(IApplicationBuilder app)
         {
 

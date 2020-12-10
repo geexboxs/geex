@@ -16,6 +16,7 @@ using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
+using HotChocolate.Execution.Configuration;
 using HotChocolate.Types;
 
 using IdentityServer4.MongoDB.Configuration;
@@ -52,14 +53,27 @@ namespace Geex.Shared
         {
             services.AddStorage(connectionStringName);
 
-            
-            services.AddGraphQLServer()
-                .AddAuthorization()
+
+            var schemaBuilder = services.AddGraphQLServer()
                 .AddQueryType<QueryType>()
                 .AddMutationType<MutationType>()
                 .AddSubscriptionType<SubscriptionType>()
+                .AddType<ObjectIdType>()
+                .AddErrorFilter(x =>
+                {
+                    Console.WriteLine(x);
+                    return x;
+                })
+                .OnSchemaError((ctx, err) =>
+                {
+                    Console.WriteLine(ctx);
+                    Console.WriteLine(err);
+                })
+                .UseExceptions()
+                .AddAuthorization()
                 .AddApolloTracing();
 
+            services.AddSingleton(schemaBuilder);
             //services.AddGraphQL(provider =>
             //{
             //    var schema = schemaBuilder
@@ -90,16 +104,27 @@ namespace Geex.Shared
             app.UsePlayground();
         }
 
-        public static ISchemaBuilder AddModuleTypes<TModule>(this ISchemaBuilder schemaBuilder)
+        public static IRequestExecutorBuilder AddModuleTypes<TModule>(this IRequestExecutorBuilder schemaBuilder)
         {
             return schemaBuilder
                 .AddTypes(typeof(TModule).Assembly.GetExportedTypes().Where(x => x.Namespace != null && x.Namespace.Contains($"{typeof(TModule).Namespace}.GqlSchemas")).ToArray());
         }
 
-        public static ISchemaBuilder AddModuleTypes(this ISchemaBuilder schemaBuilder, Type gqlModuleType)
+        public static IRequestExecutorBuilder AddModuleTypes(this IRequestExecutorBuilder schemaBuilder, Type gqlModuleType)
         {
-            return schemaBuilder
-                .AddTypes(gqlModuleType.Assembly.GetExportedTypes().Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray());
+            if (GraphQLModule.KnownAssembly.AddIfNotContains(gqlModuleType.Assembly))
+            {
+                var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
+                var extensionTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<ObjectTypeExtension>(x)).ToArray();
+                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
+                foreach (var extensionType in extensionTypes)
+                {
+                    schemaBuilder.AddTypeExtension(extensionType);
+                }
+                return schemaBuilder
+                    .AddTypes(objectTypes);
+            }
+            return schemaBuilder;
         }
 
         public static bool IsValidEmail(this string str)

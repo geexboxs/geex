@@ -13,6 +13,10 @@
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="6.0.1" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="6.0.0" />
     <PackageReference Include="Casbin.NET" Version="1.4.0" />
+    <PackageReference Include="CSharpRecordEnabler" Version="1.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.1" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.1" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />

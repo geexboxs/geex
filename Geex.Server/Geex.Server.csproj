@@ -4,13 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <UserSecretsId>fa2ed191-7e42-48d0-b0e9-5a5ec803e0fb</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />

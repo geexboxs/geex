@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Geex.Core.Users;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
+using MongoDB.Entities;
 using Volo.Abp.Uow;
 
 namespace Geex.Core
@@ -32,6 +34,13 @@ namespace Geex.Core
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            this._env = context.Services.GetSingletonInstance<IWebHostEnvironment>();
+            this._configuration = context.Services.GetConfiguration();
+            var mongoUrl = new MongoUrl(_configuration.GetConnectionString("Geex")){};
+            var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
+            mongoSettings.ApplicationName = _configuration.GetAppName();
+            DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
+            DB.MigrateAsync().Wait();
             context.Services.AddHealthChecks();
             base.ConfigureServices(context);
         }

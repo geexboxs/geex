@@ -1,5 +1,6 @@
 ﻿using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
+
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
@@ -10,7 +11,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
         protected override void Configure(IObjectTypeDescriptor descriptor)
         {
             descriptor.Name(nameof(Query));
-            descriptor.Field<UserResolver>(x => x.QueryUsers(default, default))// return
+            descriptor.Field<UserResolver>(x => x.QueryUsers(default))
                 //.UsePaging<UserType>()// paging
                 //.UseFiltering<User>(x =>
                 //{
@@ -22,7 +23,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
                 //    x.BindFieldsExplicitly();
                 //    x.Sortable(y => y.Username);
                 //})// sort
-                
+
                 ;
             base.Configure(descriptor);
         }

@@ -69,7 +69,7 @@ namespace Geex.Shared
                     Console.WriteLine(ctx);
                     Console.WriteLine(err);
                 })
-                .UseExceptions()
+                //.UseExceptions();
                 .AddAuthorization()
                 .AddApolloTracing();
 
@@ -100,7 +100,7 @@ namespace Geex.Shared
                 {
                     endpoints.MapGraphQL();
                 });
-            app.UseVoyager();
+            app.UseVoyager("/graphql","/voyager");
             app.UsePlayground();
         }
 

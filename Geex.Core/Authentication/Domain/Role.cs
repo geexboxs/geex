@@ -18,6 +18,7 @@ namespace Geex.Core.Users
     {
         public string Name { get; set; }
 
+        [InverseSide]
         public Many<User> Users { get; set; }
         //public List<AppPermission> AuthorizedPermissions { get; set; }
 

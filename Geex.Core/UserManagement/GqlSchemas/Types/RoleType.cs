@@ -15,8 +15,10 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types
     {
         protected override void Configure(IObjectTypeDescriptor<Role> descriptor)
         {
-            base.Configure(descriptor);
+            descriptor.BindFieldsExplicitly();
+            //descriptor.Field(x => x.Users).Type<ListType<UserType>>().Resolve(x=>x.ToString());
             descriptor.Field(x => x.Name);
+            base.Configure(descriptor);
         }
     }
 

@@ -17,6 +17,7 @@ namespace Geex.Core.Authentication.GqlSchemas.Types
             descriptor.Field(x => x.TokenType);
             descriptor.Field(x => x.IsError);
             descriptor.Field(x => x.Error);
+            base.Configure(descriptor);
         }
     }
 }

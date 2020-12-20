@@ -1,16 +1,23 @@
 ﻿using System;
 
+using Microsoft.Extensions.Logging;
+
 namespace Geex.Shared._ShouldMigrateToLib
 {
     public class UserFriendlyException : Exception
     {
-        /// <summary>
-        /// Additional information about the exception.
-        /// </summary>
-        public string Details { get; private set; }
-        public UserFriendlyException(string message, string detailTemplate, params object[] formatParams) : base(message)
+        public UserFriendlyException(string message) : base(message)
         {
-            this.Details = string.Format(detailTemplate, formatParams);
+        }
+    }
+
+    public class GeexException : Exception
+    {
+        public EventId EventId { get; }
+
+        public GeexException(string message, EventId eventId) : base(message)
+        {
+            EventId = eventId;
         }
     }
 }

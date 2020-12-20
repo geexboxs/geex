@@ -12,8 +12,6 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
             descriptor.Name(nameof(Mutation));
             descriptor.Field<RoleResolver>(x => x.CreateRole(default, default, default))
                 .Argument("input", x => x.Type<CreateRoleInputType>());
-            descriptor.Field<UserResolver>(x => x.Authentication(default, default, default))
-                .Argument("input", x => x.Type<RegisterUserInputType>());
             descriptor.Field<UserResolver>(x => x.Register(default, default, default))
                 .Argument("input", x => x.Type<RegisterUserInputType>());
             descriptor.Field<UserResolver>(x => x.AssignRoles(default, default))

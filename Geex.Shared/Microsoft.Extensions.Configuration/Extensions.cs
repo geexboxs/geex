@@ -13,5 +13,9 @@ namespace Microsoft.Extensions.Configuration
         {
             return configuration.GetValue<string>("App:Name");
         }
+        public static string GetAppHostAddress(this IConfiguration configuration)
+        {
+            return configuration.GetValue<string>("App:HostAddress");
+        }
     }
 }

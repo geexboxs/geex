@@ -39,11 +39,11 @@ namespace Geex.Core.Authentication
         {
             IHttpContextAccessor httpContextAccessor = componentContext.Resolve<IHttpContextAccessor>();
             IConfiguration configuration = componentContext.Resolve<IConfiguration>();
-            if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authentication", out var authValue))
-            {
-                await httpContextAccessor.HttpContext.AuthenticateAsync();
-            }
-            var client = new HttpClient() { BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("HOST_NAME")}") };
+            //if (httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authentication", out var authValue))
+            //{
+            //    await httpContextAccessor.HttpContext.AuthenticateAsync();
+            //}
+            var client = new HttpClient() { BaseAddress = new Uri($"http://{configuration.GetAppHostAddress()}") };
             var tokenResponse = await client.RequestTokenAsync(new TokenRequest()
             {
                 Address = "http://localhost:8000/connect/token",

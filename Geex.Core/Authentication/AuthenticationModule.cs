@@ -39,7 +39,6 @@ namespace Geex.Core.Authentication
         public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
         {
             base.OnPreApplicationInitialization(context);
-            var app = context.GetApplicationBuilder();
         }
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
@@ -51,45 +50,40 @@ namespace Geex.Core.Authentication
 
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddCasbinAuthorization();
-            services.AddScoped<GeexCookieAuthenticationEvents>();
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.EventsType = typeof(GeexCookieAuthenticationEvents);
-                })
-                    .AddIdentityServerAuthentication(
-                        options =>
+                .AddIdentityServerAuthentication(
+                    options =>
+                    {
+                        if (env.IsDevelopment())
                         {
-                            if (env.IsDevelopment())
+                            IdentityModelEventSource.ShowPII = true;
+                        }
+                        options.ApiName = env.ApplicationName;
+                        options.Authority = $"{configuration.GetAppHostAddress()}";
+                        options.ApiSecret = env.ApplicationName;
+                        options.RequireHttpsMetadata = false;
+                        options.JwtBearerEvents = new JwtBearerEvents
+                        {
+                            OnChallenge = context =>
                             {
-                                IdentityModelEventSource.ShowPII = true;
+                                return Task.CompletedTask;
+                            },
+                            OnTokenValidated = ContextBoundObject =>
+                            {
+                                return Task.CompletedTask;
+                            },
+                            OnMessageReceived = context =>
+                            {
+                                return Task.CompletedTask;
+                            },
+                            OnAuthenticationFailed = context =>
+                            {
+                                var te = context.Exception;
+                                return Task.CompletedTask;
                             }
-                            options.ApiName = env.ApplicationName;
-                            options.Authority = $"http://{Environment.GetEnvironmentVariable("HOST_NAME")}";
-                            options.ApiSecret = env.ApplicationName;
-                            options.RequireHttpsMetadata = false;
-                            options.JwtBearerEvents = new JwtBearerEvents
-                            {
-                                OnChallenge = context =>
-                                {
-                                    return Task.CompletedTask;
-                                },
-                                OnTokenValidated = ContextBoundObject =>
-                                {
-                                    return Task.CompletedTask;
-                                },
-                                OnMessageReceived = context =>
-                                {
-                                    return Task.CompletedTask;
-                                },
-                                OnAuthenticationFailed = context =>
-                                {
-                                    var te = context.Exception;
-                                    return Task.CompletedTask;
-                                }
-                            };
-                        });
+                        };
+                    });
 
             services.AddHealthChecks();
 
@@ -114,7 +108,7 @@ namespace Geex.Core.Authentication
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
-            
+
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)

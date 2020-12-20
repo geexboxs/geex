@@ -51,20 +51,5 @@ namespace Geex.Core.UserManagement
             await user.SaveAsync();
             return true;
         }
-
-        public async Task<TokenResponse> Authentication([Parent] Mutation mutation, IIdentityServerInteractionService identityService, AuthenticateInput input)
-        {
-            var user = await DB.Collection<User>().FirstOrDefaultAsync(x => x.ID == input.UserIdentifier || x.PhoneNumber == input.UserIdentifier || x.Email == input.UserIdentifier);
-            if (user == default)
-            {
-                throw new UserFriendlyException("invalid username or password");
-            }
-
-            if (!user.CheckPassword(input.Password))
-            {
-                throw new UserFriendlyException("invalid username or password");
-            }
-            return new IdentityServer4.Services.DefaultTokenService().
-        }
     }
 }

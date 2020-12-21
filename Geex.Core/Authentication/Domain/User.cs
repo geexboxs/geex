@@ -6,25 +6,28 @@ using CommonServiceLocator;
 
 using Geex.Core.Authorization;
 using Geex.Core.Users;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
-    public class User : Entity, ICreatedOn, IModifiedOn
+    public class User : IdentityUser, IGeexEntity, IModifiedOn
     {
         /// <summary>
         ///     Gets or sets the username.
         /// </summary>
         public string Username { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public override string PhoneNumber { get; set; }
 
-        public string Email { get; set; }
+        public override string Email { get; set; }
         public string Password { get; set; }
         public UserClaim[] Claims { get; set; }
         [InverseSide] public Many<Org> Orgs { get; set; }
@@ -57,8 +60,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             var users = DB.Collection<User>().AsQueryable();
             if (users
                 .Any(o => o.Username == Username || o.Email == Email || o.PhoneNumber == PhoneNumber))
-                throw new UserFriendlyException("UserAlreadyExists", "UserAlreadyExists_Msg", Username, Email,
-                    PhoneNumber);
+                throw new UserFriendlyException("UserAlreadyExists");
         }
 
         public bool CheckPassword(string password)
@@ -66,8 +68,11 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
             var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             return passwordHasher.VerifyHashedPassword(this, Password, password) == PasswordVerificationResult.Success;
         }
+        public string GenerateNewID()
+        {
+            return this.As<IGeexEntity>().GenerateNewID();
+        }
 
-        public string ID { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
     }

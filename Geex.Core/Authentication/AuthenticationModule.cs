@@ -19,8 +19,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Geex.Core.Authorization.Casbin;
 using Humanizer;
-using IdentityServer4.MongoDB.Entities;
-using IdentityServer4.MongoDB.Mappers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
@@ -49,60 +47,9 @@ namespace Geex.Core.Authentication
             var services = context.Services;
 
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
-            services.AddCasbinAuthorization();
             services
-                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddIdentityServerAuthentication(
-                    options =>
-                    {
-                        if (env.IsDevelopment())
-                        {
-                            IdentityModelEventSource.ShowPII = true;
-                        }
-                        options.ApiName = env.ApplicationName;
-                        options.Authority = $"{configuration.GetAppHostAddress()}";
-                        options.ApiSecret = env.ApplicationName;
-                        options.RequireHttpsMetadata = false;
-                        options.JwtBearerEvents = new JwtBearerEvents
-                        {
-                            OnChallenge = context =>
-                            {
-                                return Task.CompletedTask;
-                            },
-                            OnTokenValidated = ContextBoundObject =>
-                            {
-                                return Task.CompletedTask;
-                            },
-                            OnMessageReceived = context =>
-                            {
-                                return Task.CompletedTask;
-                            },
-                            OnAuthenticationFailed = context =>
-                            {
-                                var te = context.Exception;
-                                return Task.CompletedTask;
-                            }
-                        };
-                    });
-
-            services.AddHealthChecks();
-
-            services.AddIdentityServer(options =>
-            {
-                options.Authentication.CookieLifetime = new TimeSpan(24, 0, 0);
-                options.Authentication.CookieSlidingExpiration = false;
-            })
-                .AddJwtBearerClientAuthentication()
-                .AddDeveloperSigningCredential()
-                .AddResourceOwnerValidator<GeexPasswordValidator>()
-                // lulus:此处添加正式证书,不知道证书加密类型,未作处理
-                //.AddSigningCredential()
-                .AddMongoRepository(configuration.GetConnectionString("Geex"))
-                .AddRedirectUriValidator<RegexRedirectUriValidator>()
-                .AddCorsPolicyService<RegexCorsPolicyService>();
-            services.AddSingleton<IdentityServerSeedConfig>();
-            //bug :idsr的bug
-            //services.Replace(ServiceDescriptor.Transient<ICorsPolicyService, RegexCorsPolicyService>());
+                .AddAuthentication()
+                .AddJwtBearer();
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
@@ -113,9 +60,9 @@ namespace Geex.Core.Authentication
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
-            base.OnApplicationInitialization(context);
             var app = context.GetApplicationBuilder();
-            app.UseIdentityServer();
+            app.UseAuthentication();
+            base.OnApplicationInitialization(context);
         }
     }
 }

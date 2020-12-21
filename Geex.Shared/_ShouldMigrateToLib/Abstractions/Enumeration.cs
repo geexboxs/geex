@@ -5,10 +5,17 @@ using System.Reflection;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
-    public abstract class Enumeration<T> : ValueObject,IComparable where T : IComparable
+    public abstract class Enumeration<T>
     {
-        public abstract string Name { get; set; }
-        public abstract T Value { get; set; }
+        public Enumeration(T value)
+        {
+            if (this)
+            {
+                
+            }
+        }
+        public string Name { get; set; }
+        public T Value { get; set; }
 
         public override string ToString()
         {
@@ -20,25 +27,19 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             return value.Value;
         }
 
-        protected override IEnumerable<object> GetAtomicValues()
+        public static bool TryParse<TImplementation>(T value, out TImplementation result)
         {
-            yield return Name;
-            yield return Value;
+            result = Enumeration<T>.GetAll<TImplementation>().FirstOrDefault(x => x.Equals(value));
+            return !Equals(result, default(TImplementation));
         }
 
-        public static bool TryParse<TImplemetions>(T value,out TImplemetions result) where TImplemetions:Enumeration<T>
+        public static TImplementation Parse<TImplementation>(T value)
         {
-            result = Enumeration<T>.GetAll<TImplemetions>().FirstOrDefault(x => x.Value.CompareTo(value) == 0);
-            return result != default(TImplemetions);
-        }
-
-        public static TImplemetions Parse<TImplemetions>(T value) where TImplemetions : Enumeration<T>
-        {
-            var result = Enumeration<T>.GetAll<TImplemetions>().First(x => x.Value.CompareTo(value) == 0);
+            var result = Enumeration<T>.GetAll<TImplementation>().First(x => x.Equals(value));
             return result;
         }
 
-        public static IEnumerable<TImplemention> GetAll<TImplemention>() where TImplemention : Enumeration<T>
+        public static IEnumerable<TImplemention> GetAll<TImplemention>()
         {
             var type = typeof(TImplemention);
             var typeInfo = type.GetTypeInfo();
@@ -54,23 +55,17 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var otherValue = obj as Enumeration<T>;
-            if (otherValue == null)
+            var otherValue = obj is Enumeration<T> enumeration ? enumeration : default;
+            if (otherValue.Equals(default))
             {
                 return false;
             }
-            var typeMatches = GetType() == obj.GetType();
-            var valueMatches = Value.Equals(otherValue.Value);
-            return typeMatches && valueMatches;
+            var typeMatches = GetType() == obj?.GetType();
+            var valueMatches = Value?.Equals(otherValue.Value);
+            return typeMatches && valueMatches == true;
         }
-
-        public int CompareTo(object other)
-        {
-            return Value.CompareTo(((Enumeration<T>)other).Value);
-        }
-
         // Other utility methods ...
     }
 }

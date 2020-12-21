@@ -1,22 +1,16 @@
-﻿using HotChocolate.Types;
-using IdentityModel.Client;
-using IdentityServer4.Events;
-using IdentityServer4.Models;
+﻿using System;
+using System.Security.Claims;
+using HotChocolate.Types;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Geex.Core.Authentication.GqlSchemas.Types
 {
-    public class AccessTokenType : ObjectType<TokenResponse>
+    public class ClaimsIdentityGqlType : ObjectType<ClaimsIdentity>
     {
-        protected override void Configure(IObjectTypeDescriptor<TokenResponse> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<ClaimsIdentity> descriptor)
         {
             descriptor.BindFieldsExplicitly();
-            descriptor.Field(x => x.AccessToken);
-            descriptor.Field(x => x.ExpiresIn);
-            descriptor.Field(x => x.IdentityToken);
-            descriptor.Field(x => x.RefreshToken);
-            descriptor.Field(x => x.TokenType);
-            descriptor.Field(x => x.IsError);
-            descriptor.Field(x => x.Error);
+            descriptor.Field(x => x);
             base.Configure(descriptor);
         }
     }

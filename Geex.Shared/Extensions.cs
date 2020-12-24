@@ -137,28 +137,12 @@ namespace Geex.Shared
             return new Regex(@"\d{11}").IsMatch(str);
         }
 
-        public static IIdentityServerBuilder AddMongoRepository(this IIdentityServerBuilder builder,
-            string connectionString)
+        public static List<TFieldType> GetFieldsOfType<TFieldType>(this Type type)
         {
-            builder.Services.AddSingleton<IOptions<MongoDBConfiguration>>(new OptionsWrapper<MongoDBConfiguration>(new MongoDBConfiguration()
-            {
-                ConnectionString = connectionString,
-                Database = new MongoUrl(connectionString).DatabaseName
-            }));
-            builder.AddConfigurationStore(options =>
-             {
-                 options.ConnectionString = connectionString;
-             })
-            .AddOperationalStore(options =>
-            {
-                options.ConnectionString = connectionString;
-            })
-            .AddResourceStore<ResourceStore>()
-            .AddClientStore<ClientStore>()
-            .AddPersistedGrantStore<PersistedGrantStore>()
-            ;
-
-            return builder;
+            return type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(p => type.IsAssignableFrom(p.FieldType))
+                .Select(pi => (TFieldType)pi.GetValue(null))
+                .ToList();
         }
 
         public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "Geex")

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Geex.Core.Authentication.Domain
@@ -21,11 +22,15 @@ namespace Geex.Core.Authentication.Domain
         }
     }
     
-    public class LoginProvider : Enumeration<string>
+    public class LoginProvider : Enumeration<LoginProvider,string>
     {
         public static readonly LoginProvider Local = new LoginProvider(LoginProvider._Local);
         public const string _Local = "1";
         [DisplayName(LoginProvider.Local)]
         public string Type { get; set; }
+
+        public LoginProvider([NotNull] string name, string value) : base(name, value)
+        {
+        }
     }
 }

@@ -40,7 +40,8 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             new Lazy<Dictionary<string, TEnum>>(() => GetAllOptions().ToDictionary(item => item.Name, StringComparer.OrdinalIgnoreCase));
 
         static readonly Lazy<Dictionary<TValue, TEnum>> _fromValue =
-            new Lazy<Dictionary<TValue, TEnum>>(() => {
+            new Lazy<Dictionary<TValue, TEnum>>(() =>
+            {
                 // multiple enums with same value are allowed but store only one per value
                 var dictionary = new Dictionary<TValue, TEnum>();
                 foreach (var item in GetAllOptions())
@@ -101,6 +102,16 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
                 throw new ArgumentNullException(nameof(value));
 
             _name = name;
+            _value = value;
+        }
+
+        /// <summary>
+        /// construct a enum with name of value.ToString()
+        /// </summary>
+        /// <param name="value"></param>
+        protected Enumeration(TValue value)
+        {
+            _name = value.ToString() ?? throw new InvalidOperationException("simple enum value must have a equation of string.");
             _value = value;
         }
 

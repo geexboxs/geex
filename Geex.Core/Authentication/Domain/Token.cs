@@ -13,10 +13,11 @@ namespace Geex.Core.Authentication.Domain
 {
     public class Token : IdentityUserToken<string>
     {
-        public Token(User user, LoginProvider loginProvider = LoginProvider.Local)
+        public Token(User user, LoginProvider loginProvider)
         {
+            loginProvider ??= Domain.LoginProvider.Local;
             this.Name = user.Username;
-            this.LoginProvider = user.Username;
+            this.LoginProvider = loginProvider;
             this.Name = user.Username;
             this.Name = user.Username;
         }
@@ -25,11 +26,12 @@ namespace Geex.Core.Authentication.Domain
     public class LoginProvider : Enumeration<LoginProvider,string>
     {
         public static readonly LoginProvider Local = new LoginProvider(LoginProvider._Local);
-        public const string _Local = "1";
-        [DisplayName(LoginProvider.Local)]
-        public string Type { get; set; }
-
+        public const string _Local = nameof(Local);
         public LoginProvider([NotNull] string name, string value) : base(name, value)
+        {
+        }
+
+        public LoginProvider(string value) : base(value)
         {
         }
     }

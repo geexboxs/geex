@@ -19,9 +19,6 @@ using HotChocolate.Execution;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.Types;
 
-using IdentityServer4.MongoDB.Configuration;
-using IdentityServer4.MongoDB.Stores;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

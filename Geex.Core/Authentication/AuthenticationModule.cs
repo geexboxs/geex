@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
+using Geex.Core.Authentication.Domain;
 using Geex.Core.Authorization.Casbin;
 using Humanizer;
 using Microsoft.AspNetCore.Hosting;

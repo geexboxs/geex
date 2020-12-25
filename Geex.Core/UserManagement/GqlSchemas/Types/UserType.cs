@@ -1,4 +1,5 @@
-﻿using Geex.Core.Authentication.GqlSchemas.Types;
+﻿using Geex.Core.Authentication.Domain;
+using Geex.Core.Authentication.GqlSchemas.Types;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 
 using HotChocolate.Types;

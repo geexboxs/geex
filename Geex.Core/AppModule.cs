@@ -40,7 +40,6 @@ namespace Geex.Core
             var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
             mongoSettings.ApplicationName = _configuration.GetAppName();
             DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
-            DB.MigrateAsync().Wait();
             context.Services.AddHealthChecks();
             base.ConfigureServices(context);
         }

@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using CommonServiceLocator;
-
 using Geex.Core.Authorization;
 using Geex.Core.Users;
+using Geex.Shared;
+using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
-
+using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Entities;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authentication.Domain
 {
     public class User : IdentityUser, IGeexEntity, IModifiedOn
     {

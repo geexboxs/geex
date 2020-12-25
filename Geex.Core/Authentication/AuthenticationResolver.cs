@@ -22,6 +22,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ namespace Geex.Core.Authentication
             IConfiguration configuration = componentContext.Resolve<IConfiguration>();
             var userStore = componentContext.Resolve<IUserStore<User>>();
             var user = await userStore.FindByIdAsync(input.UserIdentifier, CancellationToken.None);
-            return new IdentityUserToken<string>();
+            return new UserToken(user, LoginProvider.Local, default);
         }
     }
 

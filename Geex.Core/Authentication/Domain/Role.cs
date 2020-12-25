@@ -5,6 +5,7 @@ using Castle.Core;
 using Geex.Shared._ShouldMigrateToLib;
 using MongoDB.Bson;
 using System;
+using Geex.Core.Authentication.Domain;
 using Geex.Core.Authorization;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;

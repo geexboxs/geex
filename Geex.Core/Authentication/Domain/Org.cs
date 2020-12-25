@@ -1,3 +1,4 @@
+using Geex.Core.Authentication.Domain;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
 using MongoDB.Entities;

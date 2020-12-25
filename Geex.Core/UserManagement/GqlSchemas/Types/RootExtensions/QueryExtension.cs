@@ -16,12 +16,12 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
                 //.UseFiltering<User>(x =>
                 //{
                 //    x.BindFieldsExplicitly();
-                //    x.Filter(y => y.Username);
+                //    x.Filter(y => y.UserName);
                 //})// filter
                 //.UseSorting<User>(x =>
                 //{
                 //    x.BindFieldsExplicitly();
-                //    x.Sortable(y => y.Username);
+                //    x.Sortable(y => y.UserName);
                 //})// sort
 
                 ;

@@ -12,6 +12,7 @@ using Geex.Shared;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Geex.Server
@@ -20,8 +21,6 @@ namespace Geex.Server
     {
         public static void Main(string[] args)
         {
-            var hmac = new HMACSHA256(Convert.FromBase64String("test"));
-            var a = hmac;
             CreateHostBuilder(args).Build().Run();
         }
 

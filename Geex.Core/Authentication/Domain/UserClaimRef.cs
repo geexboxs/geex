@@ -10,11 +10,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 {
     public class UserClaim
     {
-        public ClaimType ClaimType { get; set; }
+        public string ClaimType { get; set; }
         public string ClaimValue { get; set; }
-    }
-
-    public class ClaimType : ConstValue<string>
-    {
     }
 }

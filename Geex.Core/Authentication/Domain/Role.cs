@@ -16,7 +16,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace Geex.Core.Users
 {
-    public class Role : IGeexEntity, IEquatable<Role>
+    public class Role : GeexEntity, IEquatable<Role>
     {
         public string Name { get; set; }
 
@@ -70,13 +70,6 @@ namespace Geex.Core.Users
         public static bool operator !=(Role left, Role right)
         {
             return !(left == right);
-        }
-
-        public DateTime CreatedOn { get; set; }
-        public string Id { get; set; }
-        public string GenerateNewID()
-        {
-            return this.As<IGeexEntity>().GenerateNewID();
         }
     }
 }

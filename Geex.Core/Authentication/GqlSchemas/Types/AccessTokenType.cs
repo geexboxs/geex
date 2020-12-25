@@ -10,6 +10,7 @@ namespace Geex.Core.Authentication.GqlSchemas.Types
         protected override void Configure(IObjectTypeDescriptor<ClaimsIdentity> descriptor)
         {
             descriptor.BindFieldsExplicitly();
+            descriptor.Field(x => x.Name);
             base.Configure(descriptor);
         }
     }

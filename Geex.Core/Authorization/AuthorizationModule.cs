@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Casbin.AspNetCore.Authorization;
-using Geex.Core.Authorization.Casbin;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Builder;

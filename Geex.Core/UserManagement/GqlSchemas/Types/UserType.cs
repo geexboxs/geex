@@ -11,7 +11,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types
         protected override void Configure(IObjectTypeDescriptor<User> descriptor)
         {
             descriptor.BindFieldsExplicitly();
-            //descriptor.Field(x => x.Username);
+            //descriptor.Field(x => x.UserName);
             //descriptor.Field(x => x.Claims);
             //descriptor.Field(x => x.Email);
             //descriptor.Field(x => x.PhoneNumber);

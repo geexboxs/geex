@@ -40,8 +40,8 @@ namespace Geex.Core.UserManagement
 
         public async Task<bool> AssignRoles([Parent] Mutation mutation, AssignRoleInput input)
         {
-            var user = await DB.Collection<User>().FirstAsync(x => x.Id == input.UserId.ToString());
-            await user.Roles.RemoveAsync(user.Roles.Select(x => x.Id));
+            var user = await DB.Collection<User>().FirstAsync(x => x.ID == input.UserId.ToString());
+            await user.Roles.RemoveAsync(user.Roles.Select(x => x.ID));
             foreach (var role in input.Roles)
             {
                 await user.Roles.AddAsync(new Role(role));

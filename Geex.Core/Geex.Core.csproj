@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Authorization\Casbin\" />
     <Folder Include="Authorization\GqlSchemas\" />
   </ItemGroup>
 

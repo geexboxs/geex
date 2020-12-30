@@ -4,8 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Misc;
+using MongoDB.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib
 {
@@ -49,6 +52,17 @@ namespace Geex.Shared._ShouldMigrateToLib
             Ensure.IsNotNull(collection, nameof(collection));
             Ensure.IsNotNull(filter, nameof(filter));
             return collection.Find(new ExpressionFilterDefinition<TDocument>(filter), options).FirstOrDefaultAsync();
+        }
+
+        public static Task<TDocument> FirstOrDefaultAsync<TDocument>(this IMongoCollection<TDocument> collection, ObjectId id) where TDocument : IEntity
+        {
+            return collection.FirstOrDefaultAsync(id.ToString());
+        }
+        public static Task<TDocument> FirstOrDefaultAsync<TDocument>(this IMongoCollection<TDocument> collection, string id) where TDocument : IEntity
+        {
+            Ensure.IsNotNull(collection, nameof(collection));
+            Ensure.IsNotNull(id, nameof(id));
+            return collection.Find(x => x.ID == id).FirstOrDefaultAsync();
         }
     }
 }

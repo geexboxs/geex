@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -349,5 +350,17 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Enumeration<TEnum, TValue>(TValue value) =>
             FromValue(value);
+    }
+
+    public static class EnumerationExtensions
+    {
+        public static IEnumerable<TResult> Cast<TEnum, TResult>(this IEnumerable<TEnum> source) where TEnum : Enumeration<TEnum, TResult> where TResult : IEquatable<TResult>, IComparable<TResult>
+        {
+            if (source is IEnumerable<TResult> results)
+                return results;
+            if (source == null)
+                throw new ArgumentNullException("source");
+            return source.Select(x => (TResult)x);
+        }
     }
 }

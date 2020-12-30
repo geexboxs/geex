@@ -27,7 +27,9 @@ namespace Geex.Core.Users
         public Role(string name)
         {
             this.Name = name;
+#pragma warning disable 618
             this.InitManyToMany(() => Users, user => user.Roles);
+#pragma warning restore 618
         }
 
         public override bool Equals(object obj)

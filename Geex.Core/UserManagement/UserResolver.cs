@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Autofac;
+
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
 using Geex.Core.Authentication.GqlSchemas.Types;
@@ -15,6 +16,7 @@ using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
 
 using HotChocolate;
+
 using MongoDB.Driver;
 using MongoDB.Entities;
 
@@ -37,17 +39,12 @@ namespace Geex.Core.UserManagement
             await user.SaveAsync();
             return true;
         }
-
         public async Task<bool> AssignRoles([Parent] Mutation mutation, AssignRoleInput input)
         {
             var user = await DB.Collection<User>().FirstAsync(x => x.ID == input.UserId.ToString());
-            await user.Roles.RemoveAsync(user.Roles.Select(x => x.ID));
-            foreach (var role in input.Roles)
-            {
-                await user.Roles.AddAsync(new Role(role));
-            }
-            await user.SaveAsync();
+            await user.AssignRoles(input.Roles);
             return true;
         }
+
     }
 }

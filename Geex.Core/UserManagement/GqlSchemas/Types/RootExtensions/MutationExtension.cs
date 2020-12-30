@@ -1,4 +1,5 @@
-﻿using Geex.Core.UserManagement.GqlSchemas.Types.Inputs;
+﻿using Geex.Core.Authorization;
+using Geex.Core.UserManagement.GqlSchemas.Types.Inputs;
 using Geex.Shared.Roots;
 
 using HotChocolate.Types;
@@ -15,9 +16,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types.RootExtensions
             descriptor.Field<UserResolver>(x => x.Register(default, default, default))
                 .Argument("input", x => x.Type<RegisterUserInputType>());
             descriptor.Field<UserResolver>(x => x.AssignRoles(default, default))
-                .Argument("input", x => x.Type<AssignRoleInputType>()).Authorize("Permission");
-            descriptor.Field<UserResolver>(x => x.AssignRoles(default, default))
-                .Argument("input", x => x.Type<AssignRoleInputType>()).Authorize("Permission");
+                .Argument("input", x => x.Type<AssignRoleInputType>()).Authorize("casbin", AppPermission.AssignRole);
             base.Configure(descriptor);
         }
     }

@@ -40,10 +40,8 @@ namespace Geex.Core.Authentication
             [Service] IComponentContext componentContext,
             AuthenticateInput input)
         {
-            IHttpContextAccessor httpContextAccessor = componentContext.Resolve<IHttpContextAccessor>();
             IConfiguration configuration = componentContext.Resolve<IConfiguration>();
-            var userStore = componentContext.Resolve<IUserStore<User>>();
-            var user = await userStore.FindByIdAsync(input.UserIdentifier, CancellationToken.None);
+            var user = await User.FindAsync(input.UserIdentifier, CancellationToken.None);
             return new UserToken(user, LoginProvider.Local, componentContext.Resolve<GeexTokenOptions>());
             //return new UserToken(user, LoginProvider.Local, default);
         }
@@ -51,10 +49,15 @@ namespace Geex.Core.Authentication
 
     public class GeexTokenOptions
     {
+        public GeexTokenOptions(string secretKey, TimeSpan expires)
+        {
+            SecretKey = secretKey;
+            Expires = expires;
+        }
+
         public string SecretKey { get; }
         public TimeSpan Expires { get; }
     }
-
     public class LoginProvider : Enumeration<LoginProvider, string>
     {
         public const string _Local = nameof(Local);

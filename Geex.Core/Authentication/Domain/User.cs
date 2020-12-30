@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using CommonServiceLocator;
 
+using Geex.Core.Authentication.Domain.Events;
 using Geex.Core.Authorization;
 using Geex.Core.Users;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+
+using MediatR;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +40,9 @@ namespace Geex.Core.Authentication.Domain
         public UserClaim[] Claims { get; set; }
         [InverseSide] public Many<Org> Orgs { get; set; }
 
-        [OwnerSide] public Many<Role> Roles { get; set; }
+        [Obsolete("use " + nameof(User.AssignRoles) + " for role assigning.")]
+        [OwnerSide]
+        public Many<Role> Roles { get; set; }
         public List<AppPermission> AuthorizedPermissions { get; set; }
         public User()
         {
@@ -70,6 +77,29 @@ namespace Geex.Core.Authentication.Domain
         {
             var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             return passwordHasher.VerifyHashedPassword(this, Password, password) == PasswordVerificationResult.Success;
+        }
+
+#pragma warning disable 618
+        public async Task AssignRoles(List<string> roles)
+        {
+            await this.Roles.RemoveAsync(this.Roles.Select(x => x.ID));
+            foreach (var role in roles)
+            {
+                await this.Roles.AddAsync(new Role(role));
+            }
+            await this.SaveAsync();
+            var mediator = ServiceLocator.Current.GetService<IMediator>();
+            await mediator.Publish(new UserRoleChangedEvent(this.ID, roles));
+        }
+#pragma warning restore 618
+        public static async Task<User> FindAsync(string userIdentifier, CancellationToken cancellationToken)
+        {
+            if (ObjectId.TryParse(userIdentifier, out var objectId))
+            {
+                return await DB.Collection<User>().FirstOrDefaultAsync(userIdentifier);
+            }
+
+            return await Task.FromResult(DB.Collection<User>().FirstOrDefault(x => x.UserName == userIdentifier || x.PhoneNumber == userIdentifier || x.Email == userIdentifier));
         }
     }
 }

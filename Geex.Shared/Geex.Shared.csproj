@@ -26,6 +26,7 @@
     <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="11.0.2" />
     <PackageReference Include="HotChocolate.Types.Sorting" Version="11.0.2" />
     <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.11.5" />

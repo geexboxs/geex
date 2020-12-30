@@ -30,7 +30,6 @@ namespace Geex.Core.UserManagement
         {
             var role = new Role(input.RoleName);
             await role.SaveAsync();
-            var repository = componentContext.Resolve<IMongoCollection<Role>>();
             return true;
         }
     }

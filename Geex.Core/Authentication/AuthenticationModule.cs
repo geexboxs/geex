@@ -47,13 +47,26 @@ namespace Geex.Core.Authentication
             var services = context.Services;
 
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
-            services
-                .AddAuthentication()
-                .AddJwtBearer();
+
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            var services = context.Services;
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(x =>
+                {
+                    if (x.Events != null)
+                    {
+                        x.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
+                        x.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
+                        x.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
+                        x.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };
+                        x.Events.OnTokenValidated = receivedContext => { return Task.CompletedTask; };
+                    };
+                });
+            services.AddSingleton(new GeexTokenOptions("123456789012345678901234", TimeSpan.FromMinutes(10)));
             base.ConfigureServices(context);
 
         }

@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Authorization\Casbin\" />
     <Folder Include="Authorization\GqlSchemas\" />
+    <Folder Include="Notification\Handlers\" />
   </ItemGroup>
 
 </Project>

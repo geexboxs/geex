@@ -37,8 +37,4 @@
     <PackageReference Include="MongoDB.Entities" Version="20.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\.submodules\casbin-aspnetcore\src\Casbin.AspNetCore\Casbin.AspNetCore.csproj" />
-  </ItemGroup>
-
 </Project>

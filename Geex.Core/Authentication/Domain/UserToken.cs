@@ -21,25 +21,18 @@ namespace Geex.Core.Authentication.Domain
 {
     public class UserToken : IdentityUserToken<string>
     {
-        public new LoginProvider LoginProvider
+        public new LoginProvider? LoginProvider
         {
-            get => LoginProvider.FromValue(base.LoginProvider);
-            set => base.LoginProvider = value;
+            get => (LoginProvider)base.LoginProvider;
+            set => base.LoginProvider = value ?? throw new ArgumentNullException(nameof(value));
         }
-        public UserToken(User user, LoginProvider loginProvider, UserTokenGenerateOptions options)
+
+        public UserToken(User user, LoginProvider provider, UserTokenGenerateOptions options)
         {
-            var (issuer, audience, expires, secretKey) = options;
-            loginProvider ??= Domain.LoginProvider.Local;
-            this.Name = user.Username;
-            this.LoginProvider = loginProvider;
-            this.UserId = user.Id;
-            this.Value = new JwtSecurityTokenHandler().CreateEncodedJwt(issuer,
-                audience,
-                new ClaimsIdentity(new Claim[] { new JwtClaim(JwtClaimType.Sub, user.Id) }),
-                default, DateTime.Now.Add(expires),
-                DateTimeOffset.Now.LocalDateTime, new SigningCredentials(new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(secretKey)
-            ), SecurityAlgorithms.HmacSha256Signature));
+            UserId = user.ID;
+            Name = user.UserName;
+            LoginProvider = provider;
+            Value = new JwtSecurityTokenHandler().CreateEncodedJwt(new Utils.GeexSecurityTokenDescriptor(user, provider, options));
         }
     }
 
@@ -63,44 +56,12 @@ namespace Geex.Core.Authentication.Domain
         public TimeSpan Expires;
         public string SecretKey;
 
-        public UserTokenGenerateOptions(string issuer, string audience, TimeSpan expires, string secretKey)
+        public UserTokenGenerateOptions(string issuer, string secretKey, TimeSpan expires)
         {
             this.Issuer = issuer;
-            this.Audience = audience;
+            this.Audience = "*";
             this.Expires = expires;
             this.SecretKey = secretKey;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is UserTokenGenerateOptions other &&
-                   Issuer == other.Issuer &&
-                   Audience == other.Audience &&
-                   Expires.Equals(other.Expires) &&
-                   SecretKey == other.SecretKey;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Issuer, Audience, Expires, SecretKey);
-        }
-
-        public void Deconstruct(out string issuer, out string audience, out TimeSpan expires, out string secretKey)
-        {
-            issuer = this.Issuer;
-            audience = this.Audience;
-            expires = this.Expires;
-            secretKey = this.SecretKey;
-        }
-
-        public static implicit operator (string issuer, string audience, TimeSpan expires, string secretKey)(UserTokenGenerateOptions value)
-        {
-            return (value.Issuer, value.Audience, value.Expires, value.SecretKey);
-        }
-
-        public static implicit operator UserTokenGenerateOptions((string issuer, string audience, TimeSpan expires, string secretKey) value)
-        {
-            return new UserTokenGenerateOptions(value.issuer, value.audience, value.expires, value.secretKey);
         }
     }
 }

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-using Casbin.AspNetCore.Authorization;
-
 using CommonServiceLocator;
+using Geex.Core.Authentication.Domain;
+using Geex.Core.Authorization.Casbin;
 using Geex.Core.Authorization.Events;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
@@ -36,7 +36,7 @@ namespace Geex.Core.Authorization
         /// user.1, data.2, read : false
         /// user.1, data.2, write : true
         /// </summary>
-        public static Model Model { get; } = NewModel(@"
+        public static Model Model { get; } = Model.CreateDefaultFromText(@"
 [request_definition]
 r = sub, obj, act
 

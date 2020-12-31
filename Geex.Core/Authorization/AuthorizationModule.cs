@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Casbin.AspNetCore.Authorization;
+using Geex.Core.Authorization.Casbin;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Builder;
@@ -25,18 +25,14 @@ namespace Geex.Core.Authorization
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             var services = context.Services;
-            services.AddCasbinAuthorization(options =>
-            {
-                options.DefaultEnforcerFactory = model =>
-                    new RbacEnforcer(new CasbinMongoAdapter(() => DB.Collection<CasbinRule>()));
-            });
+            services.AddCasbinAuthorization();
             base.PreConfigureServices(context);
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
             var app = context.GetApplicationBuilder();
-            app.UseCasbinAuthorization();
+            app.UseAuthorization();
             base.OnApplicationInitialization(context);
         }
     }

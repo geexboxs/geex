@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 using Autofac;
 
-using Casbin.AspNetCore.Authorization;
-
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;

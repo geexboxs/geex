@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 
-namespace Geex.Shared._ShouldMigrateToLib.Auth
+namespace Geex.Core.Authentication.Domain
 {
-    public class RbacPolicy
+    public class PolicyItem
     {
-        public RbacPolicy(List<string> x)
+        public PolicyItem(List<string> x)
         {
             this.Sub = x[0];
             this.Obj = x[1];
             this.Act = x[2];
         }
 
-        public RbacPolicy(string sub, string obj, string act)
+        public PolicyItem(string sub, string obj, string act)
         {
             Sub = sub;
             Obj = obj;

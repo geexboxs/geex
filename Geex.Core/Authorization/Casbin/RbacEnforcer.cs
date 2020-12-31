@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Geex.Core.Authentication.Domain;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using NetCasbin;
 using NetCasbin.Model;
@@ -29,7 +30,7 @@ namespace Geex.Core.Authorization.Casbin
         /// user.1, data.2, read : false
         /// user.1, data.2, write : true
         /// </summary>
-        public static Model Model { get; } = new Model().LoadFromText(@"
+        public static Model Model { get; } = Model.CreateDefaultFromText(@"
 [request_definition]
 r = sub, obj, act
 
@@ -101,16 +102,16 @@ m = (p.sub == ""*"" || g(r.sub, p.sub)) && (p.obj == ""*"" || g2(r.obj, p.obj)) 
             return result;
         }
 
-        public List<RbacPolicy> GetFeaturePolicies(string sub)
+        public List<PolicyItem> GetFeaturePolicies(string sub)
         {
             var policies = base.GetFilteredNamedPolicy("p", 1, sub);
-            return policies.Select(x => new RbacPolicy(x)).ToList();
+            return policies.Select(x => new PolicyItem(x)).ToList();
         }
 
-        public List<RbacPolicy> GetResourcePolicy(string sub, string obj)
+        public List<PolicyItem> GetResourcePolicy(string sub, string obj)
         {
             var policies = base.GetFilteredNamedPolicy("p", 2, sub, obj);
-            return policies.Select(x => new RbacPolicy(x)).ToList();
+            return policies.Select(x => new PolicyItem(x)).ToList();
         }
 
         public bool HasRoleForUser(string user, string role)

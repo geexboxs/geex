@@ -15,8 +15,6 @@ using Volo.Abp.Uow;
 namespace Geex.Core.Notification
 {
     [DependsOn(
-        typeof(AbpAspNetCoreModule),
-        typeof(AbpUnitOfWorkModule)
     )]
     public class NotificationModule : GraphQLModule<NotificationModule>
     {

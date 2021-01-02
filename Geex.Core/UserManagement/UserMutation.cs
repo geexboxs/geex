@@ -1,36 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using Autofac;
 
 using Geex.Core.Authentication.Domain;
-using Geex.Core.Authentication.GqlSchemas.Inputs;
-using Geex.Core.Authentication.GqlSchemas.Types;
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
-using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
-using Geex.Shared._ShouldMigrateToLib.Auth;
 using Geex.Shared.Roots;
 
 using HotChocolate;
+using HotChocolate.Types;
 
-using MongoDB.Driver;
 using MongoDB.Entities;
 
 namespace Geex.Core.UserManagement
 {
-    //[GraphQLResolverOf(typeof(User))]
-    //[GraphQLResolverOf(typeof(Query))]
-    public class UserResolver
+    [ExtendObjectType(nameof(Mutation))]
+    public class UserMutation : Mutation
     {
-        [GraphQLDescription("This field does ...")]
-        public IQueryable<User> QueryUsers([Parent] Query query)
-        {
-            return DB.Collection<User>().AsQueryable();
-        }
         public async Task<bool> Register([Parent] Mutation mutation,
             [Service] IComponentContext componentContext,
             RegisterUserInput input)
@@ -45,6 +31,5 @@ namespace Geex.Core.UserManagement
             await user.AssignRoles(input.Roles);
             return true;
         }
-
     }
 }

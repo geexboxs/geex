@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace Geex.Core.Authentication.Domain
 {
-    public class PolicyItem
+    public class PolicyItem : IAuthorizationRequirement
     {
         public PolicyItem(List<string> x)
         {

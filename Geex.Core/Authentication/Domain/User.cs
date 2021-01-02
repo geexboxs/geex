@@ -14,6 +14,9 @@ using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 
+using HotChocolate;
+using HotChocolate.Types;
+
 using MediatR;
 
 using Microsoft.AspNetCore.Identity;

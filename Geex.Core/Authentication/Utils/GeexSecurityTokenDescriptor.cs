@@ -11,10 +11,11 @@ namespace Geex.Core.Authentication.Utils
     {
         public GeexSecurityTokenDescriptor(User user, LoginProvider provider, UserTokenGenerateOptions options)
         {
-            this.Audience = "*";
+            this.Audience = options.Audience;
             this.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey)), SecurityAlgorithms.HmacSha256Signature);
             Expires = DateTime.Now.Add(options.Expires);
             IssuedAt = DateTime.Now;
+            Issuer = options.Issuer;
             Subject = new ClaimsIdentity(new Claim[]
             {
                 new GeexClaim(GeexClaimType.Sub, user.ID),

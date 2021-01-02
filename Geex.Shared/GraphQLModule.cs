@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Autofac;
 
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared.Roots.RootTypes;
 
 using HotChocolate;
 using HotChocolate.Execution.Configuration;
@@ -34,6 +33,8 @@ namespace Geex.Shared
             base.ConfigureServices(context);
             context.Services.GetSingletonInstance<IRequestExecutorBuilder>().AddModuleTypes(this.GetType());
         }
+
+        public IRequestExecutorBuilder SchemaBuilder => this.ServiceConfigurationContext.Services.GetSingletonInstance<IRequestExecutorBuilder>();
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
@@ -70,13 +71,5 @@ namespace Geex.Shared
 
     public abstract class GraphQLEntryModule<T> : GraphQLModule<T> where T : GraphQLModule
     {
-        public List<Type> Resolvers { get; set; }
-
-        public Type SubscriptionType { get; set; } = typeof(SubscriptionType);
-
-        public Type MutationType { get; set; } = typeof(MutationType);
-
-        public Type QueryType { get; set; } = typeof(QueryType);
-
     }
 }

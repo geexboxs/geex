@@ -56,10 +56,10 @@ namespace Geex.Core.Authentication.Domain
         public TimeSpan Expires;
         public string SecretKey;
 
-        public UserTokenGenerateOptions(string issuer, string secretKey, TimeSpan expires)
+        public UserTokenGenerateOptions(string issuer, string audience, string secretKey, TimeSpan expires)
         {
             this.Issuer = issuer;
-            this.Audience = "*";
+            this.Audience = audience;
             this.Expires = expires;
             this.SecretKey = secretKey;
         }

@@ -9,6 +9,7 @@ using Autofac.Extensions.DependencyInjection;
 using Geex.Core;
 using Geex.Data;
 using Geex.Shared;
+using Geex.Shared.Types;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;

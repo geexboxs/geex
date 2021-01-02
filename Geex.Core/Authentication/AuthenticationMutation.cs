@@ -30,9 +30,8 @@ using MongoDB.Entities;
 
 namespace Geex.Core.Authentication
 {
-    [GraphQLResolverOf(typeof(StringType))]
-    [GraphQLResolverOf(typeof(Query))]
-    public class AuthenticationResolver
+    [ExtendObjectType(nameof(Mutation))]
+    public class AuthenticationMutation : Mutation
     {
         public async Task<IdentityUserToken<string>> Authenticate([Parent] Mutation mutation,
             [Service] IComponentContext componentContext,

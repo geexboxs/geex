@@ -8,21 +8,6 @@ using System.Runtime.CompilerServices;
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
     /// <summary>
-    /// A base type to use for creating smart enums with inner value of type <see cref="System.Int32"/>.
-    /// </summary>
-    /// <typeparam name="TEnum">The type that is inheriting from this class.</typeparam>
-    /// <remarks></remarks>
-    public abstract class Enumeration<TEnum> :
-        Enumeration<TEnum, int>
-        where TEnum : Enumeration<TEnum, int>
-    {
-        protected Enumeration(string name, int value) :
-            base(name, value)
-        {
-        }
-    }
-
-    /// <summary>
     /// A base type to use for creating smart enums.
     /// </summary>
     /// <typeparam name="TEnum">The type that is inheriting from this class.</typeparam>

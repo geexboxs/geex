@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
+
 using HotChocolate;
 using HotChocolate.Language;
 using HotChocolate.Properties;
@@ -13,9 +15,9 @@ using MongoDB.Bson;
 
 namespace Geex.Shared.Types
 {
-    public class ObjectIdType : ScalarType<ObjectId>
+    public class EnumerationType<TEnum, TValue> : ScalarType<TEnum> where TEnum : Enumeration<TEnum, TValue> where TValue : IEquatable<TValue>, IComparable<TValue>
     {
-        public ObjectIdType() : base("ObjectId")
+        public EnumerationType() : base(typeof(TEnum).Name)
         {
         }
 
@@ -40,21 +42,21 @@ namespace Geex.Shared.Types
 
             if (valueSyntax is StringValueNode stringLiteral)
             {
-                return ObjectId.Parse(stringLiteral.Value);
+                dynamic value = stringLiteral.Value;
+                return Enumeration<TEnum, TValue>.FromValue(value);
             }
 
-            throw new SerializationException("", new ObjectIdType());
-
+            throw new SerializationException("", new EnumerationType<TEnum, TValue>());
         }
 
         public override IValueNode ParseValue(object value)
         {
-            if (value is ObjectId s)
+            if (value is TEnum s)
             {
                 return new StringValueNode(s.ToString());
             }
 
-            throw new SerializationException("", new ObjectIdType());
+            throw new SerializationException("", new EnumerationType<TEnum, TValue>());
         }
 
         public override IValueNode ParseResult(object? resultValue)
@@ -64,12 +66,12 @@ namespace Geex.Shared.Types
 
         public override object Serialize(object value)
         {
-            if (value is ObjectId s)
+            if (value is TEnum s)
             {
                 return s;
             }
 
-            throw new SerializationException("", new ObjectIdType());
+            throw new SerializationException("", new EnumerationType<TEnum, TValue>());
         }
 
         public override bool TrySerialize(object? runtimeValue, out object? resultValue)
@@ -90,11 +92,11 @@ namespace Geex.Shared.Types
         {
             if (serialized is string str)
             {
-                value = ObjectId.Parse(str);
+                value = TEnum.Parse(str);
                 return true;
             }
 
-            if (serialized is ObjectId)
+            if (serialized is TEnum)
             {
                 value = serialized;
                 return true;

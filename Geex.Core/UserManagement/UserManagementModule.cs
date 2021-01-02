@@ -8,9 +8,7 @@ using Volo.Abp.Uow;
 namespace Geex.Core.UserManagement
 {
     [DependsOn(
-        typeof(AbpAspNetCoreModule),
-        typeof(AbpAutofacModule),
-        typeof(AbpUnitOfWorkModule)
+        typeof(AbpAutofacModule)
     )]
     public class UserManagementModule : GraphQLModule<UserManagementModule>
     {

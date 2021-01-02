@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 
 using Autofac;
 
-using Geex.Shared.Roots.RootTypes;
+using Geex.Shared._ShouldMigrateToLib;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
+using Geex.Shared.Roots;
 using Geex.Shared.Types;
 
 using HotChocolate;
@@ -17,7 +19,11 @@ using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
 using HotChocolate.Execution;
 using HotChocolate.Execution.Configuration;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using HotChocolate.Types.Descriptors;
+using HotChocolate.Types.Pagination;
+using HotChocolate.Utilities;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +31,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
@@ -37,7 +44,6 @@ namespace Geex.Shared
         public static IHostBuilder ConfigureGeexServer<T>(this IHostBuilder hostBuilder, string connectionStringName = "Geex") where T : GraphQLEntryModule<T>
         {
             var containerBuilder = new ContainerBuilder();
-
             return hostBuilder.ConfigureServices((_, services) =>
                 {
                     services.AddObjectAccessor(containerBuilder);
@@ -50,12 +56,20 @@ namespace Geex.Shared
         {
             services.AddStorage(connectionStringName);
 
-
             var schemaBuilder = services.AddGraphQLServer()
-                .AddQueryType<QueryType>()
-                .AddMutationType<MutationType>()
-                .AddSubscriptionType<SubscriptionType>()
-                .AddType<ObjectIdType>()
+                .AddFiltering()
+                .AddSorting()
+                .AddProjections()
+                .SetPagingOptions(new PagingOptions()
+                {
+                    DefaultPageSize = 10,
+                    IncludeTotalCount = true,
+                    MaxPageSize = 1000
+                })
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>()
+                .AddSubscriptionType<Subscription>()
+                .BindRuntimeType<ObjectId, ObjectIdType>()
                 .AddErrorFilter(x =>
                 {
                     Console.WriteLine(x);
@@ -63,30 +77,13 @@ namespace Geex.Shared
                 })
                 .OnSchemaError((ctx, err) =>
                 {
-                    Console.WriteLine(ctx);
-                    Console.WriteLine(err);
+                    throw new Exception("schema error", err);
                 })
-                //.UseExceptions();
+                //.UseExceptions()
                 .AddAuthorization()
                 .AddApolloTracing();
 
             services.AddSingleton(schemaBuilder);
-            //services.AddGraphQL(provider =>
-            //{
-            //    var schema = schemaBuilder
-            //    .AddServices(provider)
-            //    .AddAuthorizeDirectiveType()
-            //    .Create();
-            //    if (schema.QueryType.Fields.All(x => x.IsIntrospectionField) || schema.MutationType.Fields.All(x => x.IsIntrospectionField))
-            //    {
-            //        throw new Exception($"Query or Mutation must have one field at least!");
-            //    }
-            //    return schema;
-            //});
-            //services.AddQueryRequestInterceptor((context, builder, token) =>
-            //{
-            //    return Task.CompletedTask;
-            //});
 
             services.AddApplication<T>();
         }
@@ -97,7 +94,7 @@ namespace Geex.Shared
                 {
                     endpoints.MapGraphQL();
                 });
-            app.UseVoyager("/graphql","/voyager");
+            app.UseVoyager("/graphql", "/voyager");
             app.UsePlayground();
         }
 
@@ -112,14 +109,25 @@ namespace Geex.Shared
             if (GraphQLModule.KnownAssembly.AddIfNotContains(gqlModuleType.Assembly))
             {
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
-                var extensionTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<ObjectTypeExtension>(x)).ToArray();
+                var rootTypes = exportedTypes.Where(x => !x.IsAbstract &&
+                                                              (AbpTypeExtensions.IsAssignableTo<Query>(x) ||
+                                                               AbpTypeExtensions.IsAssignableTo<Mutation>(x) ||
+                                                               AbpTypeExtensions.IsAssignableTo<Subscription>(x))).ToArray();
+                schemaBuilder.AddTypes(rootTypes);
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
-                foreach (var extensionType in extensionTypes)
+                schemaBuilder.AddTypes(objectTypes);
+                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.BaseType.Name.StartsWith("Enumeration")).ToArray();
+                foreach (var classEnumType in classEnumTypes)
                 {
-                    schemaBuilder.AddTypeExtension(extensionType);
+                    if (classEnumType.GenericTypeArguments.Length == 1)
+                    {
+                        schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType.BaseType.GenericTypeArguments));
+                    }
+                    else
+                    {
+                        schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType.BaseType.GenericTypeArguments));
+                    }
                 }
-                return schemaBuilder
-                    .AddTypes(objectTypes);
             }
             return schemaBuilder;
         }

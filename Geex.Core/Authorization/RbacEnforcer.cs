@@ -141,7 +141,7 @@ m = (p.sub == ""*"" || g(r.sub, p.sub)) && (p.obj == ""*"" || g2(r.obj, p.obj)) 
             public GroupPolicy(string sub, string group)
             {
                 Sub = sub;
-                Group = @group;
+                Group = group;
             }
 
             public string Sub { get; }

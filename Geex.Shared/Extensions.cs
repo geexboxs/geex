@@ -113,6 +113,7 @@ namespace Geex.Shared
                                                               (AbpTypeExtensions.IsAssignableTo<Query>(x) ||
                                                                AbpTypeExtensions.IsAssignableTo<Mutation>(x) ||
                                                                AbpTypeExtensions.IsAssignableTo<Subscription>(x))).ToArray();
+                var hehe = rootTypes.Select(x => x.Name).ToList();
                 schemaBuilder.AddTypes(rootTypes);
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
                 schemaBuilder.AddTypes(objectTypes);

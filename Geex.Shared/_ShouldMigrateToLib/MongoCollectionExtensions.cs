@@ -62,7 +62,7 @@ namespace Geex.Shared._ShouldMigrateToLib
         {
             Ensure.IsNotNull(collection, nameof(collection));
             Ensure.IsNotNull(id, nameof(id));
-            return collection.Find(x => x.ID == id).FirstOrDefaultAsync();
+            return collection.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Geex.Core.Authentication.Domain
 
         public UserToken(User user, LoginProvider provider, UserTokenGenerateOptions options)
         {
-            UserId = user.ID;
+            UserId = user.Id;
             Name = user.UserName;
             LoginProvider = provider;
             Value = new JwtSecurityTokenHandler().CreateEncodedJwt(new Utils.GeexSecurityTokenDescriptor(user, provider, options));

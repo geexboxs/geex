@@ -18,7 +18,7 @@ namespace Geex.Core.Authentication.Utils
             Issuer = options.Issuer;
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new GeexClaim(GeexClaimType.Sub, user.ID),
+                new GeexClaim(GeexClaimType.Sub, user.Id),
                 new GeexClaim(GeexClaimType.UserName, user.UserName),
                 new GeexClaim(GeexClaimType.Provider, provider),
             });

@@ -25,9 +25,10 @@ namespace Geex.Core.UserManagement
             await user.SaveAsync();
             return true;
         }
-        public async Task<bool> AssignRoles([Parent] Mutation mutation, AssignRoleInput input)
+        public async Task<bool> AssignRoles([Parent] Mutation mutation,[ScopedService] DbContext dbContext, AssignRoleInput input)
         {
-            var user = await DB.Collection<User>().FirstAsync(x => x.ID == input.UserId.ToString());
+            var user = await dbContext.Find<User>().OneAsync(input.UserId.ToString());
+            await user.SaveAsync();
             await user.AssignRoles(input.Roles);
             return true;
         }

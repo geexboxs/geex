@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Geex.Server/appsettings.Development.json
+/Geex.Server/Properties/launchSettings.json

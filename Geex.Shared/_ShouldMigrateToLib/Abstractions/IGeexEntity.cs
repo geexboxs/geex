@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 using MongoDB.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
@@ -14,14 +15,15 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
     {
         [BsonId]
         [ObjectId]
-        public string ID { get; set; }
+        public string Id { get; set; }
 
-        string IEntity.GenerateNewID()
+        string IEntity.GenerateNewId()
         {
             return ObjectId.GenerateNewId().ToString();
         }
 
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
+        IClientSessionHandle IEntity.Session { get; set; }
     }
 }

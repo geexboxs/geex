@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Geex.Core.Users;
+
 using HotChocolate;
 using HotChocolate.Language;
 using HotChocolate.Types;
@@ -17,6 +19,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types
         {
             descriptor.BindFieldsExplicitly();
             //descriptor.Field(x => x.Users).Type<ListType<UserType>>().Resolve(x=>x.ToString());
+            descriptor.Field(x => x.Id);
             descriptor.Field(x => x.Name);
             base.Configure(descriptor);
         }

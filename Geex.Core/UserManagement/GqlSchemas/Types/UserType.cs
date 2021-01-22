@@ -16,7 +16,7 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types
             //descriptor.Field(x => x.Email);
             //descriptor.Field(x => x.PhoneNumber);
             //descriptor.Field(x => x.Roles);
-            //descriptor.Field(x => x.ID);
+            descriptor.Field(x => x.Id);
             //descriptor.Ignore(x => x.Claims);
             //descriptor.Ignore(x => x.AuthorizedPermissions);
             descriptor.Field(x => x.Roles).Type<ListType<RoleType>>().Resolve(x => x.ToString());

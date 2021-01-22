@@ -1,3 +1,7 @@
 [submodule ".submodules/casbin-aspnetcore"]
 	path = .submodules/casbin-aspnetcore
 	url = https://github.com/geexboxs/casbin-aspnetcore.git
+[submodule ".submodules/MongoDB.Entities"]
+	path = .submodules/MongoDB.Entities
+	url = https://github.com/geexboxs/MongoDB.Entities.git
+	branch = master

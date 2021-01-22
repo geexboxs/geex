@@ -22,9 +22,10 @@ namespace Geex.Core.UserManagement
     public class UserQuery : Query
     {
         [GraphQLDescription("This field does ...")]
-        public IQueryable<User> QueryUsers([Parent] Query query)
+        public IQueryable<User> QueryUsers([Parent] Query query,
+            [Service] DbContext dbContext)
         {
-            return DB.Collection<User>().AsQueryable();
+            return dbContext.Queryable<User>();
         }
 
     }

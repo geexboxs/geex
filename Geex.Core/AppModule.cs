@@ -60,6 +60,7 @@ namespace Geex.Core
             mongoSettings.ApplicationName = _configuration.GetAppName();
             DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
             context.Services.AddHealthChecks();
+            context.Services.AddScoped<DbContext>(x => new DbContext(transactional: true));
             base.ConfigureServices(context);
         }
 

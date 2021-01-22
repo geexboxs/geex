@@ -90,9 +90,10 @@ namespace Geex.Shared.Types
 
         public override bool TryDeserialize(object? serialized, out object value)
         {
+            dynamic dynamicValue = serialized;
             if (serialized is string str)
             {
-                value = TEnum.Parse(str);
+                value = Enumeration<TEnum, TValue>.FromValue(dynamicValue);
                 return true;
             }
 

@@ -70,39 +70,38 @@ namespace Geex.Core.Authentication.Domain
 
         private void CheckDuplicateUser()
         {
-            var users = DB.Collection<User>().AsQueryable();
-            if (users
-                .Any(o => o.UserName == UserName || o.Email == Email || o.PhoneNumber == PhoneNumber))
+            if (ServiceLocator.Current.GetService<DbContext>()!.CountAsync<User>(o => o.UserName == UserName || o.Email == Email || o.PhoneNumber == PhoneNumber).Result > 0)
                 throw new UserFriendlyException("UserAlreadyExists");
         }
 
         public bool CheckPassword(string password)
         {
             var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
-            return passwordHasher.VerifyHashedPassword(this, Password, password) == PasswordVerificationResult.Success;
+            return passwordHasher!.VerifyHashedPassword(this, Password, password) == PasswordVerificationResult.Success;
         }
 
 #pragma warning disable 618
         public async Task AssignRoles(List<string> roles)
         {
-            await this.Roles.RemoveAsync(this.Roles.Select(x => x.ID));
+            await this.Roles.RemoveAsync(this.Roles.Select(x => x.Id));
+            await this.SaveAsync();
             foreach (var role in roles)
             {
                 await this.Roles.AddAsync(new Role(role));
             }
             await this.SaveAsync();
             var mediator = ServiceLocator.Current.GetService<IMediator>();
-            await mediator.Publish(new UserRoleChangedEvent(this.ID, roles));
+            await mediator.Publish(new UserRoleChangedEvent(this.Id, roles));
         }
 #pragma warning restore 618
         public static async Task<User> FindAsync(string userIdentifier, CancellationToken cancellationToken)
         {
             if (ObjectId.TryParse(userIdentifier, out var objectId))
             {
-                return await DB.Collection<User>().FirstOrDefaultAsync(userIdentifier);
+                return await ServiceLocator.Current.GetInstance<DbContext>().Find<User>().OneAsync(userIdentifier, cancellationToken);
             }
 
-            return await Task.FromResult(DB.Collection<User>().FirstOrDefault(x => x.UserName == userIdentifier || x.PhoneNumber == userIdentifier || x.Email == userIdentifier));
+            return await ServiceLocator.Current.GetInstance<DbContext>().Find<User>().Match(x => x.UserName == userIdentifier || x.PhoneNumber == userIdentifier || x.Email == userIdentifier).ExecuteSingleAsync(cancellationToken);
         }
     }
 }

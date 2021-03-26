@@ -1,4 +1,5 @@
-﻿using Autofac.Extras.CommonServiceLocator;
+﻿using System.Threading.Tasks;
+using Autofac.Extras.CommonServiceLocator;
 using CommonServiceLocator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +15,7 @@ using Geex.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Geex.Core.Users;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using MongoDB.Entities;
@@ -50,17 +52,14 @@ namespace Geex.Core
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             //this.Configure<AbpAuditingOptions>((Action<AbpAuditingOptions>)(options => options.Contributors.Add((AuditLogContributor)new AspNetCoreAuditLogContributor())));
+            context.Services.AddSingleton<IMediator>(x => new Mediator(x.GetService));
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();
             //context.Services.Replace(ServiceDescriptor.Transient<IOptionsFactory<RequestLocalizationOptions>, AbpRequestLocalizationOptionsFactory>());
             this._env = context.Services.GetSingletonInstance<IWebHostEnvironment>();
             this._configuration = context.Services.GetConfiguration();
-            var mongoUrl = new MongoUrl(_configuration.GetConnectionString("Geex")) { };
-            var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
-            mongoSettings.ApplicationName = _configuration.GetAppName();
-            DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
+
             context.Services.AddHealthChecks();
-            context.Services.AddScoped<DbContext>(x => new DbContext(transactional: true));
             base.ConfigureServices(context);
         }
 

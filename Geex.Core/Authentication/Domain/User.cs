@@ -43,9 +43,8 @@ namespace Geex.Core.Authentication.Domain
         public UserClaim[] Claims { get; set; }
         [InverseSide] public Many<Org> Orgs { get; set; }
 
-        [Obsolete("use " + nameof(User.AssignRoles) + " for role assigning.")]
         [OwnerSide]
-        public Many<Role> Roles { get; set; }
+        public Many<Role> Roles { get; protected set; }
         public List<AppPermission> AuthorizedPermissions { get; set; }
         public User()
         {
@@ -80,28 +79,15 @@ namespace Geex.Core.Authentication.Domain
             return passwordHasher!.VerifyHashedPassword(this, Password, password) == PasswordVerificationResult.Success;
         }
 
-#pragma warning disable 618
-        public async Task AssignRoles(List<string> roles)
+        public async Task AssignRoles(List<Role> roles)
         {
             await this.Roles.RemoveAsync(this.Roles.Select(x => x.Id));
-            await this.SaveAsync();
             foreach (var role in roles)
             {
-                await this.Roles.AddAsync(new Role(role));
+                await this.Roles.AddAsync(role);
             }
-            await this.SaveAsync();
-            var mediator = ServiceLocator.Current.GetService<IMediator>();
-            await mediator.Publish(new UserRoleChangedEvent(this.Id, roles));
-        }
-#pragma warning restore 618
-        public static async Task<User> FindAsync(string userIdentifier, CancellationToken cancellationToken)
-        {
-            if (ObjectId.TryParse(userIdentifier, out var objectId))
-            {
-                return await ServiceLocator.Current.GetInstance<DbContext>().Find<User>().OneAsync(userIdentifier, cancellationToken);
-            }
-
-            return await ServiceLocator.Current.GetInstance<DbContext>().Find<User>().Match(x => x.UserName == userIdentifier || x.PhoneNumber == userIdentifier || x.Email == userIdentifier).ExecuteSingleAsync(cancellationToken);
+            await this.Roles.SaveAsync();
+            this.AddDomainEvent(new UserRoleChangedEvent(this.Id, roles.Select(x => x.Id).ToList()));
         }
     }
 }

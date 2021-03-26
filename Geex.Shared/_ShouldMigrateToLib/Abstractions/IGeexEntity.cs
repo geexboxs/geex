@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using MediatR;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -13,6 +16,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
     public abstract class GeexEntity : IEntity, ICreatedOn, IModifiedOn
     {
+        public static ConcurrentQueue<INotification> _domainEvents = new ConcurrentQueue<INotification>();
         [BsonId]
         [ObjectId]
         public string Id { get; set; }
@@ -25,5 +29,13 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
         IClientSessionHandle IEntity.Session { get; set; }
+
+        protected void AddDomainEvent(params INotification[] events)
+        {
+            foreach (var @event in events)
+            {
+                _domainEvents.Enqueue(@event);
+            }
+        }
     }
 }

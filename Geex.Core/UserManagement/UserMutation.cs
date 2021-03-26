@@ -4,6 +4,7 @@ using Autofac;
 
 using Geex.Core.Authentication.Domain;
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
+using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots;
 
@@ -25,11 +26,11 @@ namespace Geex.Core.UserManagement
             await user.SaveAsync();
             return true;
         }
-        public async Task<bool> AssignRoles([Parent] Mutation mutation,[ScopedService] DbContext dbContext, AssignRoleInput input)
+        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service] DbContext dbContext, AssignRoleInput input)
         {
             var user = await dbContext.Find<User>().OneAsync(input.UserId.ToString());
-            await user.SaveAsync();
-            await user.AssignRoles(input.Roles);
+            var roles = await dbContext.Find<Role>().ManyAsync(x => input.Roles.Contains(x.Id));
+            await user.AssignRoles(roles);
             return true;
         }
     }

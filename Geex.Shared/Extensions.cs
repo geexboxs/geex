@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Autofac;
@@ -34,28 +35,29 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using MongoDB.Entities;
 
 using Volo.Abp.Autofac;
+using Volo.Abp.Uow;
 
 namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static IHostBuilder ConfigureGeexServer<T>(this IHostBuilder hostBuilder, string connectionStringName = "Geex") where T : GraphQLEntryModule<T>
+        public static IHostBuilder ConfigureGeexServer<T>(this IHostBuilder hostBuilder) where T : GraphQLEntryModule<T>
         {
             var containerBuilder = new ContainerBuilder();
             return hostBuilder.ConfigureServices((_, services) =>
                 {
                     services.AddObjectAccessor(containerBuilder);
-                    services.AddGeexGraphQL<T>(connectionStringName);
+                    services.AddGeexGraphQL<T>();
                 })
                 .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder));
         }
 
-        public static void AddGeexGraphQL<T>(this IServiceCollection services, string connectionStringName = "Geex") where T : GraphQLEntryModule<T>
+        public static void AddGeexGraphQL<T>(this IServiceCollection services) where T : GraphQLEntryModule<T>
         {
-            services.AddStorage(connectionStringName);
-
+            services.AddStorage();
             var schemaBuilder = services.AddGraphQLServer()
                 .AddFiltering()
                 .AddSorting()
@@ -66,6 +68,16 @@ namespace Geex.Shared
                     IncludeTotalCount = true,
                     MaxPageSize = 1000
                 })
+                //.AddHttpRequestInterceptor(((context, executor, builder, token) =>
+                //{
+                //    context.Response.OnCompleted(() => context.RequestServices.GetService<DbContext>().CommitAsync(token));
+                //    return default;
+                //}))
+                .AddHttpRequestInterceptor<UnitOfWorkInterceptor>()
+                //.ConfigureOnRequestExecutorCreatedAsync(((provider, executor, cancellationToken) =>
+                //{
+                //    return new ValueTask(provider.GetService<DbContext>().CommitAsync(cancellationToken));
+                //}))
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
                 .AddSubscriptionType<Subscription>()
@@ -82,7 +94,7 @@ namespace Geex.Shared
                 //.UseExceptions()
                 .AddAuthorization()
                 .AddApolloTracing();
-
+            //schemaBuilder.ConfigureSchemaServices(x=>x.AddApplication<T>());
             services.AddSingleton(schemaBuilder);
 
             services.AddApplication<T>();
@@ -153,12 +165,12 @@ namespace Geex.Shared
 
         public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "Geex")
         {
-            var pack = new ConventionPack();
-            pack.Add(new IgnoreExtraElementsConvention(true));
-            ConventionRegistry.Register("My Solution Conventions", pack, t => true);
-            builder.AddTransient(x => new MongoUrl(x.GetService<IConfiguration>().GetConnectionString(connectionStringName)));
-            builder.AddTransient<IMongoClient>(x => new MongoClient(x.GetService<MongoUrl>()));
-            builder.AddTransient(x => x.GetService<IMongoClient>().GetDatabase(x.GetService<MongoUrl>().DatabaseName));
+            var configuration = builder.GetConfiguration();
+            var mongoUrl = new MongoUrl(configuration.GetConnectionString("Geex")) { };
+            var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
+            mongoSettings.ApplicationName = configuration.GetAppName();
+            DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
+            builder.AddScoped<DbContext>(x => new DbContext(transactional: true));
             return builder;
         }
     }

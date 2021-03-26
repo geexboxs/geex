@@ -4,17 +4,25 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.CommonServiceLocator;
+
+using CommonServiceLocator;
 
 using Geex.Core;
 using Geex.Data;
 using Geex.Shared;
 using Geex.Shared.Types;
 
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+
+using Volo.Abp.Autofac;
 
 namespace Geex.Server
 {
@@ -25,12 +33,23 @@ namespace Geex.Server
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterBuildCallback(x =>
+                        ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(x)));
+            Console.WriteLine(containerBuilder.GetHashCode());
+            return Host.CreateDefaultBuilder(args)
+                .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureGeexServer<AppModule>();
+                    webBuilder.ConfigureServices((_, services) =>
+                    {
+                        services.AddObjectAccessor(containerBuilder);
+                        services.AddGeexGraphQL<AppModule>();
+                    });
+                    webBuilder.Configure((webHostBuilderContext, app) => { app.InitializeApplication(); });
+                });
+        }
     }
 }

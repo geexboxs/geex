@@ -28,6 +28,7 @@
     <PackageReference Include="HotChocolate.Types.Sorting" Version="11.0.9" />
     <PackageReference Include="Humanizer.Core" Version="2.8.26" />
     <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Volo.Abp.AspNetCore" Version="3.3.2" />

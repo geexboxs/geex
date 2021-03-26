@@ -46,10 +46,10 @@ namespace Geex.Core.Authentication.Domain
         [OwnerSide]
         public Many<Role> Roles { get; protected set; }
         public List<AppPermission> AuthorizedPermissions { get; set; }
-        public User()
+        protected User()
         {
-            this.InitManyToMany(() => Roles, role => role.Users);
-            this.InitManyToMany(() => Orgs, org => org.Users);
+            this.InitManyToMany(x => x.Roles, role => role.Users);
+            this.InitManyToMany(x => x.Orgs, org => org.Users);
         }
         public User(string phoneOrEmail, string password, string? username = null)
         : this()

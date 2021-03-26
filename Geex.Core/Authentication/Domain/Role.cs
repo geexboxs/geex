@@ -24,12 +24,13 @@ namespace Geex.Core.Users
         public Many<User> Users { get; set; }
         //public List<AppPermission> AuthorizedPermissions { get; set; }
 
-        public Role(string name)
+        protected Role()
+        {
+            this.InitManyToMany(x => x.Users, user => user.Roles);
+        }
+        public Role(string name):this()
         {
             this.Name = name;
-#pragma warning disable 618
-            this.InitManyToMany(() => Users, user => user.Roles);
-#pragma warning restore 618
         }
 
         public override bool Equals(object obj)

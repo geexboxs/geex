@@ -52,6 +52,7 @@ namespace Geex.Core
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             //this.Configure<AbpAuditingOptions>((Action<AbpAuditingOptions>)(options => options.Contributors.Add((AuditLogContributor)new AspNetCoreAuditLogContributor())));
+            context.Services.AddMediatR(typeof(AppModule));
             context.Services.AddSingleton<IMediator>(x => new Mediator(x.GetService));
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();

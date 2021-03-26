@@ -14,7 +14,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Auth
 
         public Org()
         {
-            this.InitManyToMany(() => Users, user => user.Orgs);
+            this.InitManyToMany(x => x.Users, user => user.Orgs);
         }
     }
 }

@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.Utils;
 using Humanizer;
+using ImpromptuInterface;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -53,6 +54,7 @@ namespace Geex.Core.Authentication
             var services = context.Services;
             var configuration = services.GetConfiguration();
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+            services.AddTransient<IUserCreationValidator>(x=> new {}.ActLike());
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

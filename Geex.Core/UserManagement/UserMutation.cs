@@ -19,10 +19,10 @@ namespace Geex.Core.UserManagement
     public class UserMutation : Mutation
     {
         public async Task<bool> Register([Parent] Mutation mutation,
-            [Service] IComponentContext componentContext,
+            [Service] IUserCreationValidator userCreationValidator,
             RegisterUserInput input)
         {
-            var user = new User(input.PhoneOrEmail, input.Password, input.UserName);
+            var user = new User(userCreationValidator, input.PhoneOrEmail, input.Password, input.UserName);
             await user.SaveAsync();
             return true;
         }

@@ -51,7 +51,7 @@ namespace Geex.Core.Authentication.Domain
             this.InitManyToMany(x => x.Roles, role => role.Users);
             this.InitManyToMany(x => x.Orgs, org => org.Users);
         }
-        public User(string phoneOrEmail, string password, string? username = null)
+        public User(IUserCreationValidator userCreationValidator, string phoneOrEmail, string password, string? username = null)
         : this()
         {
             if (phoneOrEmail.IsValidEmail())
@@ -62,16 +62,12 @@ namespace Geex.Core.Authentication.Domain
                 throw new Exception("invalid input for phoneOrEmail");
             var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             UserName = username ?? phoneOrEmail;
-            CheckDuplicateUser();
+            userCreationValidator.Check(this);
             Password = passwordHasher.HashPassword(this, password);
         }
 
 
-        private void CheckDuplicateUser()
-        {
-            if (ServiceLocator.Current.GetService<DbContext>()!.CountAsync<User>(o => o.UserName == UserName || o.Email == Email || o.PhoneNumber == PhoneNumber).Result > 0)
-                throw new UserFriendlyException("UserAlreadyExists");
-        }
+
 
         public bool CheckPassword(string password)
         {
@@ -88,6 +84,16 @@ namespace Geex.Core.Authentication.Domain
             }
             await this.Roles.SaveAsync();
             this.AddDomainEvent(new UserRoleChangedEvent(this.Id, roles.Select(x => x.Id).ToList()));
+        }
+    }
+
+    public interface IUserCreationValidator
+    {
+        public DbContext DbContext { get; }
+        public void Check(User user)
+        {
+            if (DbContext.CountAsync<User>(o => o.UserName == user.UserName || o.Email == user.Email || o.PhoneNumber == user.PhoneNumber).Result > 0)
+                throw new UserFriendlyException("UserAlreadyExists");
         }
     }
 }

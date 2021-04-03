@@ -1,0 +1,12 @@
+schema: ./src/app/shared/graphql/geex.graphql
+# documents: ./src/app/shared/graphql/geex.graphql # <-- here
+generates:
+  ./src/app/shared/graphql/types.d.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-apollo-angular
+# config:
+#   querySuffix: 'QueryGql'
+#   mutationSuffix: 'MutationGql'
+#   subscriptionSuffix: 'SubscriptionGql'

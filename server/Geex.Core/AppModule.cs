@@ -9,6 +9,7 @@ using Volo.Abp.Modularity;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core.Authentication;
 using Geex.Core.Authorization;
+using Geex.Core.Captcha;
 using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;
@@ -41,6 +42,7 @@ namespace Geex.Core
         typeof(AbpExceptionHandlingModule),
         typeof(AuthenticationModule),
         typeof(AuthorizationModule),
+        typeof(CaptchaModule),
         typeof(UserManagementModule)
         )]
     public class AppModule : GraphQLEntryModule<AppModule>

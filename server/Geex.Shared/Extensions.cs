@@ -39,6 +39,7 @@ using MongoDB.Entities;
 
 using Volo.Abp.Autofac;
 using Volo.Abp.Uow;
+using IConvention = HotChocolate.Types.Descriptors.IConvention;
 
 namespace Geex.Shared
 {
@@ -59,6 +60,7 @@ namespace Geex.Shared
         {
             services.AddStorage();
             var schemaBuilder = services.AddGraphQLServer()
+                .AddConvention<ITypeInspector>(typeof(GeexTypeConvention))
                 .AddFiltering()
                 .AddSorting()
                 .AddProjections()
@@ -124,7 +126,6 @@ namespace Geex.Shared
                                                               (AbpTypeExtensions.IsAssignableTo<Query>(x) ||
                                                                AbpTypeExtensions.IsAssignableTo<Mutation>(x) ||
                                                                AbpTypeExtensions.IsAssignableTo<Subscription>(x))).ToArray();
-                var hehe = rootTypes.Select(x => x.Name).ToList();
                 schemaBuilder.AddTypes(rootTypes);
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
                 schemaBuilder.AddTypes(objectTypes);

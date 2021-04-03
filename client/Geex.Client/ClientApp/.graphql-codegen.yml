@@ -1,12 +1,13 @@
 overwrite: true
 schema: 'http://localhost:8000/graphql'
-# documents: "./src/app/shared/graphql/operations/**/*.graphql"
+documents: './src/app/shared/graphql/documents/**/*.graphql'
 generates:
   ./src/app/shared/graphql/types.d.ts:
     plugins:
       - 'typescript'
       - 'typescript-operations'
       - 'typescript-apollo-angular'
+      - 'typed-document-node'
 config:
   querySuffix: 'QueryGql'
   mutationSuffix: 'MutationGql'

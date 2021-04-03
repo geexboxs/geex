@@ -1,17 +1,19 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Injector, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { _HttpClient } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { AppComponentBase } from '../../../shared/app-component.base';
 
 @Component({
   selector: 'passport-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.less'],
 })
-export class UserRegisterComponent implements OnDestroy {
-  constructor(fb: FormBuilder, private router: Router, public http: _HttpClient, public msg: NzMessageService) {
+export class UserRegisterComponent extends AppComponentBase implements OnDestroy {
+  constructor(injector: Injector, fb: FormBuilder, private router: Router, public http: _HttpClient, public msg: NzMessageService) {
+    super(injector);
     this.form = fb.group({
       mail: [null, [Validators.required, Validators.email]],
       password: [null, [Validators.required, Validators.minLength(6), UserRegisterComponent.checkPassword.bind(this)]],
@@ -94,6 +96,7 @@ export class UserRegisterComponent implements OnDestroy {
       return;
     }
     this.count = 59;
+    this.apollo.mutate();
     this.interval$ = setInterval(() => {
       this.count -= 1;
       if (this.count <= 0) {

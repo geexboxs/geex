@@ -15,7 +15,6 @@ import { UserLockComponent } from './passport/lock/lock.component';
 import { UserLoginComponent } from './passport/login/login.component';
 import { UserRegisterResultComponent } from './passport/register-result/register-result.component';
 import { UserRegisterComponent } from './passport/register/register.component';
-import { TestComponent } from '../shared/test/test.component';
 
 const routes: Routes = [
   {
@@ -41,7 +40,7 @@ const routes: Routes = [
     path: 'passport',
     component: LayoutPassportComponent,
     children: [
-      { path: 'login', component: TestComponent, data: { title: '登录', titleI18n: 'pro-login' } },
+      { path: 'login', component: UserLoginComponent, data: { title: '登录', titleI18n: 'pro-login' } },
       { path: 'register', component: UserRegisterComponent, data: { title: '注册', titleI18n: 'pro-register' } },
       { path: 'register-result', component: UserRegisterResultComponent, data: { title: '注册结果', titleI18n: 'pro-register-result' } },
       { path: 'lock', component: UserLockComponent, data: { title: '锁屏', titleI18n: 'lock' } },

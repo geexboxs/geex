@@ -3,3 +3,4 @@
         - RequestService
     - 如何把session做到db级别?或者赋值到entity上?
 - 实现 gql named query
+- [x] 后端class枚举

@@ -4,9 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 {
+    public sealed class Enumeration : Enumeration<Enumeration, string>
+    {
+        public Enumeration([NotNull] string name, string value) : base(name, value)
+        {
+        }
+
+        public Enumeration(string value) : base(value)
+        {
+        }
+    }
     /// <summary>
     /// A base type to use for creating smart enums.
     /// </summary>
@@ -14,6 +25,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
     /// <typeparam name="TValue">The type of the inner value.</typeparam>
     /// <remarks></remarks>
     public abstract class Enumeration<TEnum, TValue> :
+        IEnumeration,
         IEquatable<Enumeration<TEnum, TValue>>,
         IComparable<Enumeration<TEnum, TValue>>
         where TEnum : Enumeration<TEnum, TValue>
@@ -40,8 +52,8 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
 
         private static IEnumerable<TEnum> GetAllOptions()
         {
-            Type baseType = typeof(TEnum);
-            IEnumerable<Type> enumTypes = Assembly.GetAssembly(baseType).GetTypes().Where(t => baseType.IsAssignableFrom(t));
+            Type baseType = typeof(TEnum).BaseType;
+            IEnumerable<Type> enumTypes = Assembly.GetAssembly(typeof(TEnum)).GetTypes().Where(t => baseType.IsAssignableFrom(t));
 
             List<TEnum> options = new List<TEnum>();
             foreach (Type enumType in enumTypes)
@@ -58,7 +70,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
         /// </summary>
         /// <value>A <see cref="IReadOnlyCollection{TEnum}"/> containing all the instances of <see cref="Enumeration{TEnum}"/>.</value>
         /// <remarks>Retrieves all the instances of <see cref="Enumeration{TEnum}"/> referenced by public static read-only fields in the current class or its bases.</remarks>
-        public static IReadOnlyCollection<TEnum> List =>
+        public static IEnumerable<TEnum> List =>
             _fromName.Value.Values
                 .ToList()
                 .AsReadOnly();
@@ -335,6 +347,10 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Enumeration<TEnum, TValue>(TValue value) =>
             FromValue(value);
+    }
+
+    public interface IEnumeration
+    {
     }
 
     public static class EnumerationExtensions

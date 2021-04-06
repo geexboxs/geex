@@ -4,6 +4,6 @@ namespace Geex.Core.Captcha.GqlSchemas.Inputs
 {
     public record SendCaptchaInput
     {
-        public CaptchaType CaptchaType { get; set; }
+        public CaptchaProvider CaptchaProvider { get; set; }
     }
 }

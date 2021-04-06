@@ -5,25 +5,65 @@ using System.Text;
 using System.Threading.Tasks;
 using Geex.Core.Captcha.Domain;
 using Geex.Core.Captcha.GqlSchemas.Inputs;
+using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots;
 
 using HotChocolate;
 using HotChocolate.Types;
+
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Geex.Core.Captcha
 {
     [ExtendObjectType(nameof(Mutation))]
     public class UserMutation : Mutation
     {
-        public async Task<string> SendCaptcha([Parent] Mutation mutation,
+        public async Task<Shared._ShouldMigrateToLib.Captcha> GenerateCaptcha([Parent] Mutation mutation,
+            [Service] IGeexRedisClient cache,
             SendCaptchaInput input)
         {
-            string captcha = String.Empty;
-            if (input.CaptchaType == CaptchaType.Sms)
+            cache = cache.SwitchNamespace(RedisNamespace.Captcha);
+            if (input.CaptchaProvider == CaptchaProvider.Sms)
             {
-                captcha = DateTimeOffset.Now.Ticks.ToString();
+                throw new Exception("todo");
             }
-            return captcha;
+
+            if (input.CaptchaProvider == CaptchaProvider.Image)
+            {
+                var captcha = new ImageCaptcha();
+                await cache.SetAsync(captcha.Key, captcha);
+                return captcha;
+            }
+            throw new ArgumentOutOfRangeException("input.CaptchaProvider");
         }
+
+        public async Task ValidateCaptcha([Parent] Mutation mutation,
+            [Service] IGeexRedisClient cache,
+            ValidateCaptchaInput input)
+        {
+            cache = cache.SwitchNamespace(RedisNamespace.Captcha);
+            if (input.CaptchaProvider == CaptchaProvider.Sms)
+            {
+                throw new Exception("todo");
+            }
+
+            if (input.CaptchaProvider == CaptchaProvider.Image)
+            {
+                var captcha = await cache.GetAsync<ImageCaptcha>(input.CaptchaKey);
+                if (captcha.Code != input.CaptchaCode)
+                {
+                    throw new UserFriendlyException("invalid_captcha");
+                }
+            }
+            throw new ArgumentOutOfRangeException("input.CaptchaProvider");
+        }
+    }
+
+    public class ValidateCaptchaInput
+    {
+        public string CaptchaKey { get; set; }
+        public CaptchaProvider CaptchaProvider { get; set; }
+        public string CaptchaCode { get; set; }
     }
 }

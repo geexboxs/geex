@@ -301,7 +301,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             return _value.Equals(other._value);
         }
 
-        public static bool operator ==(Enumeration<TEnum, TValue> left, Enumeration<TEnum, TValue> right)
+        public static bool operator ==(Enumeration<TEnum, TValue> left, Enumeration<TEnum, TValue>? right)
         {
             // Handle null on left side
             if (left is null)

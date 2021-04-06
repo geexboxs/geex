@@ -53,14 +53,16 @@ namespace Geex.Core
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            this._env = context.Services.GetSingletonInstance<IWebHostEnvironment>();
+            this._configuration = context.Services.GetConfiguration();
             //this.Configure<AbpAuditingOptions>((Action<AbpAuditingOptions>)(options => options.Contributors.Add((AuditLogContributor)new AspNetCoreAuditLogContributor())));
+            context.Services.AddDistributedRedisCache(x=>x.Configuration = _configuration.GetConnectionString("GeexRedis"));
             context.Services.AddMediatR(typeof(AppModule));
             context.Services.AddSingleton<IMediator>(x => new Mediator(x.GetService));
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();
             //context.Services.Replace(ServiceDescriptor.Transient<IOptionsFactory<RequestLocalizationOptions>, AbpRequestLocalizationOptionsFactory>());
-            this._env = context.Services.GetSingletonInstance<IWebHostEnvironment>();
-            this._configuration = context.Services.GetConfiguration();
+            
 
             context.Services.AddHealthChecks();
             context.Services.AddCors(options =>

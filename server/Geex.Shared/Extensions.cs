@@ -163,10 +163,10 @@ namespace Geex.Shared
                 .ToList();
         }
 
-        public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "Geex")
+        public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "GeexMongo")
         {
             var configuration = builder.GetConfiguration();
-            var mongoUrl = new MongoUrl(configuration.GetConnectionString("Geex")) { };
+            var mongoUrl = new MongoUrl(configuration.GetConnectionString("GeexMongo")) { };
             var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
             mongoSettings.ApplicationName = configuration.GetAppName();
             DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();

@@ -21,7 +21,7 @@ namespace Geex.Core.Notification
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             var services = context.Services;
-            services.AddSingleton<INotificationSender, NotificationSender>();
+            services.AddSingleton<ISiteMessageNotificationSender, SiteMessageNotificationSender>();
             base.PreConfigureServices(context);
         }
     }

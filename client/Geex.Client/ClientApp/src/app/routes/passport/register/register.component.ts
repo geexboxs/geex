@@ -5,14 +5,21 @@ import { _HttpClient } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppComponentBase } from '../../../shared/app-component.base';
-
+import { CaptchaProvider, GenerateCaptchaGqlMutation } from '../../../shared/graphql/.generated';
 @Component({
   selector: 'passport-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.less'],
 })
 export class UserRegisterComponent extends AppComponentBase implements OnDestroy {
-  constructor(injector: Injector, fb: FormBuilder, private router: Router, public http: _HttpClient, public msg: NzMessageService) {
+  constructor(
+    injector: Injector,
+    fb: FormBuilder,
+    private router: Router,
+    public http: _HttpClient,
+    public msg: NzMessageService,
+    private generateCaptchaGqlMutation: GenerateCaptchaGqlMutation,
+  ) {
     super(injector);
     this.form = fb.group({
       mail: [null, [Validators.required, Validators.email]],
@@ -89,14 +96,16 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
     return null;
   }
 
-  getCaptcha(): void {
+  async getCaptcha(): Promise<void> {
     if (this.mobile.invalid) {
       this.mobile.markAsDirty({ onlySelf: true });
       this.mobile.updateValueAndValidity({ onlySelf: true });
       return;
     }
     this.count = 59;
-    this.apollo.mutate();
+    await this.generateCaptchaGqlMutation
+      .mutate({ captchaProvider: CaptchaProvider.Sms, smsCaptchaPhoneNumber: this.mobile.value })
+      .toPromise();
     this.interval$ = setInterval(() => {
       this.count -= 1;
       if (this.count <= 0) {

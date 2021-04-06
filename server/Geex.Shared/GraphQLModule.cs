@@ -12,6 +12,8 @@ using Geex.Shared._ShouldMigrateToLib;
 using HotChocolate;
 using HotChocolate.Execution.Configuration;
 
+using MediatR;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

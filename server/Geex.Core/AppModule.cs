@@ -10,6 +10,7 @@ using Autofac.Extensions.DependencyInjection;
 using Geex.Core.Authentication;
 using Geex.Core.Authorization;
 using Geex.Core.Captcha;
+using Geex.Core.Notification;
 using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;
@@ -41,6 +42,7 @@ namespace Geex.Core
         //typeof(AbpValidationModule),
         typeof(AbpExceptionHandlingModule),
         typeof(AuthenticationModule),
+        typeof(NotificationModule),
         typeof(AuthorizationModule),
         typeof(CaptchaModule),
         typeof(UserManagementModule)
@@ -58,7 +60,6 @@ namespace Geex.Core
             //this.Configure<AbpAuditingOptions>((Action<AbpAuditingOptions>)(options => options.Contributors.Add((AuditLogContributor)new AspNetCoreAuditLogContributor())));
             context.Services.AddDistributedRedisCache(x=>x.Configuration = _configuration.GetConnectionString("GeexRedis"));
             context.Services.AddMediatR(typeof(AppModule));
-            context.Services.AddSingleton<IMediator>(x => new Mediator(x.GetService));
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();
             //context.Services.Replace(ServiceDescriptor.Transient<IOptionsFactory<RequestLocalizationOptions>, AbpRequestLocalizationOptionsFactory>());

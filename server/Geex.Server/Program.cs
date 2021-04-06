@@ -17,6 +17,7 @@ using Geex.Shared.Types;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,6 +42,13 @@ namespace Geex.Server
             Console.WriteLine(containerBuilder.GetHashCode());
             return Host.CreateDefaultBuilder(args)
                 .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder))
+                .ConfigureLogging((ctx, builder) =>
+                {
+                    if (ctx.Configuration.GetValue<bool>("Logging:RollingFile:Enabled"))
+                    {
+                        builder.AddRollingFile();
+                    }
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.ConfigureServices((_, services) =>

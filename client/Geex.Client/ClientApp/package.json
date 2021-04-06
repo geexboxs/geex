@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "gqlgen": "graphql-codegen --config .graphql-codegen.yml",
     "start": "ng s -o",
     "build": "npm run ng-high-memory build -- --prod",
     "test": "ng test",
@@ -20,9 +21,7 @@
     "lint:style": "stylelint \"src/**/*.less\" --syntax less --fix",
     "pretty-quick": "pretty-quick",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",
-    "graphql-codegen": "graphql-codegen --config .graphql-codegen.yml",
-    "pull-schema": "graphql-codegen download-schema http://localhost:8000/graphql --output ./src/app/shared/graphql/geex.graphql",
-    "prestart": "yarn graphql-codegen"
+    "prestart": "yarn gqlgen"
   },
   "private": true,
   "dependencies": {

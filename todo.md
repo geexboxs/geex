@@ -1,6 +1,7 @@
-- 实现uow
+- [x] 实现uow
     - session是否可以放在httpcontext.feature中?feature/items/requestServices哪一个更好?
         - RequestService
-    - 如何把session做到db级别?或者赋值到entity上?
-- 实现 gql named query
+    - [x] 如何把session做到db级别?或者赋值到entity上?
+        - per dbcontext, geexentity通用包含session
+- [x] 实现 gql named query
 - [x] 后端class枚举

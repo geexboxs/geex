@@ -1,0 +1,6 @@
+mutation generateCaptcha($captchaProvider: CaptchaProvider!, $smsCaptchaPhoneNumber: ChinesePhoneNumberType) {
+  generateCaptcha(input: { captchaProvider: $captchaProvider, smsCaptchaPhoneNumber: $smsCaptchaPhoneNumber }) {
+    bitmap
+    key
+  }
+}

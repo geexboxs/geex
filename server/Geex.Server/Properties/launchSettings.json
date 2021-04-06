@@ -15,6 +15,18 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "Watch": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "watch run",
+      "workingDirectory": "$(ProjectDir)",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:44300;http://localhost:8000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true
+    },
     "Geex.Server": {
       "commandName": "Project",
       "launchBrowser": false,

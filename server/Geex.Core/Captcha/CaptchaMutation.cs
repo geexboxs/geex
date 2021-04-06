@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Geex.Core.Captcha.Commands;
 using Geex.Core.Captcha.Domain;
 using Geex.Core.Captcha.GqlSchemas.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots;
-
+using Geex.Shared.Types.Scalars;
 using HotChocolate;
 using HotChocolate.Types;
+
+using MediatR;
 
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -21,12 +24,16 @@ namespace Geex.Core.Captcha
     {
         public async Task<Shared._ShouldMigrateToLib.Captcha> GenerateCaptcha([Parent] Mutation mutation,
             [Service] IGeexRedisClient cache,
+            [Service] IMediator mediator,
             SendCaptchaInput input)
         {
             cache = cache.SwitchNamespace(RedisNamespace.Captcha);
             if (input.CaptchaProvider == CaptchaProvider.Sms)
             {
-                throw new Exception("todo");
+                var captcha = new SmsCaptcha();
+                await cache.SetAsync(captcha.Key, captcha);
+                await mediator.Send(new SendSmsCaptchaRequest(input.SmsCaptchaPhoneNumber, captcha));
+                return captcha;
             }
 
             if (input.CaptchaProvider == CaptchaProvider.Image)

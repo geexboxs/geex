@@ -1,4 +1,7 @@
 import { gql } from 'apollo-angular';
+import { Injectable } from '@angular/core';
+import * as Apollo from 'apollo-angular';
+import { GraphQLModule } from 'src/app/shared/graphql/graphql.module';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -10,11 +13,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  AppPermission: any;
-  AuthorizeTargetType: any;
-  LoginProvider: any;
+  /** ^\[1\]\(\[3-9\]\)[0-9]{9}$ */
+  ChinesePhoneNumberType: any;
   ObjectId: any;
 };
+
+export enum AppPermission {
+  AssignRole = 'ASSIGN_ROLE',
+}
 
 export enum ApplyPolicy {
   BeforeResolver = 'BEFORE_RESOLVER',
@@ -32,10 +38,34 @@ export type AuthenticateInput = {
 };
 
 export type AuthorizeInput = {
-  authorizeTargetType: Scalars['AuthorizeTargetType'];
-  allowedPermissions: Array<Scalars['AppPermission']>;
+  authorizeTargetType: AuthorizeTargetType;
+  allowedPermissions: Array<AppPermission>;
   targetId: Scalars['ObjectId'];
 };
+
+export enum AuthorizeTargetType {
+  Role = 'ROLE',
+  User = 'USER',
+}
+
+export type Captcha = {
+  __typename?: 'Captcha';
+  captchaType: CaptchaType;
+  key: Scalars['String'];
+  bitmap?: Maybe<Scalars['String']>;
+};
+
+export enum CaptchaProvider {
+  Image = 'IMAGE',
+  Sms = 'SMS',
+}
+
+export enum CaptchaType {
+  Number = 'NUMBER',
+  English = 'ENGLISH',
+  NumberAndLetter = 'NUMBER_AND_LETTER',
+  Chinese = 'CHINESE',
+}
 
 export type ClaimsIdentity = {
   __typename?: 'ClaimsIdentity';
@@ -54,12 +84,17 @@ export type IdentityUserTokenOfString = {
   value?: Maybe<Scalars['String']>;
 };
 
+export enum LoginProvider {
+  Local = 'LOCAL',
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   placeHolder: Scalars['String'];
   createRole: Scalars['Boolean'];
   register: Scalars['Boolean'];
   assignRoles: Scalars['Boolean'];
+  generateCaptcha: Captcha;
   authorize: Scalars['Boolean'];
   authenticate: IdentityUserTokenOfString;
 };
@@ -74,6 +109,10 @@ export type MutationRegisterArgs = {
 
 export type MutationAssignRolesArgs = {
   input: AssignRoleInput;
+};
+
+export type MutationGenerateCaptchaArgs = {
+  input: SendCaptchaInput;
 };
 
 export type MutationAuthorizeArgs = {
@@ -108,6 +147,11 @@ export type Role = {
   name: Scalars['String'];
 };
 
+export type SendCaptchaInput = {
+  captchaProvider: CaptchaProvider;
+  smsCaptchaPhoneNumber?: Maybe<Scalars['ChinesePhoneNumberType']>;
+};
+
 export type Subscription = {
   __typename?: 'Subscription';
   placeHolder: Scalars['String'];
@@ -118,3 +162,32 @@ export type User = {
   id: Scalars['String'];
   roles?: Maybe<Array<Maybe<Role>>>;
 };
+
+export type GenerateCaptchaMutationVariables = Exact<{
+  captchaProvider: CaptchaProvider;
+  smsCaptchaPhoneNumber?: Maybe<Scalars['ChinesePhoneNumberType']>;
+}>;
+
+export type GenerateCaptchaMutation = { __typename?: 'Mutation' } & {
+  generateCaptcha: { __typename?: 'Captcha' } & Pick<Captcha, 'bitmap' | 'key'>;
+};
+
+export const GenerateCaptchaDocument = gql`
+  mutation generateCaptcha($captchaProvider: CaptchaProvider!, $smsCaptchaPhoneNumber: ChinesePhoneNumberType) {
+    generateCaptcha(input: { captchaProvider: $captchaProvider, smsCaptchaPhoneNumber: $smsCaptchaPhoneNumber }) {
+      bitmap
+      key
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: GraphQLModule,
+})
+export class GenerateCaptchaGqlMutation extends Apollo.Mutation<GenerateCaptchaMutation, GenerateCaptchaMutationVariables> {
+  document = GenerateCaptchaDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}

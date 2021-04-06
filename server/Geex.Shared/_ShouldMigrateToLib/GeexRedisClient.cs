@@ -38,6 +38,8 @@ namespace Geex.Shared._ShouldMigrateToLib
             get => _redisClient;
             set => _redisClient = value;
         }
+
+        public DistributedCacheEntryOptions DefaultSetOptions { get; set; }
     }
 
     public interface IGeexRedisClient : IDisposable
@@ -54,8 +56,29 @@ namespace Geex.Shared._ShouldMigrateToLib
         {
             var redisClient = RedisClient;
             this.Dispose();
-            return Activator.CreateInstance(this.GetType(), args: new object?[] { redisNamespace, redisClient }) as IGeexRedisClient ?? throw new InvalidOperationException("IGeexRedisClient should have constructor like 'public GeexRedisClient(RedisNamespace @namespace, IDistributedCache redisClient)'");
+            var newInstance = Activator.CreateInstance(this.GetType(), args: new object?[] { redisNamespace, redisClient }) as IGeexRedisClient ?? throw new InvalidOperationException("IGeexRedisClient should have constructor like 'public GeexRedisClient(RedisNamespace @namespace, IDistributedCache redisClient)'");
+            this.ApplyDefaultOptions();
+            return newInstance;
         }
+
+        void ApplyDefaultOptions()
+        {
+            if (this.RedisNamespace == RedisNamespace.Captcha)
+            {
+                this.DefaultSetOptions = new DistributedCacheEntryOptions()
+                {
+                    SlidingExpiration = TimeSpan.FromMinutes(10)
+                };
+            }
+            else
+            {
+                this.DefaultSetOptions = new DistributedCacheEntryOptions();
+            }
+        }
+        /// <summary>
+        /// this will be the default option if no DistributedCacheEntryOptions when setting values
+        /// </summary>
+        DistributedCacheEntryOptions DefaultSetOptions { get; set; }
 
         void IDisposable.Dispose()
         {
@@ -98,7 +121,7 @@ namespace Geex.Shared._ShouldMigrateToLib
 
         void Set<T>(string key, T value)
         {
-            RedisClient.SetString(RedisNamespace == default ? key : $"{RedisNamespace}:{key}", value.ToJson());
+            RedisClient.SetString(RedisNamespace == default ? key : $"{RedisNamespace}:{key}", value.ToJson(), DefaultSetOptions);
         }
         void Set<T>(string key, T value, DistributedCacheEntryOptions options)
         {
@@ -118,7 +141,7 @@ namespace Geex.Shared._ShouldMigrateToLib
           T value,
           CancellationToken token = default(CancellationToken))
         {
-            return RedisClient.SetStringAsync(RedisNamespace == default ? key : $"{RedisNamespace}:{key}", value.ToJson(), token);
+            return RedisClient.SetStringAsync(RedisNamespace == default ? key : $"{RedisNamespace}:{key}", value.ToJson(), DefaultSetOptions, token);
         }
     }
 

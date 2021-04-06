@@ -51,7 +51,7 @@ namespace Geex.Core.Authentication.Domain
             this.InitManyToMany(x => x.Roles, role => role.Users);
             this.InitManyToMany(x => x.Orgs, org => org.Users);
         }
-        public User(IUserCreationValidator userCreationValidator, string phoneOrEmail, string password, string? username = null)
+        public User(IUserCreationValidator userCreationValidator, IPasswordHasher<User> passwordHasher, string phoneOrEmail, string password, string? username = null)
         : this()
         {
             if (phoneOrEmail.IsValidEmail())
@@ -60,7 +60,6 @@ namespace Geex.Core.Authentication.Domain
                 PhoneNumber = phoneOrEmail;
             else
                 throw new Exception("invalid input for phoneOrEmail");
-            var passwordHasher = ServiceLocator.Current.GetService<IPasswordHasher<User>>();
             UserName = username ?? phoneOrEmail;
             userCreationValidator.Check(this);
             Password = passwordHasher.HashPassword(this, password);

@@ -5,9 +5,8 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 using Volo.Abp;
 
 namespace Geex.Shared._ShouldMigrateToLib
@@ -83,9 +82,14 @@ namespace Geex.Shared._ShouldMigrateToLib
 
     public abstract class Captcha
     {
-        public string Code { get; private set; }
-        public CaptchaType CaptchaType { get; private set; }
+        public string Code { get; init; }
+        public CaptchaType CaptchaType { get; init; }
 
+        protected Captcha(string code, string key)
+        {
+            Code = code;
+            Key = key;
+        }
         protected Captcha(CaptchaType captchaType = CaptchaType.Number, int captchaLength = 4)
         {
             Key = Guid.NewGuid().ToString();
@@ -107,7 +111,7 @@ namespace Geex.Shared._ShouldMigrateToLib
             }
         }
 
-        public string Key { get; }
+        public string Key { get; init; }
 
 
         protected static string GetRandomNums(int length)

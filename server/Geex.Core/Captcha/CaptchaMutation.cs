@@ -45,14 +45,19 @@ namespace Geex.Core.Captcha
             throw new ArgumentOutOfRangeException("input.CaptchaProvider");
         }
 
-        public async Task ValidateCaptcha([Parent] Mutation mutation,
+        public async Task<bool> ValidateCaptcha([Parent] Mutation mutation,
             [Service] IGeexRedisClient cache,
             ValidateCaptchaInput input)
         {
             cache = cache.SwitchNamespace(RedisNamespace.Captcha);
             if (input.CaptchaProvider == CaptchaProvider.Sms)
             {
-                throw new Exception("todo");
+                var captcha = await cache.GetAsync<SmsCaptcha>(input.CaptchaKey);
+                if (captcha.Code != input.CaptchaCode)
+                {
+                    return false;
+                }
+                return true;
             }
 
             if (input.CaptchaProvider == CaptchaProvider.Image)
@@ -60,8 +65,9 @@ namespace Geex.Core.Captcha
                 var captcha = await cache.GetAsync<ImageCaptcha>(input.CaptchaKey);
                 if (captcha.Code != input.CaptchaCode)
                 {
-                    throw new UserFriendlyException("invalid_captcha");
+                    return false;
                 }
+                return true;
             }
             throw new ArgumentOutOfRangeException("input.CaptchaProvider");
         }

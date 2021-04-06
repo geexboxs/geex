@@ -54,7 +54,7 @@ namespace Geex.Core.Authentication
             var services = context.Services;
             var configuration = services.GetConfiguration();
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
-            services.AddTransient<IUserCreationValidator>(x=> new {}.ActLike());
+            services.AddTransient<IUserCreationValidator, UserCreationValidator>();
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

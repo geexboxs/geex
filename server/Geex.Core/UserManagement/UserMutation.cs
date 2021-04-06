@@ -11,6 +11,8 @@ using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Types;
 
+using Microsoft.AspNetCore.Identity;
+
 using MongoDB.Entities;
 
 namespace Geex.Core.UserManagement
@@ -20,9 +22,10 @@ namespace Geex.Core.UserManagement
     {
         public async Task<bool> Register([Parent] Mutation mutation,
             [Service] IUserCreationValidator userCreationValidator,
+            [Service] IPasswordHasher<User> passwordHasher,
             RegisterUserInput input)
         {
-            var user = new User(userCreationValidator, input.PhoneOrEmail, input.Password, input.UserName);
+            var user = new User(userCreationValidator, passwordHasher, input.PhoneOrEmail, input.Password, input.UserName);
             await user.SaveAsync();
             return true;
         }

@@ -6,9 +6,11 @@ import { AlainThemeModule } from '@delon/theme';
 import { DelonACLModule } from '@delon/acl';
 import { DelonFormModule } from '@delon/form';
 import { GraphQLModule } from './graphql/graphql.module';
+import { DelonAuthModule, SimpleInterceptor } from '@delon/auth';
 
 import { SHARED_DELON_MODULES } from './shared-delon.module';
 import { SHARED_ZORRO_MODULES } from './shared-zorro.module';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // #region third libs
 
@@ -31,12 +33,14 @@ const DIRECTIVES: Type<any>[] = [];
     ReactiveFormsModule,
     AlainThemeModule.forChild(),
     DelonACLModule,
+    DelonAuthModule,
     DelonFormModule,
     ...SHARED_DELON_MODULES,
     ...SHARED_ZORRO_MODULES,
     // third libs
     ...THIRDMODULES,
   ],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: SimpleInterceptor, multi: true }],
   declarations: [
     // your components
     ...COMPONENTS,

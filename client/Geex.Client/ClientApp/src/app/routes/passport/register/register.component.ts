@@ -5,13 +5,19 @@ import { _HttpClient } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppComponentBase } from '../../../shared/app-component.base';
-import { CaptchaProvider, GenerateCaptchaGqlMutation } from '../../../shared/graphql/.generated';
+import {
+  CaptchaProvider,
+  GenerateCaptchaGqlMutation,
+  RegisterAndSignInGqlMutation,
+  ValidateSmsCaptchaGqlMutation,
+} from '../../../shared/graphql/.generated';
 @Component({
   selector: 'passport-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.less'],
 })
 export class UserRegisterComponent extends AppComponentBase implements OnDestroy {
+  captchaKey: string;
   constructor(
     injector: Injector,
     fb: FormBuilder,
@@ -19,6 +25,8 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
     public http: _HttpClient,
     public msg: NzMessageService,
     private generateCaptchaGqlMutation: GenerateCaptchaGqlMutation,
+    private registerAndSignInGqlMutation: RegisterAndSignInGqlMutation,
+    private ValidateSmsCaptchaGqlMutation: ValidateSmsCaptchaGqlMutation,
   ) {
     super(injector);
     this.form = fb.group({
@@ -103,9 +111,10 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
       return;
     }
     this.count = 59;
-    await this.generateCaptchaGqlMutation
+    let res = await this.generateCaptchaGqlMutation
       .mutate({ captchaProvider: CaptchaProvider.Sms, smsCaptchaPhoneNumber: this.mobile.value })
       .toPromise();
+    this.captchaKey = res.data.generateCaptcha.key;
     this.interval$ = setInterval(() => {
       this.count -= 1;
       if (this.count <= 0) {
@@ -116,7 +125,7 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
 
   // #endregion
 
-  submit(): void {
+  async submit(): Promise<void> {
     this.error = '';
     Object.keys(this.form.controls).forEach((key) => {
       this.form.controls[key].markAsDirty();
@@ -127,9 +136,22 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
     }
 
     const data = this.form.value;
-    this.http.post('/register?_allow_anonymous=true', data).subscribe(() => {
-      this.router.navigate(['passport', 'register-result'], { queryParams: { email: data.mail } });
-    });
+    let validateRes = await this.ValidateSmsCaptchaGqlMutation.mutate({
+      captchaKey: this.captchaKey,
+      captchaCode: this.captcha.value,
+    }).toPromise();
+    if (validateRes.data.validateCaptcha) {
+      let res = await this.registerAndSignInGqlMutation
+        .mutate({
+          password: this.password.value,
+          phoneOrEmail: this.mobile.value,
+        })
+        .toPromise();
+
+      if (res.data.register && res.data.authenticate) {
+        this.router.navigate(['passport', 'register-result'], { queryParams: { token: res.data.authenticate.value } });
+      }
+    }
   }
 
   ngOnDestroy(): void {

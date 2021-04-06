@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -7,9 +8,10 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   templateUrl: './register-result.component.html',
 })
 export class UserRegisterResultComponent {
-  params = { email: '' };
-  email = '';
-  constructor(route: ActivatedRoute, public msg: NzMessageService) {
-    this.params.email = this.email = route.snapshot.queryParams.email || 'ng-alain@example.com';
+  constructor(route: ActivatedRoute, public msg: NzMessageService, @Inject(DA_SERVICE_TOKEN) private tokenService: ITokenService) {
+    let token = route.snapshot.queryParams.token;
+    tokenService.set({
+      token,
+    });
   }
 }

@@ -39,7 +39,7 @@ namespace Geex.Shared._ShouldMigrateToLib
             set => _redisClient = value;
         }
 
-        public DistributedCacheEntryOptions DefaultSetOptions { get; set; }
+        public DistributedCacheEntryOptions DefaultSetOptions { get; set; } = new();
     }
 
     public interface IGeexRedisClient : IDisposable

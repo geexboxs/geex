@@ -4,3 +4,14 @@ mutation generateCaptcha($captchaProvider: CaptchaProvider!, $smsCaptchaPhoneNum
     key
   }
 }
+
+mutation validateSmsCaptcha($captchaKey: String!, $captchaCode: String!) {
+  validateCaptcha(input: { captchaKey: $captchaKey, captchaProvider: SMS, captchaCode: $captchaCode })
+}
+
+mutation registerAndSignIn($phoneOrEmail: String!, $password: String!) {
+  register(input: { phoneOrEmail: $phoneOrEmail, password: $password, userName: $phoneOrEmail })
+  authenticate(input: { userIdentifier: $phoneOrEmail, password: $password }) {
+    value
+  }
+}

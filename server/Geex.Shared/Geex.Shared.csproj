@@ -17,7 +17,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Geexbox.Logging.RollingFile" Version="3.1.0.8" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="11.1.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.1.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="10.5.5" />
@@ -35,6 +34,7 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.14" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     <PackageReference Include="Volo.Abp.AspNetCore" Version="3.3.2" />
@@ -43,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\.submodules\geexbox.logging.elasticsearch\Geexbox.Logging.ElasticSearch.csproj" />
     <ProjectReference Include="..\..\.submodules\MongoDB.Entities\MongoDB.Entities\MongoDB.Entities.csproj" />
   </ItemGroup>
 

@@ -22,7 +22,7 @@ namespace Geex.Core.Captcha
     [ExtendObjectType(nameof(Mutation))]
     public class UserMutation : Mutation
     {
-        public async Task<Shared._ShouldMigrateToLib.Captcha> GenerateCaptcha([Parent] Mutation mutation,
+        public async Task<Geex.Shared._ShouldMigrateToLib.Captcha> GenerateCaptcha([Parent] Mutation mutation,
             [Service] IGeexRedisClient cache,
             [Service] IMediator mediator,
             SendCaptchaInput input)

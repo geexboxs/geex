@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.Utils;
+using Geex.Core.UserManagement.Domain;
 using Humanizer;
 using ImpromptuInterface;
 using Microsoft.AspNetCore.Hosting;

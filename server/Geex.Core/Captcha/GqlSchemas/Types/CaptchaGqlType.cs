@@ -11,9 +11,9 @@ using HotChocolate.Types;
 
 namespace Geex.Core.Captcha.GqlSchemas.Types
 {
-    public class CaptchaGqlType : ObjectType<Shared._ShouldMigrateToLib.Captcha>
+    public class CaptchaGqlType : ObjectType<Geex.Shared._ShouldMigrateToLib.Captcha>
     {
-        protected override void Configure(IObjectTypeDescriptor<Shared._ShouldMigrateToLib.Captcha> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Geex.Shared._ShouldMigrateToLib.Captcha> descriptor)
         {
 
             descriptor.BindFieldsExplicitly();

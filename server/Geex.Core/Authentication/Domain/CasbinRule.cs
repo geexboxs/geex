@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Entities;
 using Volo.Abp.Domain.Entities;
+using Entity = MongoDB.Entities.Entity;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {

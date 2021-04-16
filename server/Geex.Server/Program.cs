@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -13,7 +14,10 @@ using CommonServiceLocator;
 using Geex.Core;
 using Geex.Data;
 using Geex.Shared;
+using Geex.Shared._ShouldMigrateToLib.Json;
 using Geex.Shared.Types;
+
+using GeexBox.ElasticSearch.Zero.Logging.Elasticsearch;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,9 +48,9 @@ namespace Geex.Server
                 .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder))
                 .ConfigureLogging((ctx, builder) =>
                 {
-                    if (ctx.Configuration.GetValue<bool>("Logging:RollingFile:Enabled"))
+                    if (ctx.Configuration.GetSection("Logging:Elasticsearch").GetChildren().Any())
                     {
-                        builder.AddRollingFile();
+                        builder.AddElasticsearch();
                     }
                 })
                 .ConfigureWebHostDefaults(webBuilder =>

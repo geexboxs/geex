@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
@@ -63,6 +64,30 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             }
 
             return options.OrderBy(t => t.Name).ToList();
+        }
+
+        public Task SwitchAsync<T>(params (T @case, Func<Task> action)[] cases) where T : TEnum
+        {
+            foreach (var (@case, action) in cases)
+            {
+                if (@case != this)
+                {
+                    continue;
+                }
+
+                return action.Invoke();
+            }
+            return Task.CompletedTask;
+        }
+
+        public void Switch<T>(params (T @case, Action action)[] cases) where T : TEnum
+        {
+            this.SwitchAsync<T>(cases.Select<(T, Action), (T, Func<Task>)>(pair => (pair.Item1, () =>
+                     {
+                         pair.Item2.Invoke();
+                         return Task.CompletedTask;
+                     }
+            )).ToArray()).Wait();
         }
 
         /// <summary>

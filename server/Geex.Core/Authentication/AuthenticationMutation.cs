@@ -41,11 +41,11 @@ namespace Geex.Core.Authentication
             AuthenticateInput input)
         {
             User? user;
-            if (ObjectId.TryParse(input.UserIdentifier, out var objectId))
+            user = await dbContext.Find<User>().MatchUserIdentifier(input.UserIdentifier).ExecuteSingleAsync();
+            if (user == default)
             {
-                user = await dbContext.Find<User>().OneAsync(input.UserIdentifier);
+                throw new GeexUserFriendlyException("user not exists.");
             }
-            user = await dbContext.Find<User>().Match(x => x.UserName == input.UserIdentifier || x.PhoneNumber == input.UserIdentifier || x.Email == input.UserIdentifier).ExecuteSingleAsync();
             return new UserToken(user, LoginProvider.Local, userTokenGenerateOptions);
         }
     }

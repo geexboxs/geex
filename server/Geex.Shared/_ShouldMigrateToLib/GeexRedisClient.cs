@@ -154,7 +154,19 @@ namespace Geex.Shared._ShouldMigrateToLib
         public RedisNamespace(string value) : base(value)
         {
         }
-        public static readonly RedisNamespace Captcha = new RedisNamespace(nameof(Captcha));
+        public static readonly RedisNamespace Captcha = new(nameof(Captcha));
+        public class Settings : Enumeration<RedisNamespace, string>
+        {
+            public static readonly RedisNamespace Self = new(nameof(Settings));
+            public static readonly RedisNamespace System = new(nameof(System));
+            public static readonly RedisNamespace User = new(nameof(User));
 
+            public Settings([NotNull] string name, string value) : base(name, value)
+            {
+            }
+            public Settings(string value) : base(value)
+            {
+            }
+        }
     }
 }

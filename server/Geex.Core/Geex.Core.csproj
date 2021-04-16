@@ -23,7 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Geex.Core.Shared\Geex.Core.Shared.csproj" />
     <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SystemSettings\Commands\" />
+    <Folder Include="SystemSettings\Domain\" />
+    <Folder Include="SystemSettings\GqlSchemas\Inputs\" />
+    <Folder Include="SystemSettings\GqlSchemas\Types\" />
   </ItemGroup>
 
 </Project>

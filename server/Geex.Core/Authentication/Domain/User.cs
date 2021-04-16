@@ -8,6 +8,8 @@ using CommonServiceLocator;
 
 using Geex.Core.Authentication.Domain.Events;
 using Geex.Core.Authorization;
+using Geex.Core.Shared;
+using Geex.Core.UserManagement.Domain;
 using Geex.Core.Users;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
@@ -29,18 +31,13 @@ using MongoDB.Entities;
 
 namespace Geex.Core.Authentication.Domain
 {
-    public class User : GeexEntity
+    public partial class User : GeexEntity
     {
-        /// <summary>
-        ///     Gets or sets the username.
-        /// </summary>
-        public string UserName { get; set; }
-
         public string PhoneNumber { get; set; }
-
+        public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public UserClaim[] Claims { get; set; }
+        public List<UserClaim> Claims { get; set; } = new();
         [InverseSide] public Many<Org> Orgs { get; set; }
 
         [OwnerSide]
@@ -51,7 +48,7 @@ namespace Geex.Core.Authentication.Domain
             this.InitManyToMany(x => x.Roles, role => role.Users);
             this.InitManyToMany(x => x.Orgs, org => org.Users);
         }
-        public User(IUserCreationValidator userCreationValidator, IPasswordHasher<User> passwordHasher, string phoneOrEmail, string password, string? username = null)
+        public User(IUserCreationValidator userCreationValidator, IPasswordHasher<User> passwordHasher, string phoneOrEmail, string password, string username)
         : this()
         {
             if (phoneOrEmail.IsValidEmail())
@@ -60,7 +57,7 @@ namespace Geex.Core.Authentication.Domain
                 PhoneNumber = phoneOrEmail;
             else
                 throw new Exception("invalid input for phoneOrEmail");
-            UserName = username ?? phoneOrEmail;
+            this.UserName = username;
             userCreationValidator.Check(this);
             Password = passwordHasher.HashPassword(this, password);
         }
@@ -86,13 +83,9 @@ namespace Geex.Core.Authentication.Domain
         }
     }
 
-    public interface IUserCreationValidator
+    public partial class User : IUserProfile
     {
-        public DbContext DbContext { get; }
-        public void Check(User user)
-        {
-            if (DbContext.CountAsync<User>(o => o.UserName == user.UserName || o.Email == user.Email || o.PhoneNumber == user.PhoneNumber).Result > 0)
-                throw new UserFriendlyException("UserAlreadyExists");
-        }
+        string IUserProfile.Avatar => this.Claims.FirstOrDefault(x => x.ClaimType == GeexClaimType.Avatar)?.ClaimValue;
+
     }
 }

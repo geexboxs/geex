@@ -11,6 +11,7 @@ using Geex.Core.Authentication;
 using Geex.Core.Authorization;
 using Geex.Core.Captcha;
 using Geex.Core.Notification;
+using Geex.Core.SystemSettings;
 using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;
@@ -45,6 +46,7 @@ namespace Geex.Core
         typeof(NotificationModule),
         typeof(AuthorizationModule),
         typeof(CaptchaModule),
+        typeof(SystemSettingModule),
         typeof(UserManagementModule)
         )]
     public class AppModule : GraphQLEntryModule<AppModule>

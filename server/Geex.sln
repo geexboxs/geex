@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Data", "Geex.Data\Geex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Entities", "..\.submodules\MongoDB.Entities\MongoDB.Entities\MongoDB.Entities.csproj", "{C3514DCE-609E-4F72-BA86-58FE026E829B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geexbox.Logging.ElasticSearch", "..\.submodules\geexbox.logging.elasticsearch\Geexbox.Logging.ElasticSearch.csproj", "{24C6E7E7-CE87-4271-97FD-33059408BF8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geex.Core.Shared", "Geex.Core.Shared\Geex.Core.Shared.csproj", "{F56EC778-E9E7-4459-9D33-6FD69D916909}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{C3514DCE-609E-4F72-BA86-58FE026E829B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3514DCE-609E-4F72-BA86-58FE026E829B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3514DCE-609E-4F72-BA86-58FE026E829B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C6E7E7-CE87-4271-97FD-33059408BF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C6E7E7-CE87-4271-97FD-33059408BF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C6E7E7-CE87-4271-97FD-33059408BF8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C6E7E7-CE87-4271-97FD-33059408BF8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F56EC778-E9E7-4459-9D33-6FD69D916909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F56EC778-E9E7-4459-9D33-6FD69D916909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F56EC778-E9E7-4459-9D33-6FD69D916909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F56EC778-E9E7-4459-9D33-6FD69D916909}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

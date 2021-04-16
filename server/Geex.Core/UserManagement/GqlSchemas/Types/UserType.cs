@@ -1,5 +1,6 @@
 ﻿using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Types;
+using Geex.Core.Shared;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 
 using HotChocolate.Types;
@@ -20,6 +21,15 @@ namespace Geex.Core.UserManagement.GqlSchemas.Types
             //descriptor.Ignore(x => x.Claims);
             //descriptor.Ignore(x => x.AuthorizedPermissions);
             descriptor.Field(x => x.Roles).Type<ListType<RoleType>>().Resolve(x => x.ToString());
+            base.Configure(descriptor);
+        }
+    }
+
+    public class UserProfileType : ObjectType<IUserProfile>
+    {
+        protected override void Configure(IObjectTypeDescriptor<IUserProfile> descriptor)
+        {
+            descriptor.BindFieldsImplicitly();
             base.Configure(descriptor);
         }
     }

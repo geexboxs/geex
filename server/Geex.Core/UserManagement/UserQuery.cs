@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
 using Geex.Core.Authentication.GqlSchemas.Types;
+using Geex.Core.Shared;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
@@ -28,5 +30,11 @@ namespace Geex.Core.UserManagement
             return dbContext.Queryable<User>();
         }
 
+        public async Task<IUserProfile> UserProfile([Parent] Query query,
+            [Service] DbContext dbContext,
+            string userIdentifier)
+        {
+            return await dbContext.Find<User>().MatchUserIdentifier(userIdentifier).ExecuteFirstAsync();
+        }
     }
 }

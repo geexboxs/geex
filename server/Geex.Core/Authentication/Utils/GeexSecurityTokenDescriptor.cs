@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
+
 using Geex.Core.Authentication.Domain;
 using Geex.Shared._ShouldMigrateToLib;
+
 using Microsoft.IdentityModel.Tokens;
 
 namespace Geex.Core.Authentication.Utils
@@ -19,9 +22,9 @@ namespace Geex.Core.Authentication.Utils
             Subject = new ClaimsIdentity(new Claim[]
             {
                 new GeexClaim(GeexClaimType.Sub, user.Id),
-                new GeexClaim(GeexClaimType.UserName, user.UserName),
                 new GeexClaim(GeexClaimType.Provider, provider),
             });
+            Claims = user.Claims.ToDictionary(x => x.ClaimType, x => (object)x.ClaimValue);
         }
     }
 }

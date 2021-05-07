@@ -8,6 +8,6 @@ namespace Geex.Core.Authorization
         {
         }
 
-        public static readonly AppPermission AssignRole = new AppPermission(nameof(AssignRole));
+        public static AppPermission AssignRole { get; } = new AppPermission(nameof(AssignRole));
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using JetBrains.Annotations;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
@@ -26,12 +27,17 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
     /// <typeparam name="TValue">The type of the inner value.</typeparam>
     /// <remarks></remarks>
     public abstract class Enumeration<TEnum, TValue> :
+        ValueObject<Enumeration<TEnum, TValue>>,
         IEnumeration,
         IEquatable<Enumeration<TEnum, TValue>>,
         IComparable<Enumeration<TEnum, TValue>>
         where TEnum : Enumeration<TEnum, TValue>
         where TValue : IEquatable<TValue>, IComparable<TValue>
     {
+        public Enumeration() : base((x) => x.Name, x => x.Value)
+        {
+
+        }
         static readonly Lazy<Dictionary<string, TEnum>> _fromName =
             new Lazy<Dictionary<string, TEnum>>(() => GetAllOptions().ToDictionary(item => item.Name));
 
@@ -59,7 +65,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             List<TEnum> options = new List<TEnum>();
             foreach (Type enumType in enumTypes)
             {
-                List<TEnum> typeEnumOptions = enumType.GetFieldsOfType<TEnum>();
+                List<TEnum> typeEnumOptions = enumType.GetPropertiesOfType<TEnum>();
                 options.AddRange(typeEnumOptions);
             }
 
@@ -374,6 +380,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             FromValue(value);
     }
 
+
     public interface IEnumeration
     {
     }
@@ -388,5 +395,17 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
                 throw new ArgumentNullException("source");
             return source.Select(x => (TResult)x);
         }
+
+
+        public static Type GetClassEnumValueType(this Type type)
+        {
+            return type.GetBaseClasses(false).First(x => x.IsAssignableTo<IEnumeration>()).GenericTypeArguments[1];
+        }
+
+        public static Type GetClassEnumRealType(this Type type)
+        {
+            return type.GetBaseClasses(false).First(x => x.IsAssignableTo<IEnumeration>()).GenericTypeArguments[0];
+        }
+
     }
 }

@@ -10,8 +10,6 @@ using Microsoft.Extensions.Options;
 
 using NetCasbin;
 
-using Volo.Abp.Authorization;
-
 namespace Geex.Core.Authorization.Casbin
 {
     public class CasbinAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider

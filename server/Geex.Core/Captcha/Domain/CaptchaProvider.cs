@@ -1,4 +1,5 @@
 ﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
+
 using JetBrains.Annotations;
 
 namespace Geex.Core.Captcha.Domain
@@ -13,7 +14,7 @@ namespace Geex.Core.Captcha.Domain
         {
         }
 
-        public static readonly CaptchaProvider Sms = new CaptchaProvider(nameof(Sms));
-        public static readonly CaptchaProvider Image = new CaptchaProvider(nameof(Image));
+        public static CaptchaProvider Sms { get; } = new CaptchaProvider(nameof(Sms));
+        public static CaptchaProvider Image { get; } = new CaptchaProvider(nameof(Image));
     }
 }

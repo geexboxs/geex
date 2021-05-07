@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
 using Geex.Core.Authentication.GqlSchemas.Types;
-using Geex.Core.Shared;
+using Geex.Core.UserManagement.Domain;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;

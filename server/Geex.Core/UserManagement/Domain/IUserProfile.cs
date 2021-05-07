@@ -1,8 +1,8 @@
-﻿namespace Geex.Core.Shared
+namespace Geex.Core.UserManagement.Domain
 {
     public interface IUserProfile
     {
+        string Avatar { get; }
         public string UserName { get; }
-        public string Avatar { get; }
     }
 }

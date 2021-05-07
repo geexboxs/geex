@@ -15,11 +15,11 @@ using HotChocolate.Execution.Configuration;
 using MediatR;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-
 using Volo.Abp;
-using Volo.Abp.DependencyInjection;
 using Volo.Abp.Modularity;
+
 
 namespace Geex.Shared
 {
@@ -33,6 +33,7 @@ namespace Geex.Shared
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
+            context.Services.TryAdd(new ServiceDescriptor(typeof(GraphQLModule), this));
             context.Services.GetSingletonInstance<IRequestExecutorBuilder>().AddModuleTypes(this.GetType());
         }
 

@@ -15,9 +15,7 @@ using MongoDB.Entities;
 using NetCasbin;
 
 using Volo.Abp;
-using Volo.Abp.AspNetCore;
 using Volo.Abp.Modularity;
-using Volo.Abp.Uow;
 
 namespace Geex.Core.Authorization
 {

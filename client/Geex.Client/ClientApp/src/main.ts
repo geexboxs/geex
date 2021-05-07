@@ -5,6 +5,7 @@ import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import './shared/array.extension';
 
 preloaderFinished();
 

@@ -8,7 +8,6 @@ using CommonServiceLocator;
 
 using Geex.Core.Authentication.Domain.Events;
 using Geex.Core.Authorization;
-using Geex.Core.Shared;
 using Geex.Core.UserManagement.Domain;
 using Geex.Core.Users;
 using Geex.Shared;

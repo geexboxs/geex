@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using MongoDB.Entities;
 
-using Volo.Abp.Uow;
-
 using RequestDelegate = Microsoft.AspNetCore.Http.RequestDelegate;
 
 namespace Geex.Shared

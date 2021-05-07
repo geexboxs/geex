@@ -4,7 +4,6 @@ using CommonServiceLocator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Volo.Abp;
-using Volo.Abp.AspNetCore;
 using Volo.Abp.Modularity;
 using Autofac.Extensions.DependencyInjection;
 using Geex.Core.Authentication;
@@ -22,26 +21,13 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using MongoDB.Entities;
-using Volo.Abp.Auditing;
-using Volo.Abp.Authorization;
+using StackExchange.Redis.Extensions.Core;
 using Volo.Abp.ExceptionHandling;
-using Volo.Abp.Http;
-using Volo.Abp.Security;
-using Volo.Abp.Uow;
 using Volo.Abp.Validation;
-using Volo.Abp.VirtualFileSystem;
 
 namespace Geex.Core
 {
     [DependsOn(
-        //typeof(AbpAuditingModule),
-        //typeof(AbpSecurityModule),
-        //typeof(AbpVirtualFileSystemModule),
-        typeof(AbpUnitOfWorkModule),
-        typeof(AbpHttpModule),
-        //typeof(AbpAuthorizationModule),
-        //typeof(AbpValidationModule),
-        typeof(AbpExceptionHandlingModule),
         typeof(AuthenticationModule),
         typeof(NotificationModule),
         typeof(AuthorizationModule),
@@ -60,12 +46,12 @@ namespace Geex.Core
             this._env = context.Services.GetSingletonInstance<IWebHostEnvironment>();
             this._configuration = context.Services.GetConfiguration();
             //this.Configure<AbpAuditingOptions>((Action<AbpAuditingOptions>)(options => options.Contributors.Add((AuditLogContributor)new AspNetCoreAuditLogContributor())));
-            context.Services.AddDistributedRedisCache(x=>x.Configuration = _configuration.GetConnectionString("GeexRedis"));
+            context.Services.AddStackExchangeRedisExtensions();
             context.Services.AddMediatR(typeof(AppModule));
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();
             //context.Services.Replace(ServiceDescriptor.Transient<IOptionsFactory<RequestLocalizationOptions>, AbpRequestLocalizationOptionsFactory>());
-            
+
 
             context.Services.AddHealthChecks();
             context.Services.AddCors(options =>
@@ -77,6 +63,8 @@ namespace Geex.Core
             });
             base.ConfigureServices(context);
         }
+
+        
 
         public override void OnApplicationInitialization(
             ApplicationInitializationContext context)

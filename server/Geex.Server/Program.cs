@@ -7,12 +7,7 @@ using System.Threading.Tasks;
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Autofac.Extras.CommonServiceLocator;
-
-using CommonServiceLocator;
-
 using Geex.Core;
-using Geex.Data;
 using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib.Json;
 using Geex.Shared.Types;
@@ -25,9 +20,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
+using Volo.Abp;
 
-using Volo.Abp.Autofac;
 
 namespace Geex.Server
 {
@@ -40,12 +34,8 @@ namespace Geex.Server
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterBuildCallback(x =>
-                        ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocator(x)));
-            Console.WriteLine(containerBuilder.GetHashCode());
             return Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder))
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureLogging((ctx, builder) =>
                 {
                     if (ctx.Configuration.GetSection("Logging:Elasticsearch").GetChildren().Any())
@@ -57,7 +47,6 @@ namespace Geex.Server
                 {
                     webBuilder.ConfigureServices((_, services) =>
                     {
-                        services.AddObjectAccessor(containerBuilder);
                         services.AddGeexGraphQL<AppModule>();
                     });
                     webBuilder.Configure((webHostBuilderContext, app) => { app.InitializeApplication(); });

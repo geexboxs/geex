@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
 
 using CommonServiceLocator;
 
@@ -18,6 +19,8 @@ using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Json;
 using Geex.Shared.Roots;
 using Geex.Shared.Types;
+
+using GeexBox.ElasticSearch.Zero.Logging.Elasticsearch;
 
 using HotChocolate;
 using HotChocolate.AspNetCore;
@@ -36,6 +39,7 @@ using HotChocolate.Utilities;
 using ImpromptuInterface;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -51,10 +55,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Entities;
 
-using NUglify.Helpers;
 using Volo.Abp;
-using Volo.Abp.Autofac;
-using Volo.Abp.Uow;
 
 using IConvention = HotChocolate.Types.Descriptors.IConvention;
 
@@ -62,19 +63,10 @@ namespace Geex.Shared
 {
     public static class Extensions
     {
-        public static IHostBuilder ConfigureGeexServer<T>(this IHostBuilder hostBuilder) where T : GraphQLEntryModule<T>
-        {
-            var containerBuilder = new ContainerBuilder();
-            return hostBuilder.ConfigureServices((_, services) =>
-                {
-                    services.AddObjectAccessor(containerBuilder);
-                    services.AddGeexGraphQL<T>();
-                })
-                .UseServiceProviderFactory(new AbpAutofacServiceProviderFactory(containerBuilder));
-        }
 
         public static void AddGeexGraphQL<T>(this IServiceCollection services) where T : GraphQLEntryModule<T>
         {
+            services.AddTransient<ClaimsPrincipal>(x => x.GetService<IHttpContextAccessor>()?.HttpContext?.User);
             services.AddStorage();
             var schemaBuilder = services.AddGraphQLServer();
             schemaBuilder.AddConvention<ITypeInspector>(typeof(GeexTypeConvention))
@@ -98,7 +90,7 @@ namespace Geex.Shared
             //    return new ValueTask(provider.GetService<DbContext>().CommitAsync(cancellationToken));
             //}))
             .AddGeexTypes()
-            .AddErrorFilter<UserFriendlyErrorFilter>()
+            .AddErrorFilter<UserFriendlyErrorFilter>(_ => new UserFriendlyErrorFilter(services.GetServiceProviderOrNull().GetService<ILoggerProvider>()))
             //.AddErrorFilter(x =>
             //{
             //    if (x.Exception is UserFriendlyException)
@@ -118,6 +110,7 @@ namespace Geex.Shared
             //.UseExceptions()
             .AddAuthorization()
                 .AddApolloTracing();
+
             //schemaBuilder.ConfigureSchemaServices(x=>x.AddApplication<T>());
             services.AddSingleton(schemaBuilder);
             services.AddApplication<T>();
@@ -160,17 +153,10 @@ namespace Geex.Shared
                 schemaBuilder.AddTypes(rootTypes);
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
                 schemaBuilder.AddTypes(objectTypes);
-                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.BaseType.Name.StartsWith("Enumeration")).ToArray();
+                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum()).ToArray();
                 foreach (var classEnumType in classEnumTypes)
                 {
-                    if (classEnumType.GenericTypeArguments.Length == 1)
-                    {
-                        schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType.BaseType.GenericTypeArguments));
-                    }
-                    else
-                    {
-                        schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType.BaseType.GenericTypeArguments));
-                    }
+                    schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));
                 }
             }
             return schemaBuilder;
@@ -186,13 +172,24 @@ namespace Geex.Shared
             return new Regex(@"\d{11}").IsMatch(str);
         }
 
-        public static List<TFieldType> GetFieldsOfType<TFieldType>(this Type type)
+        public static List<TPropertyType> GetPropertiesOfType<TPropertyType>(this Type type)
         {
-            return type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-                .Where(p => type.IsAssignableFrom(p.FieldType))
-                .Select(pi => (TFieldType)pi.GetValue(null))
+            return type.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(p => type.IsAssignableFrom(p.PropertyType))
+                .Select(pi => (TPropertyType)pi.GetValue(null))
                 .ToList();
         }
+
+        public static bool IsClassEnum(this Type type)
+        {
+            if (type.IsValueType)
+            {
+                return false;
+            }
+
+            return AbpTypeExtensions.IsAssignableTo<IEnumeration>(type);
+        }
+
 
         public static IServiceCollection AddStorage(this IServiceCollection builder, string connectionStringName = "GeexMongo")
         {
@@ -219,9 +216,9 @@ namespace Geex.Shared
     public class UserFriendlyErrorFilter : IErrorFilter
     {
 
-        public UserFriendlyErrorFilter()
+        public UserFriendlyErrorFilter(ILoggerProvider? loggerProvider)
         {
-            LoggerProvider = ServiceLocator.Current.GetInstance<ILoggerProvider>();
+            LoggerProvider = loggerProvider;
 
         }
 

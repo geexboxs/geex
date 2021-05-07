@@ -199,6 +199,15 @@ export type RegisterAndSignInMutation = { __typename?: 'Mutation' } & Pick<Mutat
     authenticate: { __typename?: 'IdentityUserTokenOfString' } & Pick<IdentityUserTokenOfString, 'value'>;
   };
 
+export type AuthenticateMutationVariables = Exact<{
+  userIdentifier: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+export type AuthenticateMutation = { __typename?: 'Mutation' } & {
+  authenticate: { __typename?: 'IdentityUserTokenOfString' } & Pick<IdentityUserTokenOfString, 'value'>;
+};
+
 export const GenerateCaptchaDocument = gql`
   mutation generateCaptcha($captchaProvider: CaptchaProvider!, $smsCaptchaPhoneNumber: ChinesePhoneNumberType) {
     generateCaptcha(input: { captchaProvider: $captchaProvider, smsCaptchaPhoneNumber: $smsCaptchaPhoneNumber }) {
@@ -248,6 +257,24 @@ export const RegisterAndSignInDocument = gql`
 })
 export class RegisterAndSignInGqlMutation extends Apollo.Mutation<RegisterAndSignInMutation, RegisterAndSignInMutationVariables> {
   document = RegisterAndSignInDocument;
+
+  constructor(apollo: Apollo.Apollo) {
+    super(apollo);
+  }
+}
+export const AuthenticateDocument = gql`
+  mutation authenticate($userIdentifier: String!, $password: String!) {
+    authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
+      value
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: GraphQLModule,
+})
+export class AuthenticateGqlMutation extends Apollo.Mutation<AuthenticateMutation, AuthenticateMutationVariables> {
+  document = AuthenticateDocument;
 
   constructor(apollo: Apollo.Apollo) {
     super(apollo);

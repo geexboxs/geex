@@ -6,25 +6,31 @@ using System.Threading.Tasks;
 
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
-using JetBrains.Annotations;
-
 using Microsoft.Extensions.Logging;
 
-using Volo.Abp;
 
 namespace Geex.Shared._ShouldMigrateToLib
 {
-    public class GeexBusinessException : BusinessException
+    public class GeexBusinessException : Exception
     {
-        public GeexBusinessException(GeexExceptionType exceptionType, string details = "", Exception? innerException = default) : base(exceptionType.Value, exceptionType.Message, details, innerException, exceptionType.LogLevel)
+        public LogLevel LogLevel { get; }
+        public string LogMessage { get; }
+        public GeexBusinessException(GeexExceptionType exceptionType, Exception? innerException = default, string? message = default) : base(message, innerException)
         {
-
+            ExceptionName = exceptionType.Name;
+            ExceptionCode = exceptionType.Value;
+            LogMessage = message ?? exceptionType.DefaultLogMessage;
+            LogLevel = exceptionType.LogLevel;
         }
+
+        public string ExceptionCode { get; set; }
+
+        public string ExceptionName { get; set; }
     }
 
-    public class GeexUserFriendlyException : UserFriendlyException
+    public class GeexUserFriendlyException : GeexBusinessException
     {
-        public GeexUserFriendlyException(string message, string code = null, string details = null, Exception innerException = null, LogLevel logLevel = LogLevel.Information) : base(message, code, details, innerException, logLevel)
+        public GeexUserFriendlyException(string message, Exception? innerException = default) : base(GeexExceptionType.UserFriendly, innerException, message)
         {
         }
     }
@@ -32,15 +38,18 @@ namespace Geex.Shared._ShouldMigrateToLib
     /// <summary>
     /// inherit this enumeration to customise your own business exceptions
     /// </summary>
-    public abstract class GeexExceptionType : Enumeration<GeexExceptionType, string>
+    public class GeexExceptionType : Enumeration<GeexExceptionType, string>
     {
-        protected GeexExceptionType([NotNull] string name, string value, string message, LogLevel logLevel = LogLevel.Warning) : base(name, value)
+        protected GeexExceptionType(string name, string code, string defaultLogMessage, LogLevel logLevel = LogLevel.Warning) : base(name, code)
         {
-            Message = message;
+            DefaultLogMessage = defaultLogMessage;
             LogLevel = logLevel;
         }
 
-        public string Message { get; }
+        public string DefaultLogMessage { get; }
         public LogLevel LogLevel { get; }
+
+        public static GeexExceptionType UserFriendly { get; } = new(nameof(UserFriendly), nameof(UserFriendly), nameof(UserFriendly), LogLevel.Information);
+        public static GeexExceptionType NotFound { get; } = new(nameof(NotFound), nameof(NotFound), nameof(NotFound), LogLevel.Warning);
     }
 }

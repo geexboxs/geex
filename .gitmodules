@@ -5,3 +5,7 @@
 	path = .submodules/MongoDB.Entities
 	url = https://github.com/geexboxs/MongoDB.Entities.git
 	branch = master
+[submodule ".submodules/geexbox.logging.elasticsearch"]
+	path = .submodules/geexbox.logging.elasticsearch
+	url = https://github.com/geexboxs/geexbox.logging.elasticsearch.git
+	branch = master

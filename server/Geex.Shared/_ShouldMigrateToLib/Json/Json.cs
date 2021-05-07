@@ -1,59 +1,94 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Converters;
+
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
 namespace Geex.Shared._ShouldMigrateToLib.Json
 {
     public static class Json
     {
-        public static JsonSerializerSettings DefaultSerializeSettings { get; set; } = new JsonSerializerSettings()
+        static Json()
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.Auto,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            Converters = new List<JsonConverter>()
-            {
-                new StringEnumConverter()
-            },
-        };
-
-        public static JsonSerializerSettings IgnoreErrorSerializeSettings { get; set; } = new JsonSerializerSettings()
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            Error = (sender, args) =>
-            {
-                args.ErrorContext.Handled = true;
-            },
-            TypeNameHandling = TypeNameHandling.Auto,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            Converters = new List<JsonConverter>()
-            {
-                new StringEnumConverter()
-            },
-        };
+            DefaultSerializeSettings.Converters.Add(new JsonStringEnumConverter());
+            DefaultSerializeSettings.Converters.Add(new EnumerationConverterFactory());
+        }
+        public static JsonSerializerOptions DefaultSerializeSettings { get; set; } = new();
 
         public static string ToJson(this object @this, bool ignoreError = true)
         {
-            if (ignoreError)
+            try
             {
-                return JsonConvert.SerializeObject(@this, IgnoreErrorSerializeSettings);
+                return JsonSerializer.Serialize(@this, DefaultSerializeSettings);
             }
-            else
+            catch (Exception e)
             {
-                return JsonConvert.SerializeObject(@this, DefaultSerializeSettings);
+                if (ignoreError)
+                {
+                    throw;
+                }
+                return e.Message;
             }
         }
 
-        public static T ToObject<T>(this string @this, bool ignoreError = true)
+        public static T? ToObject<T>(this string @this, bool ignoreError = true)
         {
-            if (ignoreError)
+            try
             {
-                return JsonConvert.DeserializeObject<T>(@this, IgnoreErrorSerializeSettings);
+                return JsonSerializer.Deserialize<T>(@this, DefaultSerializeSettings);
             }
-            else
+            catch (Exception e)
             {
-                return JsonConvert.DeserializeObject<T>(@this, DefaultSerializeSettings);
+                if (ignoreError)
+                {
+                    throw;
+                }
+                return default;
             }
+        }
+    }
+
+    public class EnumerationConverterFactory : JsonConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            return typeToConvert.IsAssignableTo<IEnumeration>();
+        }
+
+        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        {
+            Type enumType = typeToConvert.GetClassEnumRealType();
+
+            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
+                typeof(EnumerationConverter<>)
+                    .MakeGenericType(new Type[] { enumType }),
+                BindingFlags.Instance | BindingFlags.Public,
+                binder: null,
+                args: null,
+                culture: null)!;
+
+            return converter;
+        }
+    }
+
+    public class EnumerationConverter<T> : JsonConverter<T> where T : class
+    {
+        private static Type classEnumRealType = typeof(T).GetClassEnumRealType();
+        private static Type classEnumValueType = typeof(T).GetClassEnumValueType();
+        public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var data = reader.GetString();
+            return typeof(Enumeration<,>).MakeGenericType(classEnumRealType, classEnumValueType).GetMethod(nameof(Enumeration.FromValue), types: new[] { classEnumValueType })?.Invoke(null, new[] { data }) as T;
+        }
+
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+        {
+            var data = value.ToString();
+            writer.WriteStringValue(data);
         }
     }
 }

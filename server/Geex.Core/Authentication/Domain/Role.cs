@@ -12,7 +12,6 @@ using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Entities;
-using Volo.Abp.Domain.Entities;
 
 namespace Geex.Core.Users
 {

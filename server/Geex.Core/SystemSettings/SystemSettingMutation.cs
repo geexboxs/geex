@@ -1,42 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using Geex.Core.SystemSettings.Domain;
+using Geex.Shared.Roots;
+
 using HotChocolate;
-using Volo.Abp.Settings;
+using HotChocolate.Types;
 
 namespace Geex.Core.SystemSettings
 {
-    public class SystemSettingMutation
+    [ExtendObjectType(nameof(Mutation))]
+    public class SystemSettingMutation : Mutation
     {
         /// <summary>
         /// 更新设置
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task UpdateSetting(
+        public async Task<bool> UpdateSetting(
             [Service] ISettingManager settingManager,
             UpdateSettingInput input)
         {
             await settingManager.SetAsync(input);
+            return true;
         }
     }
 
-    public interface ISettingManager
-    {
-        public async Task SetAsync(ISettingValue setting)
-        {
-            this.Definitions
-        }
-
-        SettingDefinition Definitions { get; }
-    }
-
-    public class UpdateSettingInput:ISettingValue
+    public class UpdateSettingInput : IUpdateSettingParams
     {
         public string Name { get; set; }
         public string Value { get; set; }
-        public string ProviderKey { get; set; }
-        public SettableSettingProviderEnumeration SettingProvider { get; set; }
+        public string ScopedKey { get; set; }
+        public SettingScopeEnumeration Scope { get; set; }
     }
 }

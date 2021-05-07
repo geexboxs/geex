@@ -1,37 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Text.Json;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 using CommonServiceLocator;
 
-using Geex.Core.SystemSettings.Domain;
+using Geex.Shared._ShouldMigrateToLib;
+using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
-using Volo.Abp.MultiTenancy;
-using Volo.Abp.SettingManagement;
-using Volo.Abp.Users;
+using Microsoft.Extensions.DependencyInjection;
 
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-// ReSharper disable once CheckNamespace
-namespace Volo.Abp.Settings
+namespace Geex.Core.SystemSettings.Domain
 {
     public static class Extensions
     {
-        public static async Task<T> GetOrNullAsync<T>(this ISettingValueProvider @this, SettingDefinition setting)
+        public static async Task SetAsync(this ISettingManager settingManager, IUpdateSettingParams settingValue)
         {
-            var settingValue = await @this.GetOrNullAsync(setting);
-            return settingValue.IsNullOrEmpty() ? default : JsonSerializer.Deserialize<T>(settingValue);
-        }
-
-
-        public static async Task SetAsync(this ISettingManager settingManager, ISettingValue settingValue)
-        {
-            await settingManager.SetAsync(settingValue.Name, settingValue.Value,
-                settingValue.SettingProvider.Value, settingValue.ProviderKey);
+            await settingManager.SetAsync(settingValue);
         }
 
         /// <summary>
@@ -42,20 +29,16 @@ namespace Volo.Abp.Settings
         /// <param name="settingManager"></param>
         /// <param name="settingName"></param>
         /// <returns></returns>
-        public static async Task<TValueType> GetEffectiveAsync<TProviderType, TValueType>(this ISettingManager settingManager, TProviderType settingName) where TProviderType : RmsSettingsBase
+        public static async Task<Setting?> GetEffectiveAsync<TProviderType>(this ISettingManager settingManager, TProviderType settingName, ClaimsIdentity identity) where TProviderType : SettingDefinition
         {
-
-            string settingStr;
-            settingStr = await settingManager.GetOrNullAsync(settingName, SettingProviderEnumeration.User, ServiceLocator.Current.GetInstance<ICurrentUser>()?.Id.ToString(), false);
-            if (settingStr == default)
-            {
-                settingStr = await settingManager.GetOrNullAsync(settingName, SettingProviderEnumeration.Tenant, ServiceLocator.Current.GetInstance<ICurrentTenant>()?.Id.ToString());
-            }
-            return JsonSerializer.Deserialize<TValueType>(settingStr);
+            Setting setting;
+            setting = await settingManager.GetOrNullAsync(settingName, SettingScopeEnumeration.User, identity.Claims.FirstOrDefault(x => x.Type == GeexClaimType.Sub).Value) ??
+                      await settingManager.GetOrNullAsync(settingName, SettingScopeEnumeration.Global);
+            return setting;
         }
     }
 
-    public interface ISettingValue
+    public interface IUpdateSettingParams
     {
         /// <summary>
         /// setting名称
@@ -68,11 +51,11 @@ namespace Volo.Abp.Settings
         /// <summary>
         /// 对应主键(租户id/用户id/...)
         /// </summary>
-        public string ProviderKey { get; }
+        public string ScopedKey { get; }
         /// <summary>
         /// setting提供方
         /// </summary>
 
-        public SettableSettingProviderEnumeration SettingProvider { get; }
+        public SettingScopeEnumeration Scope { get; }
     }
 }

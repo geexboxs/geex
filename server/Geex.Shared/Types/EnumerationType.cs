@@ -19,9 +19,8 @@ using MongoDB.Bson;
 
 namespace Geex.Shared.Types
 {
-    public class EnumerationType<TEnum, TValue> : EnumType<TEnum> where TEnum : Enumeration<TEnum, TValue> where TValue : IEquatable<TValue>, IComparable<TValue>
+    public class EnumerationType<TEnum, TValue> : EnumType<TEnum> where TEnum : IEnumeration where TValue : IEquatable<TValue>, IComparable<TValue>
     {
-
     }
     //public class EnumerationType<TEnum, TValue> : ScalarType<TEnum> where TEnum : Enumeration<TEnum, TValue> where TValue : IEquatable<TValue>, IComparable<TValue>
     //{

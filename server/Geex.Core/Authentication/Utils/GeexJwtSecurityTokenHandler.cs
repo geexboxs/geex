@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 using Volo.Abp.Threading;
-using Volo.Abp.Uow;
 
 namespace Geex.Core.Authentication.Utils
 {
@@ -37,7 +36,6 @@ namespace Geex.Core.Authentication.Utils
 
         public ClaimsPrincipal ValidateToken(string securityToken, TokenValidationParameters validationParameters, out SecurityToken validatedToken)
         {
-
             var principal = _tokenHandler.ValidateToken(securityToken, validationParameters, out validatedToken);
             //if (validatedToken.ValidFrom > DateTime.Now && validatedToken.ValidTo < DateTime.Now)
             //{

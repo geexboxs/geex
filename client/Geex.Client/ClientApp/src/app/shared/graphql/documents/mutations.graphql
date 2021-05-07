@@ -15,3 +15,9 @@ mutation registerAndSignIn($phoneOrEmail: String!, $password: String!) {
     value
   }
 }
+
+mutation authenticate($userIdentifier: String!, $password: String!) {
+  authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
+    value
+  }
+}

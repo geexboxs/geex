@@ -5,7 +5,6 @@ using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Entities;
 
-using Volo.Abp.Domain.Entities;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {

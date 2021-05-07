@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Geex.Core.Captcha.Commands;
 using Geex.Core.Captcha.Domain;
 using Geex.Core.Captcha.GqlSchemas.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared.Roots;
 using Geex.Shared.Types.Scalars;
+
 using HotChocolate;
 using HotChocolate.Types;
 
 using MediatR;
+using StackExchange.Redis.Extensions.Core;
+using StackExchange.Redis.Extensions.Core.Abstractions;
 
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Geex.Core.Captcha
 {
@@ -23,15 +25,15 @@ namespace Geex.Core.Captcha
     public class UserMutation : Mutation
     {
         public async Task<Geex.Shared._ShouldMigrateToLib.Captcha> GenerateCaptcha([Parent] Mutation mutation,
-            [Service] IGeexRedisClient cache,
+            [Service] IRedisDatabase cache,
             [Service] IMediator mediator,
             SendCaptchaInput input)
         {
-            cache = cache.SwitchNamespace(RedisNamespace.Captcha);
             if (input.CaptchaProvider == CaptchaProvider.Sms)
             {
+                IRedisCacheClient a;
                 var captcha = new SmsCaptcha();
-                await cache.SetAsync(captcha.Key, captcha);
+                await cache.SetNamedAsync(captcha);
                 await mediator.Send(new SendSmsCaptchaRequest(input.SmsCaptchaPhoneNumber, captcha));
                 return captcha;
             }
@@ -39,17 +41,16 @@ namespace Geex.Core.Captcha
             if (input.CaptchaProvider == CaptchaProvider.Image)
             {
                 var captcha = new ImageCaptcha();
-                await cache.SetAsync(captcha.Key, captcha);
+                await cache.SetNamedAsync(captcha);
                 return captcha;
             }
             throw new ArgumentOutOfRangeException("input.CaptchaProvider");
         }
 
         public async Task<bool> ValidateCaptcha([Parent] Mutation mutation,
-            [Service] IGeexRedisClient cache,
+            [Service] IRedisDatabase cache,
             ValidateCaptchaInput input)
         {
-            cache = cache.SwitchNamespace(RedisNamespace.Captcha);
             if (input.CaptchaProvider == CaptchaProvider.Sms)
             {
                 var captcha = await cache.GetAsync<SmsCaptcha>(input.CaptchaKey);

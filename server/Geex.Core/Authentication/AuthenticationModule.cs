@@ -28,9 +28,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Volo.Abp;
-using Volo.Abp.AspNetCore;
-using Volo.Abp.AspNetCore.Security.Claims;
-using Volo.Abp.Uow;
 
 namespace Geex.Core.Authentication
 {
@@ -82,14 +79,12 @@ namespace Geex.Core.Authentication
                     };
                     options.SecurityTokenValidators.Clear();
                     options.SecurityTokenValidators.Add(new GeexJwtSecurityTokenHandler());
-                    if (options.Events != null)
-                    {
-                        options.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
-                        options.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
-                        options.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
-                        options.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };
-                        options.Events.OnTokenValidated = receivedContext => { return Task.CompletedTask; };
-                    };
+                    options.Events ??= new JwtBearerEvents();
+                    //options.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
+                    //options.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
+                    //options.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
+                    //options.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };
+                    //options.Events.OnTokenValidated = receivedContext => { return Task.CompletedTask; };
                 });
             services.AddSingleton(new UserTokenGenerateOptions(configuration.GetAppName(), configuration.GetAppName(), configuration["Authentication:JwtBearer:SecurityKey"], TimeSpan.FromMinutes(10000)));
             base.ConfigureServices(context);

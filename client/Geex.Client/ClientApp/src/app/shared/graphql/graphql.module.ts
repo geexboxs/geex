@@ -2,12 +2,22 @@ import { NgModule } from '@angular/core';
 import { APOLLO_OPTIONS } from 'apollo-angular';
 import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 import { HttpLink } from 'apollo-angular/http';
+import { TypedTypePolicies } from 'src/app/shared/graphql/.generated/apollo-helpers';
+
+const typePolicies: TypedTypePolicies = {
+  // Keys in this object will be validated against the typed on your schema
+  User: {
+    keyFields: ['id'],
+  },
+};
 
 const uri = 'http://localhost:8000/graphql'; // <-- add the URL of the GraphQL server here
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
   return {
     link: httpLink.create({ uri }),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: typePolicies,
+    }),
   };
 }
 

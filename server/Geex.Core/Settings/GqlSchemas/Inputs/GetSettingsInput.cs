@@ -1,6 +1,6 @@
-﻿using Geex.Core.SystemSettings.Domain;
+﻿using Geex.Core.Settings.Domain;
 
-namespace Geex.Core.SystemSettings
+namespace Geex.Core.Settings.GqlSchemas.Inputs
 {
     public class GetSettingsInput
     {

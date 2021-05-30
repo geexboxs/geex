@@ -1,14 +1,7 @@
-﻿
-using System.Collections.Generic;
-using System.Linq;
-
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
+﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Json;
 
-using Volo.Abp.DependencyInjection;
-using Volo.Abp.Localization;
-
-namespace Geex.Core.SystemSettings.Domain
+namespace Geex.Core.Settings.Domain
 {
     public abstract class SettingDefinition : Enumeration<SettingDefinition, string>
     {

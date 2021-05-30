@@ -6,9 +6,10 @@ import { ReuseTabService } from '@delon/abc/reuse-tab';
 import { DA_SERVICE_TOKEN, ITokenService, JWTTokenModel, SocialOpenType, SocialService } from '@delon/auth';
 import { SettingsService, _HttpClient } from '@delon/theme';
 import { environment } from '@env/environment';
+import { Apollo } from 'apollo-angular';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTabChangeEvent } from 'ng-zorro-antd/tabs';
-import { AuthenticateGqlMutation } from '../../../shared/graphql/.generated';
+import { AuthenticateGql } from '../../../shared/graphql/.generated/type';
 
 @Component({
   selector: 'passport-login',
@@ -29,7 +30,7 @@ export class UserLoginComponent implements OnDestroy {
     private startupSrv: StartupService,
     public http: _HttpClient,
     public msg: NzMessageService,
-    public authenticateMutation: AuthenticateGqlMutation,
+    public apollo: Apollo,
   ) {
     this.form = fb.group({
       userName: [null, [Validators.required]],
@@ -108,10 +109,13 @@ export class UserLoginComponent implements OnDestroy {
 
     // 默认配置中对所有HTTP请求都会强制 [校验](https://ng-alain.com/auth/getting-started) 用户 Token
     // 然一般来说登录请求不需要校验，因此可以在请求URL加上：`/login?_allow_anonymous=true` 表示不触发用户 Token 校验
-    let res = await this.authenticateMutation
+    let res = await this.apollo
       .mutate({
-        userIdentifier: this.userName.value,
-        password: this.password.value,
+        mutation: AuthenticateGql,
+        variables: {
+          userIdentifier: this.userName.value,
+          password: this.password.value,
+        },
       })
       .toPromise();
     if (!res.data.authenticate.value) {

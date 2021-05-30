@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-
-using Geex.Core.SystemSettings.Domain;
+using Geex.Core.Settings.Domain;
 using Geex.Core.UserManagement;
 using Geex.Shared;
-using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
-
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
-
-using MoreLinq;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using Volo.Abp.Modularity;
 
-namespace Geex.Core.SystemSettings
+namespace Geex.Core.Settings
 {
     [DependsOn(
     )]

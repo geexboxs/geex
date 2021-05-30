@@ -1,12 +1,10 @@
 ﻿using System.Threading.Tasks;
-
-using Geex.Core.SystemSettings.Domain;
+using Geex.Core.Settings.Domain;
 using Geex.Shared.Roots;
-
 using HotChocolate;
 using HotChocolate.Types;
 
-namespace Geex.Core.SystemSettings
+namespace Geex.Core.Settings
 {
     [ExtendObjectType(nameof(Mutation))]
     public class SystemSettingMutation : Mutation
@@ -27,9 +25,9 @@ namespace Geex.Core.SystemSettings
 
     public class UpdateSettingInput : IUpdateSettingParams
     {
-        public string Name { get; set; }
-        public string Value { get; set; }
-        public string ScopedKey { get; set; }
+        public SettingDefinition Name { get; set; }
+        public string? Value { get; set; }
+        public string? ScopedKey { get; set; }
         public SettingScopeEnumeration Scope { get; set; }
     }
 }

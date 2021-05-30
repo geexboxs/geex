@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Converters;
-
+using System.Text.Unicode;
 using Geex.Shared._ShouldMigrateToLib.Abstractions;
+using Geex.Shared._ShouldMigrateToLib.Json.Converters;
 
 namespace Geex.Shared._ShouldMigrateToLib.Json
 {
@@ -14,8 +16,12 @@ namespace Geex.Shared._ShouldMigrateToLib.Json
     {
         static Json()
         {
+            var encoderSettings = new TextEncoderSettings();
+            encoderSettings.AllowRange(UnicodeRanges.All);
+            DefaultSerializeSettings.Encoder = JavaScriptEncoder.Create(encoderSettings);
             DefaultSerializeSettings.Converters.Add(new JsonStringEnumConverter());
             DefaultSerializeSettings.Converters.Add(new EnumerationConverterFactory());
+            DefaultSerializeSettings.Converters.Add(new DynamicJsonConverter());
         }
         public static JsonSerializerOptions DefaultSerializeSettings { get; set; } = new();
 

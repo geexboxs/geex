@@ -151,9 +151,17 @@ namespace Geex.Shared
                                                                AbpTypeExtensions.IsAssignableTo<Mutation>(x) ||
                                                                AbpTypeExtensions.IsAssignableTo<Subscription>(x))).ToArray();
                 schemaBuilder.AddTypes(rootTypes);
-                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToArray();
-                schemaBuilder.AddTypes(objectTypes);
-                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum()).ToArray();
+                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToList();
+                schemaBuilder.AddTypes(objectTypes.ToArray());
+                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum()).ToList();
+                for (var i = 0; i < classEnumTypes.Count; i++)
+                {
+                    var baseEnumClasses = classEnumTypes[i].GetClassEnumBases();
+                    foreach (var baseEnumClass in baseEnumClasses)
+                    {
+                        classEnumTypes.AddLast(baseEnumClass);
+                    }
+                }
                 foreach (var classEnumType in classEnumTypes)
                 {
                     schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));

@@ -10,7 +10,7 @@ using Geex.Core.Authentication;
 using Geex.Core.Authorization;
 using Geex.Core.Captcha;
 using Geex.Core.Notification;
-using Geex.Core.SystemSettings;
+using Geex.Core.Settings;
 using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;

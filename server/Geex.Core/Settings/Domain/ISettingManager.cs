@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-
 using Geex.Shared._ShouldMigrateToLib;
 using MoreLinq;
 
-namespace Geex.Core.SystemSettings.Domain
+namespace Geex.Core.Settings.Domain
 {
     public interface ISettingManager
     {
@@ -24,7 +22,7 @@ namespace Geex.Core.SystemSettings.Domain
             Setting setting = !updateSettingParams.ScopedKey.IsNullOrEmpty() ? Settings.FirstOrDefault(x => x.Scope == updateSettingParams.Scope && x.ScopedKey == updateSettingParams.ScopedKey) : Settings.First(x => x.Scope == updateSettingParams.Scope);
             if (setting == default)
             {
-                setting = new Setting(definition.Name, updateSettingParams.Value, updateSettingParams.Scope, updateSettingParams.ScopedKey);
+                setting = new Setting(definition, updateSettingParams.Value, updateSettingParams.Scope, updateSettingParams.ScopedKey);
                 this.Settings.Add(setting);
             }
             setting.Value = updateSettingParams.Value;
@@ -34,15 +32,20 @@ namespace Geex.Core.SystemSettings.Domain
         IReadOnlyList<SettingDefinition> SettingDefinitions { get; }
         ObservableCollection<Setting> Settings { get; }
 
-        async Task<IEnumerable<Setting>> GetAllForUserAsync(ClaimsPrincipal identity)
+        async Task<IEnumerable<Setting>> GetAllForCurrentUserAsync(ClaimsPrincipal identity)
         {
             var userSettings = this.Settings.Where(x => x.Scope == SettingScopeEnumeration.User && x.ScopedKey == identity.FindUserId());
             var globalSettings = this.Settings.Where(x => x.Scope == SettingScopeEnumeration.Global).ExceptBy(userSettings,x=> x.Name);
             return userSettings.Concat(globalSettings);
         }
-        async Task<IEnumerable<Setting>> GetAllGlobalAsync()
+        async Task<IEnumerable<Setting>> GetGlobalSettingsAsync()
         {
             return this.Settings.Where(x => x.Scope == SettingScopeEnumeration.Global);
+        }
+
+        async Task<IEnumerable<Setting>> GetUserSettingsAsync(ClaimsPrincipal identity)
+        {
+            return this.Settings.Where(x => x.Scope == SettingScopeEnumeration.User && x.ScopedKey == identity.FindUserId());
         }
 
         async Task<Setting?> GetOrNullAsync(SettingDefinition settingDefinition, SettingScopeEnumeration? settingScope = default,

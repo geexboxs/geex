@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-
+using Geex.Shared.Types;
 using JetBrains.Annotations;
 
 namespace Geex.Shared._ShouldMigrateToLib.Abstractions
@@ -343,7 +343,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Enumeration<TEnum, TValue> left, Enumeration<TEnum, TValue> right) =>
+        public static bool operator !=(Enumeration<TEnum, TValue>? left, Enumeration<TEnum, TValue>? right) =>
             !(left == right);
 
         /// <summary>
@@ -402,6 +402,11 @@ namespace Geex.Shared._ShouldMigrateToLib.Abstractions
             return type.GetBaseClasses(false).First(x => x.IsAssignableTo<IEnumeration>()).GenericTypeArguments[1];
         }
 
+        public static IEnumerable<Type> GetClassEnumBases(this Type classEnumType)
+        {
+            return classEnumType.GetBaseClasses().Where(x => !x.IsGenericType && x.IsAssignableTo<IEnumeration>());
+        }
+        
         public static Type GetClassEnumRealType(this Type type)
         {
             return type.GetBaseClasses(false).First(x => x.IsAssignableTo<IEnumeration>()).GenericTypeArguments[0];

@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SystemSettings\Commands\" />
+    <Folder Include="Settings\Commands\" />
   </ItemGroup>
 
 </Project>

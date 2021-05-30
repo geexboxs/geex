@@ -1,0 +1,64 @@
+fragment SettingPair on Setting {
+  name
+  value
+}
+mutation authenticate($userIdentifier: String!, $password: String!) {
+  authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
+    value
+  }
+}
+
+mutation assignRoles($userId: ObjectId!, $roleId: String!) {
+  assignRoles(input: { userId: $userId, roles: [$roleId] })
+}
+
+mutation registerAndSignIn($phoneOrEmail: String!, $password: String!) {
+  register(input: { phoneOrEmail: $phoneOrEmail, password: $password, userName: $phoneOrEmail })
+  authenticate(input: { userIdentifier: $phoneOrEmail, password: $password }) {
+    value
+  }
+}
+
+query userProfile($userIdentifier: String!) {
+  userProfile(userIdentifier: $userIdentifier) {
+    avatar
+    userName
+  }
+}
+
+mutation updateProfile($newAvatar: String, $userId: ObjectId!) {
+  updateProfile(input: { newAvatar: $newAvatar, userId: $userId })
+}
+
+query settings {
+  settings(dto: { scope: GLOBAL }) {
+    ...SettingPair
+  }
+}
+
+mutation updateSetting(
+  $settingScope: SettingScopeEnumeration!
+  $settingName: SettingDefinition!
+  $settingValue: String
+  $settingScopeKey: String
+) {
+  updateSetting(input: { name: $settingName, scope: $settingScope, scopedKey: $settingScopeKey, value: $settingValue })
+}
+
+mutation sendSmsCaptcha($phoneOrEmail: ChinesePhoneNumberType!) {
+  generateCaptcha(input: { captchaProvider: SMS, smsCaptchaPhoneNumber: $phoneOrEmail }) {
+    captchaType
+    key
+  }
+}
+
+mutation validateSmsCaptcha($captchaKey: String!, $captchaCode: String!) {
+  validateCaptcha(input: { captchaProvider: SMS, captchaKey: $captchaKey, captchaCode: $captchaCode })
+}
+
+query initSettings {
+  settings(dto: { scope: EFFECTIVE }) {
+    name
+    value
+  }
+}

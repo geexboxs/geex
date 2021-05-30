@@ -1,0 +1,22 @@
+<div nz-row nzGutter="24" class="py-lg">
+  <div nz-col>
+    <nz-card [nzBordered]="false" class="mb-lg" [nzLoading]="!user">
+      <ng-container *ngIf="user">
+        <div class="avatarHolder">
+          <img src="{{ user.avatar }}" />
+          <div class="name">{{ user.name }}</div>
+          <div>{{ user.signature }}</div>
+        </div>
+        <div class="detail">
+          <p><i class="title"></i>{{ user.title }}</p>
+          <p><i class="group"></i>{{ user.group }}</p>
+          <p>
+            <i class="address"></i>
+            {{ user.geographic.province.label }}
+            {{ user.geographic.city.label }}
+          </p>
+        </div>
+      </ng-container>
+    </nz-card>
+  </div>
+</div>

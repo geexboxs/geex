@@ -20,7 +20,7 @@ const routes: Routes = [
         loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
       },
       // 业务子模块
-      // { path: 'widgets', loadChildren: () => import('./widgets/widgets.module').then(m => m.WidgetsModule) },
+      { path: 'account', loadChildren: () => import('./account/account.module').then((m) => m.AccountModule) },
     ],
   },
   // 空白布局
@@ -35,6 +35,7 @@ const routes: Routes = [
     loadChildren: () => import('./passport/passport.module').then((m) => m.PassportModule),
   },
   { path: 'exception', loadChildren: () => import('./exception/exception.module').then((m) => m.ExceptionModule) },
+  { path: 'account', loadChildren: () => import('./account/account.module').then((m) => m.AccountModule) },
   { path: '**', redirectTo: 'exception/404' },
 ];
 

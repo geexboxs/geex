@@ -2,15 +2,11 @@ import { Component, Injector, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { _HttpClient } from '@delon/theme';
+import { Apollo } from 'apollo-angular';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppComponentBase } from '../../../shared/app-component.base';
-import {
-  CaptchaProvider,
-  GenerateCaptchaGqlMutation,
-  RegisterAndSignInGqlMutation,
-  ValidateSmsCaptchaGqlMutation,
-} from '../../../shared/graphql/.generated';
+import { RegisterAndSignInGql, SendSmsCaptchaGql, ValidateSmsCaptchaGql } from '../../../shared/graphql/.generated/type';
 @Component({
   selector: 'passport-register',
   templateUrl: './register.component.html',
@@ -24,9 +20,7 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
     private router: Router,
     public http: _HttpClient,
     public msg: NzMessageService,
-    private generateCaptchaGqlMutation: GenerateCaptchaGqlMutation,
-    private registerAndSignInGqlMutation: RegisterAndSignInGqlMutation,
-    private ValidateSmsCaptchaGqlMutation: ValidateSmsCaptchaGqlMutation,
+    public apollo: Apollo,
   ) {
     super(injector);
     this.form = fb.group({
@@ -111,9 +105,7 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
       return;
     }
     this.count = 59;
-    let res = await this.generateCaptchaGqlMutation
-      .mutate({ captchaProvider: CaptchaProvider.Sms, smsCaptchaPhoneNumber: this.mobile.value })
-      .toPromise();
+    let res = await this.apollo.mutate({ mutation: SendSmsCaptchaGql, variables: { phoneOrEmail: this.mobile.value } }).toPromise();
     this.captchaKey = res.data.generateCaptcha.key;
     this.interval$ = setInterval(() => {
       this.count -= 1;
@@ -136,15 +128,23 @@ export class UserRegisterComponent extends AppComponentBase implements OnDestroy
     }
 
     const data = this.form.value;
-    let validateRes = await this.ValidateSmsCaptchaGqlMutation.mutate({
-      captchaKey: this.captchaKey,
-      captchaCode: this.captcha.value,
-    }).toPromise();
+    let validateRes = await this.apollo
+      .mutate({
+        mutation: ValidateSmsCaptchaGql,
+        variables: {
+          captchaKey: this.captchaKey,
+          captchaCode: this.captcha.value,
+        },
+      })
+      .toPromise();
     if (validateRes.data.validateCaptcha) {
-      let res = await this.registerAndSignInGqlMutation
+      let res = await this.apollo
         .mutate({
-          password: this.password.value,
-          phoneOrEmail: this.mobile.value,
+          mutation: RegisterAndSignInGql,
+          variables: {
+            password: this.password.value,
+            phoneOrEmail: this.mobile.value,
+          },
         })
         .toPromise();
 

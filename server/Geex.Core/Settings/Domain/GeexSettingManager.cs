@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Geex.Shared._ShouldMigrateToLib;
-
 using StackExchange.Redis.Extensions.Core;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
-
-namespace Geex.Core.SystemSettings.Domain
+namespace Geex.Core.Settings.Domain
 {
     public class GeexSettingManager : ISettingManager
     {
@@ -22,7 +17,7 @@ namespace Geex.Core.SystemSettings.Domain
         {
             _redisClient = redisClient;
             SettingDefinitions = new ReadOnlyCollection<SettingDefinition>(settingDefinitions.ToArray());
-            var globalSettings = SettingDefinitions.Select(x => new Setting(x.Name, x.DefaultValue, SettingScopeEnumeration.Global));
+            var globalSettings = SettingDefinitions.Select(x => new Setting(x, x.DefaultValue, SettingScopeEnumeration.Global));
             var existedSettings = redisClient.GetAllNamedAsync<Setting>().Result.Select(x => x.Value);
             var userSettings = existedSettings.Where(x => x.Scope == SettingScopeEnumeration.User);
             var overrideSettings = existedSettings.Where(x => x.Scope == SettingScopeEnumeration.Global);

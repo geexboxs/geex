@@ -1,18 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
-using CommonServiceLocator;
-
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
-using Microsoft.Extensions.DependencyInjection;
-
-using JsonSerializer = System.Text.Json.JsonSerializer;
-
-namespace Geex.Core.SystemSettings.Domain
+namespace Geex.Core.Settings.Domain
 {
     public static class Extensions
     {
@@ -43,7 +34,7 @@ namespace Geex.Core.SystemSettings.Domain
         /// <summary>
         /// setting名称
         /// </summary>
-        public string Name { get; }
+        public SettingDefinition Name { get; }
         /// <summary>
         /// setting值
         /// </summary>

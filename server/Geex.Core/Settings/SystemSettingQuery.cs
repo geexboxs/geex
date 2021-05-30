@@ -2,19 +2,13 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
-using Geex.Core.SystemSettings.Domain;
-using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
+using Geex.Core.Settings.Domain;
+using Geex.Core.Settings.GqlSchemas.Inputs;
 using Geex.Shared.Roots;
-
 using HotChocolate;
-using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 
-using MongoDB.Entities;
-
-namespace Geex.Core.SystemSettings
+namespace Geex.Core.Settings
 {
     [ExtendObjectType(nameof(Query))]
     public class SystemSettingQuery : Query
@@ -32,9 +26,10 @@ namespace Geex.Core.SystemSettings
             var settingDefinitions = settingManager.SettingDefinitions;
             IEnumerable<Setting> settingValues = Enumerable.Empty<Setting>();
             await dto.Scope.SwitchAsync(
-                 (SettingScopeEnumeration.User, async () => settingValues = await settingManager.GetAllForUserAsync(claimsPrincipal)),
-                 (SettingScopeEnumeration.Global, async () => settingValues = await settingManager.GetAllGlobalAsync())
-             );
+                    (SettingScopeEnumeration.User, async () => settingValues = await settingManager.GetUserSettingsAsync(claimsPrincipal)),
+                    (SettingScopeEnumeration.Global, async () => settingValues = await settingManager.GetGlobalSettingsAsync()),
+                    (SettingScopeEnumeration.Effective, async () => settingValues = await settingManager.GetAllForCurrentUserAsync(claimsPrincipal))
+                );
             var result = settingValues.Join(settingDefinitions, setting => setting.Name, settingDefinition => settingDefinition.Name, (settingValue, _) => settingValue);
             return result.ToList();
         }

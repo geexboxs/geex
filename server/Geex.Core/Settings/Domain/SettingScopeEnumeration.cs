@@ -1,6 +1,6 @@
 ﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
 
-namespace Geex.Core.SystemSettings.Domain
+namespace Geex.Core.Settings.Domain
 {
     public class SettingScopeEnumeration : Enumeration<SettingScopeEnumeration, string>
     {
@@ -12,6 +12,10 @@ namespace Geex.Core.SystemSettings.Domain
         /// 全局运行时
         /// </summary>
         public static SettingScopeEnumeration Global { get; } = new(nameof(Global), nameof(Global));
+        /// <summary>
+        /// 对当前用户生效的配置
+        /// </summary>
+        public static SettingScopeEnumeration Effective { get; } = new(nameof(Effective), nameof(Effective));
         /// <summary>
         /// 用户级
         /// </summary>

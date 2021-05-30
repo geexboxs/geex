@@ -1,14 +1,21 @@
 overwrite: true
 schema: 'http://localhost:8000/graphql'
-documents: './src/app/shared/graphql/documents/**/*.graphql'
+documents: './src/app/shared/graphql/documents/*.graphql'
 generates:
-  ./src/app/shared/graphql/.generated.ts:
+  ./src/app/shared/graphql/.generated/type.ts:
     plugins:
-      - 'typescript'
-      - 'typescript-operations'
-      - 'typescript-apollo-angular'
+      - typescript
+      - typescript-operations
+      - typed-document-node
+    config:
+      declarationKind: 'interface'
+      documentMode: 'graphQLTag'
+      defaultScalarType: 'string|number'
+      documentVariableSuffix: 'Gql'
+      fragmentVariableSuffix: 'Gql'
+  ./src/app/shared/graphql/.generated/apollo-helpers.ts:
+    plugins:
+      - typescript-apollo-client-helpers
 config:
-  ngModule: src/app/shared/graphql/graphql.module#GraphQLModule
-  querySuffix: 'GqlQuery'
-  mutationSuffix: 'GqlMutation'
-  subscriptionSuffix: 'GqlSubscription'
+  declarationKind: 'interface'
+  enumsAsTypes: true

@@ -11,7 +11,7 @@ namespace Geex.Core.Captcha
 {
     [DependsOn(
     )]
-    public class CaptchaModule : GraphQLModule<CaptchaModule>
+    public class CaptchaModule : GeexModule<CaptchaModule>
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {

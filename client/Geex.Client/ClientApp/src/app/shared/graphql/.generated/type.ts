@@ -18,7 +18,7 @@ export interface Scalars {
 
 export type AppPermission = 'ASSIGN_ROLE';
 
-export type AppSettings = 'APP_MENU' | 'APP_NAME';
+export type AppSettings = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
 
 export type ApplyPolicy = 'BEFORE_RESOLVER' | 'AFTER_RESOLVER';
 
@@ -77,6 +77,8 @@ export interface IdentityUserTokenOfString {
   name?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
 }
+
+export type LocalizationSettings = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
 
 export type LoginProvider = 'LOCAL';
 
@@ -177,7 +179,7 @@ export interface Setting {
   name: SettingDefinition;
 }
 
-export type SettingDefinition = 'APP_MENU' | 'APP_NAME';
+export type SettingDefinition = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
 
 export type SettingScopeEnumeration = 'EFFECTIVE' | 'GLOBAL' | 'USER';
 

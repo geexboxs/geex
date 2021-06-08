@@ -1,12 +1,9 @@
 ﻿using Geex.Shared;
-using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 
-namespace Geex.Core.UserManagement
+namespace Geex.Core.Localization
 {
-    [DependsOn(
-    )]
-    public class UserManagementModule : GeexModule<UserManagementModule>
+    public class LocalizationModule : GeexModule<LocalizationModule>
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {

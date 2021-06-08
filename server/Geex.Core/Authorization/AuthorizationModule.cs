@@ -21,7 +21,7 @@ namespace Geex.Core.Authorization
 {
     [DependsOn(
     )]
-    public class AuthorizationModule : GraphQLModule<AuthorizationModule>
+    public class AuthorizationModule : GeexModule<AuthorizationModule>
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {

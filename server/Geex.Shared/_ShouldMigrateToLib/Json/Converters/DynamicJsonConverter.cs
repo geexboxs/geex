@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -7,61 +8,29 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
+using ImpromptuInterface;
+
+using MoreLinq;
+
 namespace Geex.Shared._ShouldMigrateToLib.Json.Converters
 {
-        /// <summary>
+    /// <summary>
     /// Temp Dynamic Converter
     /// by:tchivs@live.cn
     /// </summary>
-    public class DynamicJsonConverter : JsonConverter<dynamic>
+    public class DynamicJsonConverter : JsonConverterFactory
     {
-        public override dynamic Read(ref Utf8JsonReader reader,
-            Type typeToConvert,
-            JsonSerializerOptions options)
+        public override bool CanConvert(Type typeToConvert)
         {
-
-            if (reader.TokenType == JsonTokenType.True)
-            {
-                return true;
-            }
-
-            if (reader.TokenType == JsonTokenType.False)
-            {
-                return false;
-            }
-
-            if (reader.TokenType == JsonTokenType.Number)
-            {
-                if (reader.TryGetInt64(out long l))
-                {
-                    return l;
-                }
-
-                return reader.GetDouble();
-            }
-
-            if (reader.TokenType == JsonTokenType.String)
-            {
-                if (reader.TryGetDateTime(out DateTime datetime))
-                {
-                    return datetime;
-                }
-
-                return reader.GetString();
-            }
-
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                using JsonDocument documentV = JsonDocument.ParseValue(ref reader);
-                return ReadObject(documentV.RootElement);
-            }
-            // Use JsonElement as fallback.
-            // Newtonsoft uses JArray or JObject.
-            JsonDocument document = JsonDocument.ParseValue(ref reader);
-            return document.RootElement.Clone();
+            return (typeToConvert.IsInterface && !typeToConvert.IsAssignableTo<IEnumerable>()) || typeToConvert.IsDynamic() || typeToConvert == typeof(object);
         }
 
-        private object ReadObject(JsonElement jsonElement)
+        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        {
+            return Activator.CreateInstance(typeof(DynamicJsonConverterInstance<>).MakeGenericType(typeToConvert)) as JsonConverter;
+        }
+        #region read methods
+        private static object ReadObject(JsonElement jsonElement)
         {
             IDictionary<string, object> expandoObject = new ExpandoObject();
             foreach (var obj in jsonElement.EnumerateObject())
@@ -72,7 +41,8 @@ namespace Geex.Shared._ShouldMigrateToLib.Json.Converters
             }
             return expandoObject;
         }
-        private object? ReadValue(JsonElement jsonElement)
+
+        private static object? ReadValue(JsonElement jsonElement)
         {
             object? result = null;
             switch (jsonElement.ValueKind)
@@ -110,8 +80,7 @@ namespace Geex.Shared._ShouldMigrateToLib.Json.Converters
             }
             return result;
         }
-
-        private object? ReadList(JsonElement jsonElement)
+        private static object? ReadList(JsonElement jsonElement)
         {
             IList<object?> list = new List<object?>();
             foreach (var item in jsonElement.EnumerateArray())
@@ -120,11 +89,85 @@ namespace Geex.Shared._ShouldMigrateToLib.Json.Converters
             }
             return list.Count == 0 ? null : list;
         }
-        public override void Write(Utf8JsonWriter writer,
-            object value,
-            JsonSerializerOptions options)
+        #endregion
+
+        internal class DynamicJsonConverterInstance<T> : JsonConverter<T> where T : class
         {
-           // writer.WriteStringValue(value.ToString());
+
+            public override T Read(ref Utf8JsonReader reader,
+                Type typeToConvert,
+                JsonSerializerOptions options)
+            {
+
+                if (reader.TokenType == JsonTokenType.True)
+                {
+                    return (T)(object)true;
+                }
+
+                if (reader.TokenType == JsonTokenType.False)
+                {
+                    return (T)(object)false;
+                }
+
+                if (reader.TokenType == JsonTokenType.Number)
+                {
+                    if (reader.TryGetInt64(out long l))
+                    {
+                        return (T)(object)l;
+                    }
+
+                    return (T)(object)reader.GetDouble();
+                }
+
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    if (reader.TryGetDateTime(out DateTime datetime))
+                    {
+                        return (T)(object)datetime;
+                    }
+
+                    return (T)(object)reader.GetString();
+                }
+
+                if (reader.TokenType == JsonTokenType.StartObject)
+                {
+                    using JsonDocument documentV = JsonDocument.ParseValue(ref reader);
+                    if (typeof(T).IsInterface)
+                    {
+                        return ReadObject(documentV.RootElement).ActLike<T>();
+                    }
+                    else
+                    {
+                        return (T)ReadObject(documentV.RootElement);
+                    }
+                }
+                // Use JsonElement as fallback.
+                // Newtonsoft uses JArray or JObject.
+                JsonDocument document = JsonDocument.ParseValue(ref reader);
+                return (T)(object)document.RootElement.Clone();
+            }
+
+
+            public override void Write(Utf8JsonWriter writer,
+                T value,
+                JsonSerializerOptions options)
+            {
+                if (value is IActLikeProxy proxy)
+                {
+                    var data = (proxy.Original as ExpandoObject).ToDictionary();
+                    writer.WriteRaw(JsonSerializer.Serialize(data, options));
+                }
+                else if (value is ExpandoObject)
+                {
+                    var settingsCopy = new JsonSerializerOptions(options);
+                    settingsCopy.Converters.RemoveAll(x => x is DynamicJsonConverter);
+                    writer.WriteRaw(JsonSerializer.Serialize(value, settingsCopy));
+                }
+                else
+                {
+                    writer.WriteRaw(JsonSerializer.Serialize(value, value.GetType(), options));
+                }
+            }
         }
     }
 }

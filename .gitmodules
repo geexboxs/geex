@@ -9,3 +9,6 @@
 	path = .submodules/geexbox.logging.elasticsearch
 	url = https://github.com/geexboxs/geexbox.logging.elasticsearch.git
 	branch = master
+[submodule ".submodules/Geex.IdentityServer"]
+	path = .submodules/Geex.IdentityServer
+	branch = master

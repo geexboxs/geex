@@ -32,8 +32,9 @@ using Volo.Abp;
 namespace Geex.Core.Authentication
 {
     [DependsOn(
+        
     )]
-    public class AuthenticationModule : GraphQLModule<AuthenticationModule>
+    public class AuthenticationModule : GeexModule<AuthenticationModule>
     {
         public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
         {

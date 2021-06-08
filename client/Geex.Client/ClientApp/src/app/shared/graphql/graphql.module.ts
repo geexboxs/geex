@@ -14,7 +14,7 @@ const typePolicies: TypedTypePolicies = {
 const uri = 'http://localhost:8000/graphql'; // <-- add the URL of the GraphQL server here
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
   return {
-    link: httpLink.create({ uri }),
+    link: httpLink.create({ uri, withCredentials: true }),
     cache: new InMemoryCache({
       typePolicies: typePolicies,
     }),

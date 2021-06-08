@@ -11,7 +11,7 @@ namespace Geex.Core.Settings.Domain
 
         protected SettingDefinition(string name, object? defaultValue, string? description = null, bool isHiddenForClients = false) : base(name, name)
         {
-            DefaultValue = defaultValue?.ToJson();
+            DefaultValue = defaultValue is string str ? str : defaultValue?.ToJson();
             Description = description ?? name;
             IsHiddenForClients = isHiddenForClients;
         }

@@ -14,7 +14,7 @@ namespace Geex.Core.Notification
 {
     [DependsOn(
     )]
-    public class NotificationModule : GraphQLModule<NotificationModule>
+    public class NotificationModule : GeexModule<NotificationModule>
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {

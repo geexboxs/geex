@@ -9,6 +9,7 @@ using Autofac.Extensions.DependencyInjection;
 using Geex.Core.Authentication;
 using Geex.Core.Authorization;
 using Geex.Core.Captcha;
+using Geex.Core.Localization;
 using Geex.Core.Notification;
 using Geex.Core.Settings;
 using Geex.Core.UserManagement;
@@ -33,9 +34,10 @@ namespace Geex.Core
         typeof(AuthorizationModule),
         typeof(CaptchaModule),
         typeof(SystemSettingModule),
+        typeof(LocalizationModule),
         typeof(UserManagementModule)
         )]
-    public class AppModule : GraphQLEntryModule<AppModule>
+    public class AppModule : GeexEntryModule<AppModule>
     {
         private IWebHostEnvironment _env;
         private IConfiguration _configuration;
@@ -64,7 +66,7 @@ namespace Geex.Core
             base.ConfigureServices(context);
         }
 
-        
+
 
         public override void OnApplicationInitialization(
             ApplicationInitializationContext context)

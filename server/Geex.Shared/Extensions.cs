@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,12 +65,17 @@ namespace Geex.Shared
     public static class Extensions
     {
 
-        public static void AddGeexGraphQL<T>(this IServiceCollection services) where T : GraphQLEntryModule<T>
+        public static void AddGeexGraphQL<T>(this IServiceCollection services) where T : GeexEntryModule<T>
         {
             services.AddTransient<ClaimsPrincipal>(x => x.GetService<IHttpContextAccessor>()?.HttpContext?.User);
             services.AddStorage();
             var schemaBuilder = services.AddGraphQLServer();
             schemaBuilder.AddConvention<ITypeInspector>(typeof(GeexTypeConvention))
+                .AddTypeConverter((Type source, Type target, out ChangeType? converter) =>
+                {
+                    converter = o => o;
+                    return source.GetBaseClasses().Intersect(target.GetBaseClasses()).Any();
+                })
                 .AddFiltering()
             .AddSorting()
             .AddProjections()
@@ -143,7 +149,7 @@ namespace Geex.Shared
 
         public static IRequestExecutorBuilder AddModuleTypes(this IRequestExecutorBuilder schemaBuilder, Type gqlModuleType)
         {
-            if (GraphQLModule.KnownAssembly.AddIfNotContains(gqlModuleType.Assembly))
+            if (GeexModule.KnownAssembly.AddIfNotContains(gqlModuleType.Assembly))
             {
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
                 var rootTypes = exportedTypes.Where(x => !x.IsAbstract &&

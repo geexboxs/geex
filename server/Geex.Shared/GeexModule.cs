@@ -23,17 +23,17 @@ using Volo.Abp.Modularity;
 
 namespace Geex.Shared
 {
-    public abstract class GraphQLModule<T> : GraphQLModule where T : GraphQLModule
+    public abstract class GeexModule<T> : GeexModule where T : GeexModule
     {
 
     }
     [DependsOn(typeof(FrameworkFixModule))]
-    public class GraphQLModule : AbpModule
+    public class GeexModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
-            context.Services.TryAdd(new ServiceDescriptor(typeof(GraphQLModule), this));
+            context.Services.TryAdd(new ServiceDescriptor(typeof(GeexModule), this));
             context.Services.GetSingletonInstance<IRequestExecutorBuilder>().AddModuleTypes(this.GetType());
         }
 
@@ -72,7 +72,7 @@ namespace Geex.Shared
         public static HashSet<Assembly> KnownAssembly { get; } = new HashSet<Assembly>();
     }
 
-    public abstract class GraphQLEntryModule<T> : GraphQLModule<T> where T : GraphQLModule
+    public abstract class GeexEntryModule<T> : GeexModule<T> where T : GeexModule
     {
     }
 }

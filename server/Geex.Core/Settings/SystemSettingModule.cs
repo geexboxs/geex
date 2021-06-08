@@ -12,13 +12,13 @@ namespace Geex.Core.Settings
 {
     [DependsOn(
     )]
-    public class SystemSettingModule : GraphQLModule<UserManagementModule>
+    public class SystemSettingModule : GeexModule<UserManagementModule>
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.AddSingleton<ISettingManager, GeexSettingManager>(x =>
             {
-                var modules = x.GetServices<GraphQLModule>()
+                var modules = x.GetServices<GeexModule>()
                     .Select(y => y.GetType().Assembly).Distinct();
                 var definitionTypes = modules
                     .SelectMany(y => y.DefinedTypes

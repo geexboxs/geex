@@ -29,6 +29,24 @@ const LANG_PROVIDES = [
   { provide: DELON_LOCALE, useValue: LANG.delon },
 ];
 // #endregion
+// #region i18n services
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { ALAIN_I18N_TOKEN } from '@delon/theme';
+import { GeexTranslateLoader, I18NService } from '@core';
+
+const I18NSERVICE_MODULES = [
+  TranslateModule.forRoot({
+    loader: {
+      provide: TranslateLoader,
+      useClass: GeexTranslateLoader,
+    },
+    defaultLanguage: 'en',
+    useDefaultLang: true,
+  }),
+];
+
+const I18NSERVICE_PROVIDES = [{ provide: ALAIN_I18N_TOKEN, useClass: I18NService, multi: false }];
+// #region
 
 // #region JSON Schema form (using @delon/form)
 import { JsonSchemaModule } from '@shared';
@@ -87,10 +105,11 @@ import { STWidgetModule } from './shared/st-widget/st-widget.module';
     STWidgetModule,
     NzMessageModule,
     NzNotificationModule,
+    ...I18NSERVICE_MODULES,
     ...FORM_MODULES,
     ...GLOBAL_THIRD_MODULES,
   ],
-  providers: [...LANG_PROVIDES, ...INTERCEPTOR_PROVIDES, ...APPINIT_PROVIDES],
+  providers: [...LANG_PROVIDES, ...INTERCEPTOR_PROVIDES, ...APPINIT_PROVIDES, ...I18NSERVICE_PROVIDES],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

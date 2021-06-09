@@ -7,15 +7,15 @@ using MongoDB.Bson;
 using System;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authorization;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Entities;
+using Entity = Geex.Common.Abstractions.Entity;
 
 namespace Geex.Core.Users
 {
-    public class Role : GeexEntity, IEquatable<Role>
+    public class Role : Common.Abstractions.Entity, IEquatable<Role>
     {
         public string Name { get; set; }
 

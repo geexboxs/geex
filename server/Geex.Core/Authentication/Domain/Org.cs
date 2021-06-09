@@ -1,7 +1,6 @@
 using Geex.Core.Authentication.Domain;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
-
 using MongoDB.Entities;
+using Entity = MongoDB.Entities.Entity;
 
 namespace Geex.Shared._ShouldMigrateToLib.Auth
 {

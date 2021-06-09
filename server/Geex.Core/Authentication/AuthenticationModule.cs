@@ -18,6 +18,8 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
+using Geex.Common;
+using Geex.Common.Abstractions;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.Utils;
 using Geex.Core.UserManagement.Domain;

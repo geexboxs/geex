@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
+    <Folder Include="Settings\Commands\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Settings\Commands\" />
+    <ProjectReference Include="..\..\.submodules\Geex.Common\Geex.Common.csproj" />
   </ItemGroup>
 
 </Project>

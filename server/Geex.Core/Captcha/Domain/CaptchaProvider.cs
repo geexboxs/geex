@@ -1,5 +1,4 @@
-﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
-
+﻿using Geex.Common.Abstractions;
 using JetBrains.Annotations;
 
 namespace Geex.Core.Captcha.Domain

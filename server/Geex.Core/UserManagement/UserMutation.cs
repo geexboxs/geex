@@ -4,15 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Autofac;
-
+using Geex.Common.Abstractions.Enumerations;
+using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.UserManagement.Domain;
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
-using Geex.Shared.Roots;
-
 using HotChocolate;
 using HotChocolate.Types;
 

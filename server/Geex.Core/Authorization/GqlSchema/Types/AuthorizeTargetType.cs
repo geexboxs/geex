@@ -1,4 +1,4 @@
-﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
+﻿using Geex.Common.Abstractions;
 
 namespace Geex.Core.Authorization
 {

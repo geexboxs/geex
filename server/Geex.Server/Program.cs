@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Geex.Common;
 using Geex.Core;
 using Geex.Shared;
-using Geex.Shared._ShouldMigrateToLib.Json;
-using Geex.Shared.Types;
-
 using GeexBox.ElasticSearch.Zero.Logging.Elasticsearch;
 
 using Microsoft.AspNetCore.Builder;

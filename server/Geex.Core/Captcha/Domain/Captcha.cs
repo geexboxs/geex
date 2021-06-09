@@ -5,11 +5,10 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Volo.Abp;
 
-namespace Geex.Shared._ShouldMigrateToLib
+namespace Geex.Core.Captcha.Domain
 {
     public enum CaptchaType
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Geex.Common.Abstractions;
 using Geex.Core.Settings.Domain;
 using Geex.Core.UserManagement;
 using Geex.Shared;

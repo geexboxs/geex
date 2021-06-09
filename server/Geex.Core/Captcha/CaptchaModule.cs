@@ -1,4 +1,5 @@
-﻿using Geex.Shared;
+﻿using Geex.Common.Abstractions;
+using Geex.Shared;
 using Geex.Shared._ShouldMigrateToLib;
 
 using Microsoft.Extensions.Caching.Distributed;

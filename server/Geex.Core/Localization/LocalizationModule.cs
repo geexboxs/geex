@@ -1,4 +1,5 @@
-﻿using Geex.Shared;
+﻿using Geex.Common.Abstractions;
+using Geex.Shared;
 using Volo.Abp.Modularity;
 
 namespace Geex.Core.Localization

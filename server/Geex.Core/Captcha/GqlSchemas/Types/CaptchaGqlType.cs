@@ -4,16 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Geex.Core.Captcha.Domain;
 using Geex.Shared._ShouldMigrateToLib;
 
 using HotChocolate.Types;
 
 namespace Geex.Core.Captcha.GqlSchemas.Types
 {
-    public class CaptchaGqlType : ObjectType<Geex.Shared._ShouldMigrateToLib.Captcha>
+    public class CaptchaGqlType : ObjectType<Domain.Captcha>
     {
-        protected override void Configure(IObjectTypeDescriptor<Geex.Shared._ShouldMigrateToLib.Captcha> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Domain.Captcha> descriptor)
         {
 
             descriptor.BindFieldsExplicitly();

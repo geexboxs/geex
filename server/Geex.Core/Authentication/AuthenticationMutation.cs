@@ -1,8 +1,6 @@
 ﻿using Autofac;
 
 using Geex.Core.Users;
-using Geex.Shared.Roots;
-
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -21,10 +19,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonServiceLocator;
+using Geex.Common.Abstractions;
+using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
+using Geex.Core.Exceptions;
 using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -44,7 +44,7 @@ namespace Geex.Core.Authentication
             user = await dbContext.Find<User>().MatchUserIdentifier(input.UserIdentifier).ExecuteSingleAsync();
             if (user == default)
             {
-                throw new GeexUserFriendlyException("user not exists.");
+                throw new BusinessException(ExceptionType.NotFound, message: "user not exists.");
             }
             return new UserToken(user, LoginProvider.Local, userTokenGenerateOptions);
         }

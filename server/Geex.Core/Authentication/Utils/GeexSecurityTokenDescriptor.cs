@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-
+using Geex.Common.Abstractions;
+using Geex.Common.Abstractions.Enumerations;
 using Geex.Core.Authentication.Domain;
 using Geex.Shared._ShouldMigrateToLib;
 

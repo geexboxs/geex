@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
+using Geex.Common.Gql.Roots;
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using Geex.Core.Users;
-using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Types;
 using MongoDB.Driver;

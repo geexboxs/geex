@@ -1,5 +1,6 @@
-﻿using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared.Types;
+﻿using Geex.Common.Abstractions;
+using Geex.Common.Gql.Types;
+using Geex.Shared._ShouldMigrateToLib;
 using HotChocolate;
 
 namespace Geex.Core.Settings.Domain

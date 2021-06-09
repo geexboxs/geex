@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Geex.Common.Gql.Roots;
 using Geex.Core.Settings.Domain;
-using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Types;
 

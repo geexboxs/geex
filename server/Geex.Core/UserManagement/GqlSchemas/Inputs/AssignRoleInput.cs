@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Geex.Shared.Types;
 using HotChocolate;
 using HotChocolate.Types;
 using MongoDB.Bson;

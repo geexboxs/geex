@@ -6,12 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autofac;
-
+using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Auth;
-using Geex.Shared.Roots;
-
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Resolvers;

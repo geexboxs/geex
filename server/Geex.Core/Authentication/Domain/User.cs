@@ -5,14 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using CommonServiceLocator;
-
+using Geex.Common;
+using Geex.Common.Abstractions.Enumerations;
 using Geex.Core.Authentication.Domain.Events;
 using Geex.Core.Authorization;
 using Geex.Core.UserManagement.Domain;
 using Geex.Core.Users;
-using Geex.Shared;
-using Geex.Shared._ShouldMigrateToLib;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 
 using HotChocolate;
@@ -27,10 +25,11 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Entities;
+using Entity = Geex.Common.Abstractions.Entity;
 
 namespace Geex.Core.Authentication.Domain
 {
-    public partial class User : GeexEntity
+    public partial class User : Common.Abstractions.Entity
     {
         public string PhoneNumber { get; set; }
         public string UserName { get; set; }

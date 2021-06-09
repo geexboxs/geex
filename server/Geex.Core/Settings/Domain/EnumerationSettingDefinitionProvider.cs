@@ -1,5 +1,5 @@
-﻿using Geex.Shared._ShouldMigrateToLib.Abstractions;
-using Geex.Shared._ShouldMigrateToLib.Json;
+﻿using System.Text.Json;
+using Geex.Common.Abstractions;
 
 namespace Geex.Core.Settings.Domain
 {

@@ -1,4 +1,5 @@
-﻿using Geex.Shared._ShouldMigrateToLib;
+﻿using Geex.Core.Captcha.Domain;
+using Geex.Shared._ShouldMigrateToLib;
 
 using MediatR;
 

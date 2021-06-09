@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Volo.Abp;
 using Volo.Abp.Modularity;
 using Autofac.Extensions.DependencyInjection;
+using Geex.Common;
+using Geex.Common.Abstractions;
 using Geex.Core.Authentication;
 using Geex.Core.Authorization;
 using Geex.Core.Captcha;

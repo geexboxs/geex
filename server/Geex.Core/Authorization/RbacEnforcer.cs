@@ -3,11 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using CommonServiceLocator;
+using Geex.Common.Abstractions;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authorization.Casbin;
 using Geex.Core.Authorization.Events;
-using Geex.Shared._ShouldMigrateToLib.Abstractions;
-
 using MediatR;
 
 using NetCasbin;

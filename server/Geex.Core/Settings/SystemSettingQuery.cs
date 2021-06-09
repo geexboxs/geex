@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Geex.Common.Gql.Roots;
 using Geex.Core.Settings.Domain;
 using Geex.Core.Settings.GqlSchemas.Inputs;
-using Geex.Shared.Roots;
 using HotChocolate;
 using HotChocolate.Types;
 

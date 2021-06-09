@@ -1,5 +1,5 @@
-﻿using Geex.Core.Settings.Domain;
-using Geex.Shared._ShouldMigrateToLib.Json;
+﻿using System.Text.Json;
+using Geex.Core.Settings.Domain;
 using JetBrains.Annotations;
 
 namespace Geex.Core.Localization

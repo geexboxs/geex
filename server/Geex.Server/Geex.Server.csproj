@@ -31,9 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\.submodules\Geex.Common\Geex.Common.csproj" />
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
     <ProjectReference Include="..\Geex.Data\Geex.Data.csproj" />
-    <ProjectReference Include="..\Geex.Shared\Geex.Shared.csproj" />
   </ItemGroup>
 
 </Project>

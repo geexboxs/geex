@@ -1,6 +1,5 @@
-﻿using Geex.Core.Captcha.Domain;
-using Geex.Shared.Types.Scalars;
-
+﻿using Geex.Common.Gql.Types.Scalars;
+using Geex.Core.Captcha.Domain;
 using HotChocolate;
 using HotChocolate.Types;
 

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Geex.Common.Abstractions.Enumerations;
 using Geex.Shared._ShouldMigrateToLib;
 
 namespace Geex.Core.Settings.Domain

@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Geex.Common.Abstractions;
+using Geex.Core.Exceptions;
 using Geex.Shared._ShouldMigrateToLib;
+
 using MoreLinq;
 
 namespace Geex.Core.Settings.Domain
@@ -17,7 +21,7 @@ namespace Geex.Core.Settings.Domain
             var definition = this.SettingDefinitions.FirstOrDefault(x => x.Name == updateSettingParams.Name);
             if (definition == default)
             {
-                throw new GeexBusinessException(GeexExceptionType.NotFound, message: "setting name not exists.");
+                throw new BusinessException(ExceptionType.NotFound, message: "setting name not exists.");
             }
             Setting setting = !updateSettingParams.ScopedKey.IsNullOrEmpty() ? Settings.FirstOrDefault(x => x.Scope == updateSettingParams.Scope && x.ScopedKey == updateSettingParams.ScopedKey) : Settings.First(x => x.Scope == updateSettingParams.Scope);
             if (setting == default)
@@ -35,7 +39,7 @@ namespace Geex.Core.Settings.Domain
         async Task<IEnumerable<Setting>> GetAllForCurrentUserAsync(ClaimsPrincipal identity)
         {
             var userSettings = this.Settings.Where(x => x.Scope == SettingScopeEnumeration.User && x.ScopedKey == identity.FindUserId());
-            var globalSettings = this.Settings.Where(x => x.Scope == SettingScopeEnumeration.Global).ExceptBy(userSettings,x=> x.Name);
+            var globalSettings = this.Settings.Where(x => x.Scope == SettingScopeEnumeration.Global).ExceptBy(userSettings, x => x.Name);
             return userSettings.Concat(globalSettings);
         }
         async Task<IEnumerable<Setting>> GetGlobalSettingsAsync()

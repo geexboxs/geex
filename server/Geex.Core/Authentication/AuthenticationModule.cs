@@ -30,6 +30,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Volo.Abp;
+using Volo.Abp.DependencyInjection;
 
 namespace Geex.Core.Authentication
 {

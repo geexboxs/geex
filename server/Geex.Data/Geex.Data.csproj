@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
-    <ProjectReference Include="..\..\.submodules\Geex.Shared\Geex.Common.csproj" />
   </ItemGroup>
 
 </Project>

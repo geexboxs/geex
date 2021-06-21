@@ -1,4 +1,6 @@
-﻿using Geex.Core.Settings.Domain;
+﻿using Geex.Common.Settings;
+using Geex.Common.Settings.Abstraction;
+
 using JetBrains.Annotations;
 
 namespace Geex.Core.Settings
@@ -25,14 +27,14 @@ namespace Geex.Core.Settings
             public bool shortcut { get; set; }
         }
 
-        public static AppSettings AppName { get; } = new(nameof(AppName), "Geex");
+        public static AppSettings AppName { get; } = new(nameof(AppName), "Geex", new[] { SettingScopeEnumeration.Global });
 
         public static AppSettings AppMenu { get; } = new(nameof(AppMenu), new AlainMenuItem[]
         {
             new()
             {
                 i18n = "menu.mine",
-                group = true,
+                @group = true,
                 hideInBreadcrumb = true,
                 children = new AlainMenuItem[]
                 {
@@ -47,7 +49,7 @@ namespace Geex.Core.Settings
             new()
             {
                 i18n = "menu.main",
-                group = true,
+                @group = true,
                 hideInBreadcrumb = true,
                 children = new AlainMenuItem[]
                 {
@@ -89,7 +91,7 @@ namespace Geex.Core.Settings
             new()
             {
                 i18n = "menu.administration",
-                group = true,
+                @group = true,
                 hideInBreadcrumb = true,
                 children = new AlainMenuItem[]
                 {
@@ -141,11 +143,12 @@ namespace Geex.Core.Settings
                     },
                 }
             },
-        });
+        }, new[] { SettingScopeEnumeration.Global});
 
         public AppSettings([NotNull] string name, [NotNull] object? defaultValue,
+            SettingScopeEnumeration[] validScopes = default,
             [CanBeNull] string? description = null, bool isHiddenForClients = false) : base(name, defaultValue,
-            description, isHiddenForClients)
+            validScopes, description, isHiddenForClients)
         {
         }
     }

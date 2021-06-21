@@ -19,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
+using Volo.Abp.DependencyInjection;
 
 
 namespace Geex.Server
@@ -45,7 +46,7 @@ namespace Geex.Server
                 {
                     webBuilder.ConfigureServices((_, services) =>
                     {
-                        services.AddGeexGraphQL<AppModule>();
+                        services.AddApplication<AppModule>();
                     });
                     webBuilder.Configure((webHostBuilderContext, app) => { app.InitializeApplication(); });
                 });

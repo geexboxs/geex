@@ -16,6 +16,7 @@ using MongoDB.Entities;
 using NetCasbin;
 
 using Volo.Abp;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Modularity;
 
 namespace Geex.Core.Authorization

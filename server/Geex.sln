@@ -24,6 +24,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.IdentityServer", "..\.submodules\Geex.IdentityServer\Geex.IdentityServer.csproj", "{687C0644-A26A-40ED-9B2B-9C83E17C96F6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Settings", "..\.submodules\Geex.Common.Settings\Geex.Common.Settings.csproj", "{D29C811A-565A-46DC-A508-CBE27EA688DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Redis", "..\.submodules\Geex.Common.Redis\Geex.Common.Redis.csproj", "{76DF6C4E-F9DC-4B27-91E2-8F6D19417041}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Abstraction", "..\.submodules\Geex.Common.Abstraction\Geex.Common.Abstraction.csproj", "{E557BB3E-4510-4375-908C-1763D08C7E46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +64,18 @@ Global
 		{687C0644-A26A-40ED-9B2B-9C83E17C96F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{687C0644-A26A-40ED-9B2B-9C83E17C96F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{687C0644-A26A-40ED-9B2B-9C83E17C96F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D29C811A-565A-46DC-A508-CBE27EA688DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D29C811A-565A-46DC-A508-CBE27EA688DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D29C811A-565A-46DC-A508-CBE27EA688DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D29C811A-565A-46DC-A508-CBE27EA688DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E557BB3E-4510-4375-908C-1763D08C7E46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E557BB3E-4510-4375-908C-1763D08C7E46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E557BB3E-4510-4375-908C-1763D08C7E46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E557BB3E-4510-4375-908C-1763D08C7E46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +85,9 @@ Global
 		{C3514DCE-609E-4F72-BA86-58FE026E829B} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{24C6E7E7-CE87-4271-97FD-33059408BF8F} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{687C0644-A26A-40ED-9B2B-9C83E17C96F6} = {708825AC-62A7-4AF2-AA60-565130F0053F}
+		{D29C811A-565A-46DC-A508-CBE27EA688DB} = {708825AC-62A7-4AF2-AA60-565130F0053F}
+		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041} = {708825AC-62A7-4AF2-AA60-565130F0053F}
+		{E557BB3E-4510-4375-908C-1763D08C7E46} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B29333E1-4892-465E-983D-B4CDFFEA01C3}

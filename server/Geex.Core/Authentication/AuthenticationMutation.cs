@@ -23,7 +23,6 @@ using Geex.Common.Abstractions;
 using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.GqlSchemas.Inputs;
-using Geex.Core.Exceptions;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +43,7 @@ namespace Geex.Core.Authentication
             user = await dbContext.Find<User>().MatchUserIdentifier(input.UserIdentifier).ExecuteSingleAsync();
             if (user == default)
             {
-                throw new BusinessException(ExceptionType.NotFound, message: "user not exists.");
+                throw new BusinessException(GeexExceptionType.NotFound, message: "user not exists.");
             }
             return new UserToken(user, LoginProvider.Local, userTokenGenerateOptions);
         }

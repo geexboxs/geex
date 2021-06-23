@@ -143,11 +143,11 @@ namespace Geex.Core.Settings
                     },
                 }
             },
-        }, new[] { SettingScopeEnumeration.Global});
+        }, new[] { SettingScopeEnumeration.Global });
 
         public AppSettings([NotNull] string name, [NotNull] object? defaultValue,
             SettingScopeEnumeration[] validScopes = default,
-            [CanBeNull] string? description = null, bool isHiddenForClients = false) : base(name, defaultValue,
+            [CanBeNull] string? description = null, bool isHiddenForClients = false) : base("App" + name, defaultValue,
             validScopes, description, isHiddenForClients)
         {
         }

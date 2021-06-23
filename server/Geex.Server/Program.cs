@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.CommonServiceLocator;
+using CommonServiceLocator;
 using Geex.Common;
 using Geex.Core;
 using Geex.Shared;
@@ -34,7 +36,14 @@ namespace Geex.Server
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory(x =>
+                {
+                    x.RegisterBuildCallback(a =>
+                    {
+                        var csl = new AutofacServiceLocator(a);
+                        ServiceLocator.SetLocatorProvider(() => csl);
+                    });
+                }))
                 .ConfigureLogging((ctx, builder) =>
                 {
                     if (ctx.Configuration.GetSection("Logging:Elasticsearch").GetChildren().Any())

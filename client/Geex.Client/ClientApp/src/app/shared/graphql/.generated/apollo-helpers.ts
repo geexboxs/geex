@@ -9,6 +9,10 @@ export type ClaimsIdentityKeySpecifier = ('name' | ClaimsIdentityKeySpecifier)[]
 export type ClaimsIdentityFieldPolicy = {
   name?: FieldPolicy<any> | FieldReadFunction<any>;
 };
+export type ITestKeySpecifier = ('name' | ITestKeySpecifier)[];
+export type ITestFieldPolicy = {
+  name?: FieldPolicy<any> | FieldReadFunction<any>;
+};
 export type IUserProfileKeySpecifier = ('avatar' | 'userName' | IUserProfileKeySpecifier)[];
 export type IUserProfileFieldPolicy = {
   avatar?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -29,36 +33,39 @@ export type IdentityUserTokenOfStringFieldPolicy = {
 };
 export type MutationKeySpecifier = (
   | 'placeHolder'
+  | 'updateSetting'
   | 'createRole'
   | 'register'
   | 'assignRoles'
   | 'updateProfile'
+  | 'updateTest'
   | 'generateCaptcha'
   | 'validateCaptcha'
   | 'authorize'
   | 'authenticate'
-  | 'updateSetting'
   | MutationKeySpecifier
 )[];
 export type MutationFieldPolicy = {
   placeHolder?: FieldPolicy<any> | FieldReadFunction<any>;
+  updateSetting?: FieldPolicy<any> | FieldReadFunction<any>;
   createRole?: FieldPolicy<any> | FieldReadFunction<any>;
   register?: FieldPolicy<any> | FieldReadFunction<any>;
   assignRoles?: FieldPolicy<any> | FieldReadFunction<any>;
   updateProfile?: FieldPolicy<any> | FieldReadFunction<any>;
+  updateTest?: FieldPolicy<any> | FieldReadFunction<any>;
   generateCaptcha?: FieldPolicy<any> | FieldReadFunction<any>;
   validateCaptcha?: FieldPolicy<any> | FieldReadFunction<any>;
   authorize?: FieldPolicy<any> | FieldReadFunction<any>;
   authenticate?: FieldPolicy<any> | FieldReadFunction<any>;
-  updateSetting?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type QueryKeySpecifier = ('placeHolder' | 'queryRoles' | 'queryUsers' | 'userProfile' | 'settings' | QueryKeySpecifier)[];
+export type QueryKeySpecifier = ('placeHolder' | 'settings' | 'queryRoles' | 'queryUsers' | 'userProfile' | 'tests' | QueryKeySpecifier)[];
 export type QueryFieldPolicy = {
   placeHolder?: FieldPolicy<any> | FieldReadFunction<any>;
+  settings?: FieldPolicy<any> | FieldReadFunction<any>;
   queryRoles?: FieldPolicy<any> | FieldReadFunction<any>;
   queryUsers?: FieldPolicy<any> | FieldReadFunction<any>;
   userProfile?: FieldPolicy<any> | FieldReadFunction<any>;
-  settings?: FieldPolicy<any> | FieldReadFunction<any>;
+  tests?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type RoleKeySpecifier = ('id' | 'name' | RoleKeySpecifier)[];
 export type RoleFieldPolicy = {
@@ -89,6 +96,10 @@ export type TypedTypePolicies = TypePolicies & {
   ClaimsIdentity?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | ClaimsIdentityKeySpecifier | (() => undefined | ClaimsIdentityKeySpecifier);
     fields?: ClaimsIdentityFieldPolicy;
+  };
+  ITest?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+    keyFields?: false | ITestKeySpecifier | (() => undefined | ITestKeySpecifier);
+    fields?: ITestFieldPolicy;
   };
   IUserProfile?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | IUserProfileKeySpecifier | (() => undefined | IUserProfileKeySpecifier);

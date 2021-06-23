@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Geex.Core\Geex.Core.csproj" />
-    <ProjectReference Include="..\Geex.Data\Geex.Data.csproj" />
   </ItemGroup>
 
 </Project>

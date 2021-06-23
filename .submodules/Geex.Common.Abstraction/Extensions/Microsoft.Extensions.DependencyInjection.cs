@@ -59,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IRequestExecutorBuilder AddModuleTypes(this IRequestExecutorBuilder schemaBuilder, Type gqlModuleType)
         {
-            if (GeexModule.KnownAssembly.AddIfNotContains(gqlModuleType.Assembly))
+            if (GeexModule.KnownModuleAssembly.AddIfNotContains(gqlModuleType.Assembly))
             {
                 var dependedModuleTypes = gqlModuleType.GetCustomAttribute<DependsOnAttribute>()?.DependedTypes;
                 if (dependedModuleTypes?.Any() == true)

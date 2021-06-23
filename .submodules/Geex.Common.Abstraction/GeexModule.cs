@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using HotChocolate.Execution.Configuration;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using MongoDB.Entities;
 using Volo.Abp;
 using Volo.Abp.Modularity;
 
@@ -31,6 +33,7 @@ namespace Geex.Common.Abstractions
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             base.ConfigureServices(context);
+            context.Services.AddMediatR(typeof(T));
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
@@ -65,7 +68,7 @@ namespace Geex.Common.Abstractions
     }
     public class GeexModule : AbpModule
     {
-        public static HashSet<Assembly> KnownAssembly { get; } = new HashSet<Assembly>();
+        public static HashSet<Assembly> KnownModuleAssembly { get; } = new HashSet<Assembly>();
     }
 
     public abstract class GeexEntryModule<T> : GeexModule<T> where T : GeexModule
@@ -75,6 +78,12 @@ namespace Geex.Common.Abstractions
         {
             context.Services.GetSingletonInstance<IRequestExecutorBuilder>().AddModuleTypes(this.GetType());
             base.ConfigureServices(context);
+        }
+
+        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+        {
+            DB.MigrateAsync<T>().Wait();
+            base.OnApplicationInitialization(context);
         }
     }
 }

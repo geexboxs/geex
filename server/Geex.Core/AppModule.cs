@@ -16,6 +16,7 @@ using Geex.Core.Captcha;
 using Geex.Core.Localization;
 using Geex.Core.Notification;
 using Geex.Core.Settings;
+using Geex.Core.Testing.Api;
 using Geex.Core.UserManagement;
 using Microsoft.AspNetCore.Http;
 using Geex.Shared;
@@ -38,6 +39,7 @@ namespace Geex.Core
         typeof(AuthenticationModule),
         typeof(NotificationModule),
         typeof(AuthorizationModule),
+        typeof(TestingModule),
         typeof(CaptchaModule),
         typeof(SettingsModule),
         typeof(LocalizationModule),
@@ -63,7 +65,7 @@ namespace Geex.Core
         public override void OnApplicationInitialization(
             ApplicationInitializationContext context)
         {
-            
+            base.OnApplicationInitialization(context);
         }
     }
 }

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using JetBrains.Annotations;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Geex.Common.Abstractions
@@ -61,7 +63,7 @@ namespace Geex.Common.Abstractions
         .GetEntryAssembly()
         .GetReferencedAssemblies()
         .Select(Assembly.Load)
-        .SelectMany(x => x.DefinedTypes).Where(x=>x.IsAssignableTo(typeof(TEnum))).Concat(new []{typeof(TEnum)}).Distinct();
+        .SelectMany(x => x.DefinedTypes).Where(x => x.IsAssignableTo(typeof(TEnum))).Concat(new[] { typeof(TEnum) }).Distinct();
 
             List<TEnum> options = new List<TEnum>();
             foreach (Type enumType in enumTypes)
@@ -407,7 +409,7 @@ namespace Geex.Common.Abstractions
         {
             return classEnumType.GetBaseClasses().Where(x => !x.IsGenericType && x.IsAssignableTo<IEnumeration>());
         }
-        
+
         public static Type GetClassEnumRealType(this Type type)
         {
             return type.GetBaseClasses(false).First(x => x.IsAssignableTo<IEnumeration>()).GenericTypeArguments[0];

@@ -57,7 +57,7 @@ mutation validateSmsCaptcha($captchaKey: String!, $captchaCode: String!) {
 }
 
 query initSettings {
-  settings(dto: { scope: EFFECTIVE }) {
+  settings(dto: {}) {
     name
     value
   }

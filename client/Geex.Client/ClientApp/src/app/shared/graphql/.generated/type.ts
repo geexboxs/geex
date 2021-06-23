@@ -61,7 +61,16 @@ export interface CreateRoleInput {
 }
 
 export interface GetSettingsInput {
-  scope: SettingScopeEnumeration;
+  scope?: Maybe<SettingScopeEnumeration>;
+}
+
+export interface GetTestsRequestInput {
+  name: Scalars['String'];
+}
+
+export interface ITest {
+  __typename?: 'ITest';
+  name: Scalars['String'];
 }
 
 export interface IUserProfile {
@@ -85,15 +94,20 @@ export type LoginProvider = 'LOCAL';
 export interface Mutation {
   __typename?: 'Mutation';
   placeHolder: Scalars['String'];
+  updateSetting: Scalars['Boolean'];
   createRole: Scalars['Boolean'];
   register: Scalars['Boolean'];
   assignRoles: Scalars['Boolean'];
   updateProfile: Scalars['Boolean'];
+  updateTest: Scalars['Boolean'];
   generateCaptcha: Captcha;
   validateCaptcha: Scalars['Boolean'];
   authorize: Scalars['Boolean'];
   authenticate: IdentityUserTokenOfString;
-  updateSetting: Scalars['Boolean'];
+}
+
+export interface MutationUpdateSettingArgs {
+  input?: Maybe<UpdateSettingInput>;
 }
 
 export interface MutationCreateRoleArgs {
@@ -112,6 +126,10 @@ export interface MutationUpdateProfileArgs {
   input: UploadProfileInput;
 }
 
+export interface MutationUpdateTestArgs {
+  input: UpdateTestRequestInput;
+}
+
 export interface MutationGenerateCaptchaArgs {
   input: SendCaptchaInput;
 }
@@ -128,18 +146,19 @@ export interface MutationAuthenticateArgs {
   input: AuthenticateInput;
 }
 
-export interface MutationUpdateSettingArgs {
-  input: UpdateSettingInput;
-}
-
 export interface Query {
   __typename?: 'Query';
   placeHolder: Scalars['String'];
+  settings?: Maybe<Array<Maybe<Setting>>>;
   queryRoles: Array<Role>;
   /** This field does ... */
   queryUsers: Array<User>;
   userProfile: IUserProfile;
-  settings: Array<Setting>;
+  tests: Array<ITest>;
+}
+
+export interface QuerySettingsArgs {
+  dto?: Maybe<GetSettingsInput>;
 }
 
 export interface QueryQueryRolesArgs {
@@ -150,8 +169,8 @@ export interface QueryUserProfileArgs {
   userIdentifier: Scalars['String'];
 }
 
-export interface QuerySettingsArgs {
-  dto: GetSettingsInput;
+export interface QueryTestsArgs {
+  req: GetTestsRequestInput;
 }
 
 export interface RegisterUserInput {
@@ -175,13 +194,13 @@ export interface Setting {
   __typename?: 'Setting';
   scope?: Maybe<SettingScopeEnumeration>;
   scopedKey?: Maybe<Scalars['String']>;
-  value: Scalars['String'];
-  name: SettingDefinition;
+  value?: Maybe<Scalars['String']>;
+  name?: Maybe<SettingDefinition>;
 }
 
 export type SettingDefinition = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
 
-export type SettingScopeEnumeration = 'EFFECTIVE' | 'GLOBAL' | 'USER';
+export type SettingScopeEnumeration = 'GLOBAL' | 'USER';
 
 export interface Subscription {
   __typename?: 'Subscription';
@@ -189,10 +208,15 @@ export interface Subscription {
 }
 
 export interface UpdateSettingInput {
-  name: SettingDefinition;
+  name?: Maybe<SettingDefinition>;
   value?: Maybe<Scalars['String']>;
   scopedKey?: Maybe<Scalars['String']>;
-  scope: SettingScopeEnumeration;
+  scope?: Maybe<SettingScopeEnumeration>;
+}
+
+export interface UpdateTestRequestInput {
+  name: Scalars['String'];
+  newName: Scalars['String'];
 }
 
 export interface UploadProfileInput {
@@ -256,7 +280,7 @@ export type UpdateProfileMutation = { __typename?: 'Mutation' } & Pick<Mutation,
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SettingsQuery = { __typename?: 'Query' } & { settings: Array<{ __typename?: 'Setting' } & SettingPairFragment> };
+export type SettingsQuery = { __typename?: 'Query' } & { settings?: Maybe<Array<Maybe<{ __typename?: 'Setting' } & SettingPairFragment>>> };
 
 export type UpdateSettingMutationVariables = Exact<{
   settingScope: SettingScopeEnumeration;
@@ -285,7 +309,7 @@ export type ValidateSmsCaptchaMutation = { __typename?: 'Mutation' } & Pick<Muta
 export type InitSettingsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type InitSettingsQuery = { __typename?: 'Query' } & {
-  settings: Array<{ __typename?: 'Setting' } & Pick<Setting, 'name' | 'value'>>;
+  settings?: Maybe<Array<Maybe<{ __typename?: 'Setting' } & Pick<Setting, 'name' | 'value'>>>>;
 };
 
 export const SettingPairGql = (gql`
@@ -360,7 +384,7 @@ export const ValidateSmsCaptchaGql = (gql`
 ` as unknown) as DocumentNode<ValidateSmsCaptchaMutation, ValidateSmsCaptchaMutationVariables>;
 export const InitSettingsGql = (gql`
   query initSettings {
-    settings(dto: { scope: EFFECTIVE }) {
+    settings(dto: {}) {
       name
       value
     }

@@ -37,7 +37,7 @@ namespace Geex.Common.Abstractions
         /// <summary>
         /// Data conflict
         /// </summary>
-        public static GeexExceptionType Conflict = new(nameof(Conflict), nameof(Conflict), nameof(Conflict), LogLevel.Warning);
+        public static GeexExceptionType Conflict { get; } = new(nameof(Conflict), nameof(Conflict), nameof(Conflict), LogLevel.Warning);
         /// <summary>
         /// on purpose, no need to handle
         /// </summary>
@@ -46,5 +46,9 @@ namespace Geex.Common.Abstractions
         /// data not found
         /// </summary>
         public static GeexExceptionType NotFound { get; } = new(nameof(NotFound), nameof(NotFound), nameof(NotFound), LogLevel.Warning);
+         /// <summary>
+        /// Unknown exception
+        /// </summary>
+        public static GeexExceptionType Unknown { get; } = new(nameof(Unknown), nameof(Unknown), nameof(Unknown), LogLevel.Error);
     }
 }

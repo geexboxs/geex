@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Geex.Core.Testing.Core.Aggregates;
+using Geex.Core.Testing.Core.Aggregates.Tests;
 using MongoDB.Entities;
 
 namespace Geex.Core.Testing.Core.Migrations

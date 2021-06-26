@@ -4,9 +4,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Geex.Common.Gql.Roots;
 using Geex.Common.Settings.Abstraction;
-using Geex.Common.Settings.Api.GqlSchemas.Inputs;
+using Geex.Common.Settings.Api.Aggregates.Settings;
+using Geex.Common.Settings.Api.Aggregates.Settings.Inputs;
 using Geex.Common.Settings.Core;
 using HotChocolate;
+using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 
 namespace Geex.Common.Settings.Api
@@ -19,23 +21,11 @@ namespace Geex.Common.Settings.Api
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<List<Setting>> Settings(
-            [Service] GeexSettingManager settingManager,
-            [Service] ClaimsPrincipal claimsPrincipal,
-            GetSettingsInput dto)
+        [Authorize]
+        public async Task<IQueryable<ISetting>> Settings(
+            GetSettingsInput input)
         {
-            var settingDefinitions = settingManager.SettingDefinitions;
-            IEnumerable<Setting> settingValues = Enumerable.Empty<Setting>();
-            if (dto.Scope != default)
-            {
-                await dto.Scope.SwitchAsync(
-                    (SettingScopeEnumeration.User, async () => settingValues = await settingManager.GetUserSettingsAsync(claimsPrincipal)),
-                    (SettingScopeEnumeration.Global, async () => settingValues = await settingManager.GetGlobalSettingsAsync())
-                );
-            }
-            settingValues = await settingManager.GetAllForCurrentUserAsync(claimsPrincipal);
-            var result = settingValues.Join(settingDefinitions, setting => setting.Name, settingDefinition => settingDefinition.Name, (settingValue, _) => settingValue);
-            return result.ToList();
+            return await this.Mediator.Send(input);
         }
     }
 }

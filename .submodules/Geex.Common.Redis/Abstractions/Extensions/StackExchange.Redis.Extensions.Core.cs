@@ -14,6 +14,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using MongoDB.Entities;
 
 using StackExchange.Redis;
@@ -51,21 +52,17 @@ namespace StackExchange.Redis.Extensions.Core
 
             return services;
         }
-        public static string GetId(this object obj)
+
+        public static string GetUniqueId(this object obj)
         {
             if (obj is IEntity entity)
             {
                 return entity.Id;
             }
 
-            if (obj is IHasId hasId)
-            {
-                return hasId.Id;
-            }
-
             if (obj is IValueObject valueObject)
             {
-                return string.Join("", valueObject.EqualityComponents.Select(x => x.GetId()));
+                return string.Join("", valueObject.EqualityComponents.Select(x => x.GetUniqueId()));
             }
             var idProp = obj.GetType().GetProperty("Id");
             if (idProp != default)
@@ -104,8 +101,8 @@ namespace StackExchange.Redis.Extensions.Core
 
         public static async Task<T> GetAndRemoveAsync<T>(this IRedisDatabase service, T obj)
         {
-            var result = await service.GetNamedAsync<T>(obj.GetId());
-            await service.RemoveNamedAsync<T>(obj.GetId());
+            var result = await service.GetNamedAsync<T>(obj.GetUniqueId());
+            await service.RemoveNamedAsync<T>(obj.GetUniqueId());
             return result;
         }
 
@@ -117,9 +114,9 @@ namespace StackExchange.Redis.Extensions.Core
         {
             if (expireIn.HasValue)
             {
-                return await service.AddAsync<T>($"{typeof(T).Name}:{obj.GetId()}", obj, expireIn.Value);
+                return await service.AddAsync<T>($"{typeof(T).Name}:{obj.GetUniqueId()}", obj, expireIn.Value);
             }
-            return await service.AddAsync<T>($"{typeof(T).Name}:{obj.GetId()}", obj);
+            return await service.AddAsync<T>($"{typeof(T).Name}:{obj.GetUniqueId()}", obj);
         }
     }
 }

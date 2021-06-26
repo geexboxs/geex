@@ -9,10 +9,6 @@ namespace Microsoft.Extensions.Configuration
 {
     public static class Extensions
     {
-        public static string GetAppName(this IConfiguration configuration)
-        {
-            return configuration.GetValue<string>("App:Name");
-        }
         public static string GetAppHostAddress(this IConfiguration configuration)
         {
             return configuration.GetValue<string>("App:HostAddress");

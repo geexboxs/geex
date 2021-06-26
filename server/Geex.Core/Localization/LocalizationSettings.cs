@@ -9,10 +9,11 @@ namespace Geex.Core.Localization
 {
     public class LocalizationSettings : SettingDefinition
     {
-        public LocalizationSettings([NotNull] string name, [CanBeNull] object? defaultValue, [CanBeNull] string? description = null, bool isHiddenForClients = false) : base(nameof(Localization) + name, defaultValue, new[] { SettingScopeEnumeration.Global, }, description, isHiddenForClients)
+        public LocalizationSettings([NotNull] string name, SettingScopeEnumeration[] validScopes,
+            [CanBeNull] string? description = null, bool isHiddenForClients = false) : base(nameof(Localization) + name, validScopes, description, isHiddenForClients)
         {
         }
-        public static LocalizationSettings Language { get; } = new(nameof(Language), "en-US");
-        public static LocalizationSettings Data { get; } = new(nameof(Data), "{\"en-US\":{\"common\":{\"test\":\"fuck\"}}}".ToObject<object>());
+        public static LocalizationSettings Language { get; } = new(nameof(Language), new[] { SettingScopeEnumeration.Global, SettingScopeEnumeration.User, });
+        public static LocalizationSettings Data { get; } = new(nameof(Data), new[] { SettingScopeEnumeration.Global, });
     }
 }

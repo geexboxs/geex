@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Geex.Common.Abstraction;
+
 using HotChocolate.Execution.Configuration;
+
 using MediatR;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+using MongoDB.Bson.Serialization;
 using MongoDB.Entities;
+
 using Volo.Abp;
 using Volo.Abp.Modularity;
 
@@ -16,17 +24,45 @@ namespace Geex.Common.Abstractions
     public abstract class GeexModule<T> : GeexModule where T : GeexModule
     {
         public IConfiguration Configuration { get; private set; }
-        
-        public virtual void ConfigureModuleOptions<TOptions>(Action<TOptions> optionsAction) where TOptions : GeexModuleOption<T>
+
+        public virtual void ConfigureModuleOptions(Action<GeexModuleOption<T>> optionsAction)
         {
-            base.Configure<TOptions>(optionsAction);
+            var type = this.GetType().Assembly.ExportedTypes.FirstOrDefault(x => x.IsAssignableTo<GeexModuleOption<T>>());
+            if (type == default)
+            {
+                return;
+            }
+            var options = (GeexModuleOption<T>?)this.ServiceConfigurationContext.Services.GetSingletonInstanceOrNull(type);
+            if (options == default)
+            {
+                options = Activator.CreateInstance(type) as GeexModuleOption<T>;
+                Configuration.GetSection(type.Name).Bind(options);
+            }
+            optionsAction.Invoke(options!);
+            this.ServiceConfigurationContext.Services.TryAdd(new ServiceDescriptor(this.GetType().Assembly.ExportedTypes.First(x => x.IsAssignableTo<GeexModuleOption<T>>()), options));
         }
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             Configuration = context.Services.GetConfiguration();
             context.Services.Add(new ServiceDescriptor(typeof(GeexModule), this));
             context.Services.Add(new ServiceDescriptor(this.GetType(), this));
+            this.ConfigureModuleOptions(option => { });
+            this.ConfigureModuleEntityMaps();
             base.PreConfigureServices(context);
+        }
+
+        public virtual void ConfigureModuleEntityMaps()
+        {
+            var entityConfigs = this.GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo<IEntityMapConfig>());
+            foreach (var entityMapConfig in entityConfigs)
+            {
+                var entityType = entityMapConfig.BaseType!.GetGenericArguments().First();
+                var instance = Activator.CreateInstance(entityMapConfig);
+                var method = entityMapConfig.GetMethods().First(x => x.Name == nameof(EntityMapConfig<IEntity>.Map));
+                var bsonClassMapInstance = Activator.CreateInstance(typeof(BsonClassMap<>).MakeGenericType(entityType));
+                method.Invoke(instance, new[] { bsonClassMapInstance });
+                BsonClassMap.RegisterClassMap(bsonClassMapInstance as BsonClassMap);
+            }
         }
 
 

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Geex.Common.Settings.Abstraction;
-
-using JetBrains.Annotations;
+﻿using Geex.Common.Settings.Abstraction;
 
 namespace Geex.Core.Testing.Api
 {
@@ -16,7 +8,7 @@ namespace Geex.Core.Testing.Api
             object? defaultValue,
             SettingScopeEnumeration[] validScopes = default,
             string? description = null,
-            bool isHiddenForClients = false) : base(nameof(Testing) + name, defaultValue, validScopes, description, isHiddenForClients)
+            bool isHiddenForClients = false) : base(nameof(Testing) + name, validScopes, description, isHiddenForClients)
         {
         }
         public static TestingSettings ModuleName { get; } = new(nameof(ModuleName), "Testing");

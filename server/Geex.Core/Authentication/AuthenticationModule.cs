@@ -35,10 +35,14 @@ using Volo.Abp.DependencyInjection;
 namespace Geex.Core.Authentication
 {
     [DependsOn(
-        
+
     )]
     public class AuthenticationModule : GeexModule<AuthenticationModule>
     {
+        public override void PreConfigureServices(ServiceConfigurationContext context)
+        {
+            base.PreConfigureServices(context);
+        }
         public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
         {
             base.OnPreApplicationInitialization(context);
@@ -49,7 +53,7 @@ namespace Geex.Core.Authentication
             base.PostConfigureServices(context);
         }
 
-        public override void PreConfigureServices(ServiceConfigurationContext context)
+        public override void ConfigureServices(ServiceConfigurationContext context)
         {
             IdentityModelEventSource.ShowPII = true;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -57,6 +61,7 @@ namespace Geex.Core.Authentication
             var configuration = services.GetConfiguration();
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddTransient<IUserCreationValidator, UserCreationValidator>();
+            var moduleOptions = services.GetSingletonInstance<AuthenticationModuleOptions>();
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -65,15 +70,15 @@ namespace Geex.Core.Authentication
                     {
                         // 签名键必须匹配!
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Authentication:JwtBearer:SecurityKey"])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(moduleOptions.SecurityKey)),
 
                         // 验证JWT发行者(iss)的 claim
                         ValidateIssuer = true,
-                        ValidIssuer = configuration.GetAppName(),
+                        ValidIssuer = moduleOptions.ValidIssuer,
 
                         // Validate the JWT Audience (aud) claim
                         ValidateAudience = true,
-                        ValidAudience = configuration.GetAppName(),
+                        ValidAudience = moduleOptions.ValidAudience,
 
                         // 验证过期
                         ValidateLifetime = true,
@@ -84,13 +89,13 @@ namespace Geex.Core.Authentication
                     options.SecurityTokenValidators.Clear();
                     options.SecurityTokenValidators.Add(new GeexJwtSecurityTokenHandler());
                     options.Events ??= new JwtBearerEvents();
-                    //options.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
-                    //options.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
-                    //options.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
-                    //options.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };
-                    //options.Events.OnTokenValidated = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnTokenValidated = receivedContext => { return Task.CompletedTask; };
                 });
-            services.AddSingleton(new UserTokenGenerateOptions(configuration.GetAppName(), configuration.GetAppName(), configuration["Authentication:JwtBearer:SecurityKey"], TimeSpan.FromMinutes(10000)));
+            services.AddSingleton(new UserTokenGenerateOptions(moduleOptions.ValidIssuer, moduleOptions.ValidAudience, moduleOptions.SecurityKey, TimeSpan.FromMinutes(10000)));
             base.ConfigureServices(context);
         }
 

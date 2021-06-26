@@ -1,17 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-
-using Geex.Common.Abstractions;
+﻿using Geex.Common.Abstractions;
 using Geex.Common.Redis;
-using Geex.Common.Settings.Abstraction;
 using Geex.Common.Settings.Core;
-
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using StackExchange.Redis.Extensions.Core.Abstractions;
-
 using Volo.Abp.Modularity;
 
 namespace Geex.Common.Settings
@@ -29,7 +19,7 @@ namespace Geex.Common.Settings
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
 
-            context.Services.AddSingleton<GeexSettingManager>();
+            context.Services.AddSingleton<SettingHandler>();
             base.PostConfigureServices(context);
         }
     }

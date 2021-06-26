@@ -1,20 +1,24 @@
 ﻿using System.Diagnostics;
+
 using Geex.Common.Abstractions;
 using Geex.Common.Gql.Types;
 using Geex.Common.Settings.Abstraction;
+using Geex.Common.Settings.Api.Aggregates.Settings;
+
 using HotChocolate;
 
 namespace Geex.Common.Settings.Core
 {
     [DebuggerDisplay("{Name}")]
-    public class Setting : IHasId
+    public class Setting : Entity, ISetting, IHasRedisKey
     {
         [GraphQLType(typeof(EnumerationType<SettingScopeEnumeration, string>))]
-        public SettingScopeEnumeration Scope { get; }
-        public string? ScopedKey { get; }
-        public string? Value { get; }
-        public SettingDefinition Name { get; }
-        string IHasId.Id => $"{this.Scope}:{this.Name}{(this.ScopedKey == default ? "" : $":{this.ScopedKey}")}";
+        public SettingScopeEnumeration Scope { get; private set; }
+        public string? ScopedKey { get; private set; }
+        public string? Value { get; private set; }
+        public SettingDefinition Name { get; private set; }
+
+        public string RedisKey => $"{this.Scope}{(this.ScopedKey == default ? "" : $":{this.ScopedKey}")}:{this.Name}";
 
         public Setting(SettingDefinition name, string value, SettingScopeEnumeration scope, string? scopedKey = default)
         {

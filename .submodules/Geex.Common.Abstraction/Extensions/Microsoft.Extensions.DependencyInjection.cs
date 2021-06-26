@@ -37,7 +37,7 @@ using Volo.Abp.Modularity;
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class Extensions
+    public static class Extension
     {
 
         public static void UseGeexGraphQL(this IApplicationBuilder app)
@@ -56,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return schemaBuilder
                 .AddModuleTypes(typeof(TModule));
         }
-
+        public static object? GetSingletonInstanceOrNull(this IServiceCollection services, Type type) => services.FirstOrDefault<ServiceDescriptor>((Func<ServiceDescriptor, bool>) (d => d.ServiceType == type))?.ImplementationInstance;
         public static IRequestExecutorBuilder AddModuleTypes(this IRequestExecutorBuilder schemaBuilder, Type gqlModuleType)
         {
             if (GeexModule.KnownModuleAssembly.AddIfNotContains(gqlModuleType.Assembly))
@@ -78,14 +78,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToList();
                 schemaBuilder.AddTypes(objectTypes.ToArray());
                 var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum()).ToList();
-                //for (var i = 0; i < classEnumTypes.Count; i++)
-                //{
-                //    var baseEnumClasses = classEnumTypes[i].GetClassEnumBases();
-                //    foreach (var baseEnumClass in baseEnumClasses)
-                //    {
-                //        classEnumTypes.AddIfNotContains(baseEnumClass);
-                //    }
-                //}
                 foreach (var classEnumType in classEnumTypes)
                 {
                     schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));

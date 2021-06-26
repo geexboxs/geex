@@ -35,37 +35,17 @@ using Volo.Abp.Validation;
 namespace Geex.Core
 {
     [DependsOn(
-        typeof(GeexCommonModule),
         typeof(AuthenticationModule),
-        typeof(NotificationModule),
         typeof(AuthorizationModule),
+        typeof(GeexCommonModule),
+        typeof(NotificationModule),
         typeof(TestingModule),
         typeof(CaptchaModule),
-        typeof(SettingsModule),
         typeof(LocalizationModule),
         typeof(UserManagementModule)
         )]
     public class AppModule : GeexEntryModule<AppModule>
     {
-        private IWebHostEnvironment _env;
-        private IConfiguration _configuration;
-
-        public override void PreConfigureServices(ServiceConfigurationContext context)
-        {
-            base.PreConfigureServices(context);
-        }
-
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            base.ConfigureServices(context);
-        }
-
-
-
-        public override void OnApplicationInitialization(
-            ApplicationInitializationContext context)
-        {
-            base.OnApplicationInitialization(context);
-        }
+        
     }
 }

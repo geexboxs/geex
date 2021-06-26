@@ -4,10 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-
+using Geex.Common.Abstraction.Bson;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Geex.Common.Abstractions
 {
@@ -27,6 +28,7 @@ namespace Geex.Common.Abstractions
     /// <typeparam name="TEnum">The type that is inheriting from this class.</typeparam>
     /// <typeparam name="TValue">The type of the inner value.</typeparam>
     /// <remarks></remarks>
+    [BsonSerializer(typeof(EnumerationSerializer<,>))]
     public abstract class Enumeration<TEnum, TValue> :
         ValueObject<Enumeration<TEnum, TValue>>,
         IEnumeration,

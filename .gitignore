@@ -340,3 +340,4 @@ ASALocalRun/
 healthchecksdb
 /Geex.Server/appsettings.Development.json
 /Geex.Server/Properties/launchSettings.json
+/nuget

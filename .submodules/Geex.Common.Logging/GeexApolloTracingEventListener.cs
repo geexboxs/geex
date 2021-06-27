@@ -44,6 +44,7 @@ namespace Geex.Common.Gql
             if (!this.IsEnabled(context.ContextData))
                 return this.EmptyScope;
             DateTime startTime = this._timestampProvider.UtcNow();
+            logger.LogInformationWithData(new EventId((nameof(GeexApolloTracingRequestScope) + "Start").GetHashCode(), nameof(GeexApolloTracingRequestScope) + "Start"), "Request started.", new { QueryId = context.Request.QueryId, Query = context.Request.Query.ToString(), Variables = context.Request.VariableValues?.ToDictionary(x => x.Key, x => (x.Value as IValueNode)?.Value) });
             GeexApolloTracingResultBuilder builder = CreateBuilder(context.ContextData, logger);
             builder.SetRequestStartTime(startTime, this._timestampProvider.NowInNanoseconds());
             return new GeexApolloTracingRequestScope(context, logger, startTime, builder, this._timestampProvider);
@@ -116,7 +117,6 @@ namespace Geex.Common.Gql
                 this._startTime = startTime;
                 this._builder = builder;
                 this._timestampProvider = timestampProvider;
-                logger.LogInformationWithData(new EventId((nameof(GeexApolloTracingRequestScope) + "Start").GetHashCode(), nameof(GeexApolloTracingRequestScope) + "Start"), "Request started.", new { QueryId = context.Request.QueryId, Query = context.Request.Query.ToString(), Variables = context.Request.VariableValues?.ToDictionary(x => x.Key, x => (x.Value as IValueNode)?.Value) });
             }
 
             public void Dispose()
@@ -124,7 +124,6 @@ namespace Geex.Common.Gql
                 if (this._disposed)
                     return;
                 this._builder.SetRequestDuration(this._timestampProvider.UtcNow() - this._startTime);
-
 
                 if (this._context.Result is IReadOnlyQueryResult result)
                 {

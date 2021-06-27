@@ -25,21 +25,21 @@ namespace Geex.Common.Abstractions
     {
         public IConfiguration Configuration { get; private set; }
 
-        public virtual void ConfigureModuleOptions(Action<GeexModuleOption<T>> optionsAction)
+        public virtual void ConfigureModuleOptions(Action<IGeexModuleOption<T>> optionsAction)
         {
-            var type = this.GetType().Assembly.ExportedTypes.FirstOrDefault(x => x.IsAssignableTo<GeexModuleOption<T>>());
+            var type = this.GetType().Assembly.ExportedTypes.FirstOrDefault(x => x.IsAssignableTo<IGeexModuleOption<T>>());
             if (type == default)
             {
                 return;
             }
-            var options = (GeexModuleOption<T>?)this.ServiceConfigurationContext.Services.GetSingletonInstanceOrNull(type);
+            var options = (IGeexModuleOption<T>?)this.ServiceConfigurationContext.Services.GetSingletonInstanceOrNull(type);
             if (options == default)
             {
-                options = Activator.CreateInstance(type) as GeexModuleOption<T>;
+                options = Activator.CreateInstance(type) as IGeexModuleOption<T>;
                 Configuration.GetSection(type.Name).Bind(options);
             }
             optionsAction.Invoke(options!);
-            this.ServiceConfigurationContext.Services.TryAdd(new ServiceDescriptor(this.GetType().Assembly.ExportedTypes.First(x => x.IsAssignableTo<GeexModuleOption<T>>()), options));
+            this.ServiceConfigurationContext.Services.TryAdd(new ServiceDescriptor(type, options));
         }
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
@@ -53,7 +53,7 @@ namespace Geex.Common.Abstractions
 
         public virtual void ConfigureModuleEntityMaps()
         {
-            var entityConfigs = this.GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo<IEntityMapConfig>());
+            var entityConfigs = this.GetType().Assembly.ExportedTypes.Where(x => x.IsAssignableTo<IEntityMapConfig>() && !x.IsAbstract);
             foreach (var entityMapConfig in entityConfigs)
             {
                 var entityType = entityMapConfig.BaseType!.GetGenericArguments().First();

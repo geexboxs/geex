@@ -2,14 +2,21 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
 using Geex.Common.Abstractions;
+using Geex.Common.Logging;
+
 using HotChocolate.Execution;
 using HotChocolate.Execution.Instrumentation;
 using HotChocolate.Execution.Options;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
+
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Geex.Common.Gql
 {
@@ -17,17 +24,17 @@ namespace Geex.Common.Gql
     {
         private const string _extensionKey = "tracing";
         private readonly ILogger<GeexApolloTracingDiagnosticEventListener> logger;
-        private readonly TracingPreference _tracingPreference;
+        private TracingPreference _tracingPreference;
         private readonly ITimestampProvider _timestampProvider;
 
         public GeexApolloTracingDiagnosticEventListener(
           ILogger<GeexApolloTracingDiagnosticEventListener> logger,
-          TracingPreference tracingPreference = TracingPreference.OnDemand,
-          ITimestampProvider? timestampProvider = null)
+          LoggingModuleOptions options,
+          ITimestampProvider? timestampProvider)
         {
             this.logger = logger;
-            this._tracingPreference = tracingPreference;
-            this._timestampProvider = timestampProvider ?? (ITimestampProvider)new DefaultTimestampProvider();
+            this._tracingPreference = options.TracingPreference;
+            this._timestampProvider = timestampProvider;
         }
 
         public override bool EnableResolveFieldValue => true;
@@ -37,34 +44,34 @@ namespace Geex.Common.Gql
             if (!this.IsEnabled(context.ContextData))
                 return this.EmptyScope;
             DateTime startTime = this._timestampProvider.UtcNow();
-            GeexApolloTracingResultBuilder builder = GeexApolloTracingDiagnosticEventListener.CreateBuilder(context.ContextData, logger);
-            builder.SetRequestStartTime((DateTimeOffset)startTime, this._timestampProvider.NowInNanoseconds());
-            return (IActivityScope)new GeexApolloTracingDiagnosticEventListener.GeexApolloTracingRequestScope(context, logger, startTime, builder, this._timestampProvider);
+            GeexApolloTracingResultBuilder builder = CreateBuilder(context.ContextData, logger);
+            builder.SetRequestStartTime(startTime, this._timestampProvider.NowInNanoseconds());
+            return new GeexApolloTracingRequestScope(context, logger, startTime, builder, this._timestampProvider);
         }
 
         public override IActivityScope ParseDocument(IRequestContext context)
         {
             GeexApolloTracingResultBuilder builder;
-            return !GeexApolloTracingDiagnosticEventListener.TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : (IActivityScope)new GeexApolloTracingDiagnosticEventListener.ParseDocumentScope(builder, this._timestampProvider);
+            return !TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : new ParseDocumentScope(builder, this._timestampProvider);
         }
 
         public override IActivityScope ValidateDocument(IRequestContext context)
         {
             GeexApolloTracingResultBuilder builder;
-            return !GeexApolloTracingDiagnosticEventListener.TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : (IActivityScope)new GeexApolloTracingDiagnosticEventListener.ValidateDocumentScope(builder, this._timestampProvider);
+            return !TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : new ValidateDocumentScope(builder, this._timestampProvider);
         }
 
         public override IActivityScope ResolveFieldValue(IMiddlewareContext context)
         {
             GeexApolloTracingResultBuilder builder;
-            return !GeexApolloTracingDiagnosticEventListener.TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : (IActivityScope)new GeexApolloTracingDiagnosticEventListener.ResolveFieldValueScope(context, builder, this._timestampProvider);
+            return !TryGetBuilder(context.ContextData, out builder) ? this.EmptyScope : new ResolveFieldValueScope(context, builder, this._timestampProvider);
         }
 
         private static GeexApolloTracingResultBuilder CreateBuilder(IDictionary<string, object?> contextData,
             ILogger<GeexApolloTracingDiagnosticEventListener> logger)
         {
             GeexApolloTracingResultBuilder tracingResultBuilder = new GeexApolloTracingResultBuilder(logger);
-            contextData["ApolloTracingResultBuilder"] = (object)tracingResultBuilder;
+            contextData["ApolloTracingResultBuilder"] = tracingResultBuilder;
             return tracingResultBuilder;
         }
 
@@ -78,7 +85,7 @@ namespace Geex.Common.Gql
                 builder = tracingResultBuilder;
                 return true;
             }
-            builder = (GeexApolloTracingResultBuilder)null;
+            builder = null;
             return false;
         }
 
@@ -109,6 +116,7 @@ namespace Geex.Common.Gql
                 this._startTime = startTime;
                 this._builder = builder;
                 this._timestampProvider = timestampProvider;
+                logger.LogInformationWithData(new EventId((nameof(GeexApolloTracingRequestScope) + "Start").GetHashCode(), nameof(GeexApolloTracingRequestScope) + "Start"), "Request started.", new { QueryId = context.Request.QueryId, Query = context.Request.Query.ToString(), Variables = context.Request.VariableValues?.ToDictionary(x => x.Key, x => (x.Value as IValueNode)?.Value) });
             }
 
             public void Dispose()
@@ -116,11 +124,14 @@ namespace Geex.Common.Gql
                 if (this._disposed)
                     return;
                 this._builder.SetRequestDuration(this._timestampProvider.UtcNow() - this._startTime);
+
+
                 if (this._context.Result is IReadOnlyQueryResult result)
                 {
                     var resultMap = this._builder.Build();
                     this._logger.LogTraceWithData(GeexboxEventId.ApolloTracing, null, resultMap);
-                    this._context.Result = (IExecutionResult)QueryResultBuilder.FromResult((IQueryResult)result).AddExtension("tracing", (object)resultMap).Create();
+                    _logger.LogInformationWithData(new EventId((nameof(GeexApolloTracingRequestScope) + "End").GetHashCode(), nameof(GeexApolloTracingRequestScope) + "End"), "Request ended.", new { Label = result.Label, QueryId = this._context.Request.QueryId, Data = result.Data, Error = this._context.Result.Errors });
+                    this._context.Result = QueryResultBuilder.FromResult(result).AddExtension("tracing", resultMap).Create();
                 }
 
                 this._disposed = true;
@@ -200,7 +211,7 @@ namespace Geex.Common.Gql
             {
                 if (this._disposed)
                     return;
-                this._builder.AddResolverResult(new GeexApolloTracingResolverRecord((IResolverContext)this._context, this._startTimestamp, this._timestampProvider.NowInNanoseconds()));
+                this._builder.AddResolverResult(new GeexApolloTracingResolverRecord(this._context, this._startTimestamp, this._timestampProvider.NowInNanoseconds()));
                 this._disposed = true;
             }
         }
@@ -234,16 +245,16 @@ namespace Geex.Common.Gql
         {
             this._parsingResult = new ResultMap();
             this._parsingResult.EnsureCapacity(2);
-            this._parsingResult.SetValue(0, "startOffset", (object)(startTimestamp - this._startTimestamp));
-            this._parsingResult.SetValue(1, "duration", (object)(endTimestamp - startTimestamp));
+            this._parsingResult.SetValue(0, "startOffset", startTimestamp - this._startTimestamp);
+            this._parsingResult.SetValue(1, "duration", endTimestamp - startTimestamp);
         }
 
         public void SetValidationResult(long startTimestamp, long endTimestamp)
         {
             this._validationResult = new ResultMap();
             this._validationResult.EnsureCapacity(2);
-            this._validationResult.SetValue(0, "startOffset", (object)(startTimestamp - this._startTimestamp));
-            this._validationResult.SetValue(1, "duration", (object)(endTimestamp - startTimestamp));
+            this._validationResult.SetValue(0, "startOffset", startTimestamp - this._startTimestamp);
+            this._validationResult.SetValue(1, "duration", endTimestamp - startTimestamp);
         }
 
         public void AddResolverResult(GeexApolloTracingResolverRecord record) => this._resolverRecords.Enqueue(record);
@@ -258,17 +269,17 @@ namespace Geex.Common.Gql
                 this.SetValidationResult(this._startTimestamp, this._startTimestamp);
             ResultMap resultMap1 = new ResultMap();
             resultMap1.EnsureCapacity(1);
-            resultMap1.SetValue(0, "resolvers", (object)this.BuildResolverResults());
+            resultMap1.SetValue(0, "resolvers", this.BuildResolverResults());
             ResultMap resultMap2 = new ResultMap();
             resultMap2.EnsureCapacity(7);
-            resultMap2.SetValue(0, "version", (object)1);
-            resultMap2.SetValue(1, "startTime", (object)this._startTime.ToUnixTimeSeconds());
-            resultMap2.SetValue(2, "endTime", (object)this._startTime.Add(this._duration).ToUnixTimeSeconds());
-            resultMap2.SetValue(3, "duration", (object)(this._duration.TotalSeconds));
+            resultMap2.SetValue(0, "version", 1);
+            resultMap2.SetValue(1, "startTime", this._startTime.ToUnixTimeSeconds());
+            resultMap2.SetValue(2, "endTime", this._startTime.Add(this._duration).ToUnixTimeSeconds());
+            resultMap2.SetValue(3, "duration", this._duration.TotalSeconds);
             resultMap2.SetValue(4, "parsing", (object)this._parsingResult);
             resultMap2.SetValue(5, "validation", (object)this._validationResult);
-            resultMap2.SetValue(6, "execution", (object)resultMap1);
-            return (IResultMap)resultMap2;
+            resultMap2.SetValue(6, "execution", resultMap1);
+            return resultMap2;
         }
 
         private ResultMap[] BuildResolverResults()
@@ -279,12 +290,12 @@ namespace Geex.Common.Gql
             {
                 ResultMap resultMap = new ResultMap();
                 resultMap.EnsureCapacity(6);
-                resultMap.SetValue(0, "path", (object)resolverRecord.Path);
-                resultMap.SetValue(1, "parentType", (object)resolverRecord.ParentType);
-                resultMap.SetValue(2, "fieldName", (object)resolverRecord.FieldName);
-                resultMap.SetValue(3, "returnType", (object)resolverRecord.ReturnType);
-                resultMap.SetValue(4, "startOffset", (object)(resolverRecord.StartTimestamp - this._startTimestamp));
-                resultMap.SetValue(5, "duration", (object)(resolverRecord.EndTimestamp - resolverRecord.StartTimestamp));
+                resultMap.SetValue(0, "path", resolverRecord.Path);
+                resultMap.SetValue(1, "parentType", resolverRecord.ParentType);
+                resultMap.SetValue(2, "fieldName", resolverRecord.FieldName);
+                resultMap.SetValue(3, "returnType", resolverRecord.ReturnType);
+                resultMap.SetValue(4, "startOffset", resolverRecord.StartTimestamp - this._startTimestamp);
+                resultMap.SetValue(5, "duration", resolverRecord.EndTimestamp - resolverRecord.StartTimestamp);
                 resultMapArray[num++] = resultMap;
             }
             return resultMapArray;
@@ -299,9 +310,9 @@ namespace Geex.Common.Gql
           long endTimestamp)
         {
             this.Path = context.Path.ToList();
-            this.ParentType = (string)context.ObjectType.Name;
-            this.FieldName = (string)context.Field.Name;
-            this.ReturnType = (string)context.Field.Type.TypeName();
+            this.ParentType = context.ObjectType.Name;
+            this.FieldName = context.Field.Name;
+            this.ReturnType = context.Field.Type.TypeName();
             this.StartTimestamp = startTimestamp;
             this.EndTimestamp = endTimestamp;
         }

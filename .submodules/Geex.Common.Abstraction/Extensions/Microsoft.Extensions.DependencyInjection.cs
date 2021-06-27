@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 using Geex.Common;
+using Geex.Common.Abstraction;
 using Geex.Common.Abstractions;
 using Geex.Common.Gql;
 using Geex.Common.Gql.Interceptors;
@@ -106,16 +107,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return AbpTypeExtensions.IsAssignableTo<IEnumeration>(type);
-        }
-
-        public static IRequestExecutorBuilder AddGeexApolloTracing(
-      this IRequestExecutorBuilder builder,
-      TracingPreference tracingPreference = TracingPreference.OnDemand,
-      ITimestampProvider? timestampProvider = null)
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-            return tracingPreference == TracingPreference.Never ? builder : builder.ConfigureSchemaServices((Action<IServiceCollection>)(s => s.AddSingleton<IDiagnosticEventListener>((Func<IServiceProvider, IDiagnosticEventListener>)(sp => (IDiagnosticEventListener)new GeexApolloTracingDiagnosticEventListener(sp.GetApplicationService<ILogger<GeexApolloTracingDiagnosticEventListener>>(), tracingPreference, timestampProvider ?? sp.GetService<ITimestampProvider>())))));
         }
 
         public static IEnumerable<T> GetSingletonInstancesOrNull<T>(this IServiceCollection services) => services.Where<ServiceDescriptor>((Func<ServiceDescriptor, bool>)(d => d.ServiceType == typeof(T)))?.Select(x => x.ImplementationInstance).Cast<T>();

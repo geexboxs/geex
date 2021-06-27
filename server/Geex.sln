@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Redis", "..\.su
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Abstraction", "..\.submodules\Geex.Common.Abstraction\Geex.Common.Abstraction.csproj", "{E557BB3E-4510-4375-908C-1763D08C7E46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Geex.Common.Logging", "..\.submodules\Geex.Common.Logging\Geex.Common.Logging.csproj", "{1717CA46-15D1-4076-A942-5D3925D05FA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{E557BB3E-4510-4375-908C-1763D08C7E46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E557BB3E-4510-4375-908C-1763D08C7E46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E557BB3E-4510-4375-908C-1763D08C7E46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{D29C811A-565A-46DC-A508-CBE27EA688DB} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{E557BB3E-4510-4375-908C-1763D08C7E46} = {708825AC-62A7-4AF2-AA60-565130F0053F}
+		{1717CA46-15D1-4076-A942-5D3925D05FA1} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B29333E1-4892-465E-983D-B4CDFFEA01C3}

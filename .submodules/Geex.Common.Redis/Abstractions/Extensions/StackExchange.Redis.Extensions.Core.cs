@@ -37,7 +37,7 @@ namespace StackExchange.Redis.Extensions.Core
         /// <typeparam name="T">The typof of serializer. <see cref="ISerializer" />.</typeparam>
         public static IServiceCollection AddStackExchangeRedisExtensions(this IServiceCollection services)
         {
-            var redisConfiguration = services.ExecutePreConfiguredActions(new RedisModuleOptions());
+            var redisConfiguration = services.GetSingletonInstance<RedisModuleOptions>();
             services.AddSingleton<IRedisCacheClient, RedisCacheClient>();
             services.AddSingleton<IRedisDatabase>(x => x.GetService<IRedisCacheClient>()?.Db0!);
             services.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();

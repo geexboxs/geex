@@ -5,9 +5,12 @@ using HotChocolate.Execution;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Entities;
+using Volo.Abp.DependencyInjection;
 
 namespace Geex.Common.Gql.Interceptors
 {
+    [Dependency(ServiceLifetime.Transient, TryRegister = true, ReplaceServices = false)]
+    [ExposeServices(typeof(IHttpRequestInterceptor))]
     public class UnitOfWorkInterceptor : DefaultHttpRequestInterceptor
     {
 

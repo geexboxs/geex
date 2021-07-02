@@ -12,7 +12,6 @@ namespace Geex.Common.Settings.Core
     [DebuggerDisplay("{Name}")]
     public class Setting : Entity, ISetting, IHasRedisKey
     {
-        [GraphQLType(typeof(EnumerationType<SettingScopeEnumeration, string>))]
         public SettingScopeEnumeration Scope { get; private set; }
         public string? ScopedKey { get; private set; }
         public string? Value { get; private set; }

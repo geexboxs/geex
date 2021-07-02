@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-
-using Geex.Shared._ShouldMigrateToLib;
-
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
-using Volo.Abp.Threading;
-
-namespace Geex.Core.Authentication.Utils
+namespace Geex.Common.Abstraction
 {
     public class GeexJwtSecurityTokenHandler : ISecurityTokenValidator
     {

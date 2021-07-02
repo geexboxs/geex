@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Linq;
 using Geex.Common.Abstractions;
 
 using HotChocolate.Configuration;
@@ -13,7 +13,24 @@ namespace Geex.Common.Gql.Types
     public class EnumerationType<TEnum, TValue> : EnumType<TEnum> where TEnum : IEnumeration
         where TValue : IEquatable<TValue>, IComparable<TValue>
     {
+        //protected override EnumTypeDefinition CreateDefinition(ITypeDiscoveryContext context)
+        //{
+        //    var definition = base.CreateDefinition(context);
+
+        //    if (!definition.Values.Any())
+        //    {
+        //        definition.Values.Push(new EnumValueDefinition()
+        //        {
+        //            Name = "_",
+        //            Value = null,
+        //            DeprecationReason = "_"
+        //        });
+        //    }
+
+        //    return definition;
+        //}
     }
+
     //public class EnumerationType<TEnum, TValue> : ScalarType<TEnum> where TEnum : IEnumeration where TValue : IEquatable<TValue>, IComparable<TValue>
     //{
     //    public EnumerationType() : base(typeof(TEnum).Name)

@@ -40,24 +40,35 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class Extension
     {
+        public static IServiceCollection AddStorage(this IServiceCollection builder)
+        {
+            var commonModuleOptions = builder.GetSingletonInstance<GeexCoreModuleOptions>();
+            var mongoUrl = new MongoUrl(commonModuleOptions.ConnectionString) { };
+            var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
+            mongoSettings.ApplicationName = commonModuleOptions.AppName;
+            DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
+            builder.AddScoped<DbContext>(x => new DbContext(transactional: true));
+            return builder;
+        }
 
         public static void UseGeexGraphQL(this IApplicationBuilder app)
         {
+            app.UseWebSockets();
             app.UseRouting()
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapGraphQL();
                 });
             app.UseVoyager("/graphql", "/voyager");
-            app.UsePlayground();
+            app.UsePlayground("/graphql", "/playground");
         }
-
         public static IRequestExecutorBuilder AddModuleTypes<TModule>(this IRequestExecutorBuilder schemaBuilder)
+
         {
             return schemaBuilder
                 .AddModuleTypes(typeof(TModule));
         }
-        public static object? GetSingletonInstanceOrNull(this IServiceCollection services, Type type) => services.FirstOrDefault<ServiceDescriptor>((Func<ServiceDescriptor, bool>) (d => d.ServiceType == type))?.ImplementationInstance;
+        public static object? GetSingletonInstanceOrNull(this IServiceCollection services, Type type) => services.FirstOrDefault<ServiceDescriptor>((Func<ServiceDescriptor, bool>)(d => d.ServiceType == type))?.ImplementationInstance;
         public static IRequestExecutorBuilder AddModuleTypes(this IRequestExecutorBuilder schemaBuilder, Type gqlModuleType)
         {
             if (GeexModule.KnownModuleAssembly.AddIfNotContains(gqlModuleType.Assembly))
@@ -72,13 +83,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 }
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
                 var rootTypes = exportedTypes.Where(x => !x.IsAbstract &&
-                                                              (AbpTypeExtensions.IsAssignableTo<Query>(x) ||
-                                                               AbpTypeExtensions.IsAssignableTo<Mutation>(x) ||
-                                                               AbpTypeExtensions.IsAssignableTo<Subscription>(x))).ToArray();
+                                                         (x.IsAssignableTo<Query>() ||
+                                                          x.IsAssignableTo<Mutation>() ||
+                                                          x.IsAssignableTo<Subscription>())).ToArray();
                 schemaBuilder.AddTypes(rootTypes);
-                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).ToList();
+                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsAssignableTo<IType>()).Where(x => !x.IsGenericType || (x.IsGenericType && x.GenericTypeArguments.Any())).ToList();
                 schemaBuilder.AddTypes(objectTypes.ToArray());
-                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum()).ToList();
+                var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum() && x.Name != nameof(Enumeration)).ToList();
                 foreach (var classEnumType in classEnumTypes)
                 {
                     schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));
@@ -112,6 +123,5 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IEnumerable<T> GetSingletonInstancesOrNull<T>(this IServiceCollection services) => services.Where<ServiceDescriptor>((Func<ServiceDescriptor, bool>)(d => d.ServiceType == typeof(T)))?.Select(x => x.ImplementationInstance).Cast<T>();
 
         public static IEnumerable<T> GetSingletonInstances<T>(this IServiceCollection services) => services.GetSingletonInstancesOrNull<T>() ?? throw new InvalidOperationException("Could not find singleton service: " + typeof(T).AssemblyQualifiedName);
-
     }
 }

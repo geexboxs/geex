@@ -18,6 +18,32 @@ namespace System.Reflection
                 .Select(pi => (TPropertyType)pi.GetValue(null))
                 .ToList();
         }
+        private static Dictionary<Type, PropertyInfo[]> _typeCache = new();
+        /// <summary>
+        /// Create a dictionary from the given object (<paramref name="obj"/>).
+        /// </summary>
+        /// <param name="obj">Source object.</param>
+        /// <returns>Created dictionary.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="obj"/> is null.</exception>
+        public static IDictionary<string, object> ToDictionary(this object obj)
+        {
+            
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+
+            if (obj is IDictionary<string, object> already)
+            {
+                return already;
+            }
+
+            var type = obj.GetType();
+            if (!_typeCache.TryGetValue(type, out var props))
+            {
+                props = type.GetProperties();
+            }
+
+            return props.ToDictionary(x => x.Name, x => x.GetValue(obj, null));
+        }
     }
 
 }

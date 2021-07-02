@@ -19,10 +19,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Geex.Common;
+using Geex.Common.Abstraction;
 using Geex.Common.Abstractions;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authentication.Utils;
 using Geex.Core.UserManagement.Domain;
+using HotChocolate.AspNetCore;
 using Humanizer;
 using ImpromptuInterface;
 using Microsoft.AspNetCore.Hosting;
@@ -59,15 +61,10 @@ namespace Geex.Core.Authentication
             IdentityModelEventSource.ShowPII = true;
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             var services = context.Services;
-            var configuration = services.GetConfiguration();
             services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddTransient<IUserCreationValidator, UserCreationValidator>();
             var moduleOptions = services.GetSingletonInstance<AuthenticationModuleOptions>();
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+            var tokenValidationParameters = new TokenValidationParameters
                     {
                         // 签名键必须匹配!
                         ValidateIssuerSigningKey = true,
@@ -87,10 +84,27 @@ namespace Geex.Core.Authentication
                         // If you want to allow a certain amount of clock drift, set that here
                         ClockSkew = TimeSpan.Zero
                     };
+            services.AddSingleton<TokenValidationParameters>(tokenValidationParameters);
+            services.AddTransient<ISocketSessionInterceptor, SubscriptionAuthInterceptor>(x=> new SubscriptionAuthInterceptor(x.GetApplicationService<TokenValidationParameters>()));
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = tokenValidationParameters;
                     options.SecurityTokenValidators.Clear();
                     options.SecurityTokenValidators.Add(new GeexJwtSecurityTokenHandler());
                     options.Events ??= new JwtBearerEvents();
-                    options.Events.OnMessageReceived = receivedContext => { return Task.CompletedTask; };
+                    options.Events.OnMessageReceived = receivedContext =>
+                    {
+                        if (receivedContext.HttpContext.WebSockets.IsWebSocketRequest)
+                        {
+                            if (receivedContext.HttpContext.Items.TryGetValue("jwtToken", out var token))
+                            {
+                                receivedContext.Token = token.ToString();
+                            }
+                        }
+                        return Task.CompletedTask;
+                    };
                     options.Events.OnAuthenticationFailed = receivedContext => { return Task.CompletedTask; };
                     options.Events.OnChallenge = receivedContext => { return Task.CompletedTask; };
                     options.Events.OnForbidden = receivedContext => { return Task.CompletedTask; };

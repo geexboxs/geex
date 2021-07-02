@@ -8,7 +8,7 @@ using Geex.Common.Abstractions.Enumerations;
 using Volo.Abp;
 
 // ReSharper disable once CheckNamespace
-namespace System.Security
+namespace System.Security.Claims
 {
     public static class AbpClaimsIdentityExtensions
     {

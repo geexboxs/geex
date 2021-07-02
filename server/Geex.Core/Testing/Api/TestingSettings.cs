@@ -5,13 +5,12 @@ namespace Geex.Core.Testing.Api
     public class TestingSettings : SettingDefinition
     {
         public TestingSettings(string name,
-            object? defaultValue,
             SettingScopeEnumeration[] validScopes = default,
             string? description = null,
             bool isHiddenForClients = false) : base(nameof(Testing) + name, validScopes, description, isHiddenForClients)
         {
         }
-        public static TestingSettings ModuleName { get; } = new(nameof(ModuleName), "Testing");
+        public static TestingSettings ModuleName { get; } = new(nameof(ModuleName), new[] { SettingScopeEnumeration.Global, });
 
     }
 }

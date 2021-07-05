@@ -36,6 +36,7 @@ const routes: Routes = [
   },
   { path: 'exception', loadChildren: () => import('./exception/exception.module').then((m) => m.ExceptionModule) },
   { path: 'account', loadChildren: () => import('./account/account.module').then((m) => m.AccountModule) },
+  { path: 'messaging', loadChildren: () => import('./messaging/messaging.module').then((m) => m.MessagingModule) },
   { path: '**', redirectTo: 'exception/404' },
 ];
 

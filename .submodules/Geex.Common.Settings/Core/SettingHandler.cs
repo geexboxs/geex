@@ -15,60 +15,52 @@ using Geex.Common.Settings.Abstraction;
 using Geex.Common.Settings.Api;
 using Geex.Common.Settings.Api.Aggregates.Settings;
 using Geex.Common.Settings.Api.Aggregates.Settings.Inputs;
+
 using MediatR;
 
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 using MongoDB.Entities;
+
 using MoreLinq;
 
 using StackExchange.Redis.Extensions.Core;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
+using Volo.Abp.DependencyInjection;
+
 namespace Geex.Common.Settings.Core
 {
     public class SettingHandler : IRequestHandler<UpdateSettingInput, ISetting>, IRequestHandler<GetSettingsInput, IQueryable<ISetting>>
     {
+        public ILogger<SettingHandler> Logger { get; }
         private IRedisDatabase _redisClient;
         private readonly DbContext _dbContext;
-        private readonly Lazy<ClaimsPrincipal> _principalLazyInject;
+        private readonly ClaimsPrincipal _principal;
+        private static IReadOnlyList<SettingDefinition> _settingDefinitions;
 
-        public SettingHandler(IRedisDatabase redisClient, IEnumerable<GeexModule> modules, DbContext dbContext, Lazy<ClaimsPrincipal> principalLazyInject)
+
+        public SettingHandler(IRedisDatabase redisClient, IEnumerable<GeexModule> modules, DbContext dbContext, ClaimsPrincipal principal, ILogger<SettingHandler> logger)
         {
+            Logger = logger;
             _redisClient = redisClient;
             _dbContext = dbContext;
-            _principalLazyInject = principalLazyInject;
-            var definitionTypes = modules
-                    .Select(y => y.GetType().Assembly).Distinct()
-                    .SelectMany(y => y.DefinedTypes
-                    .Where(z => z.BaseType == typeof(SettingDefinition)));
-            var settingDefinitions =
-                definitionTypes.SelectMany(x => x.GetProperties(BindingFlags.Static | BindingFlags.Public).Where(y => y.DeclaringType.IsAssignableTo(x))).Select(x => x.GetValue(null)).Cast<SettingDefinition>();
-            SettingDefinitions = new ReadOnlyCollection<SettingDefinition>(settingDefinitions.ToArray());
-            //var defaultSettings = SettingDefinitions.Select(x => new Setting(x, x.DefaultValue, SettingScopeEnumeration.Global));
-            //var existedSettings = _redisClient.GetAllNamedAsync<Setting>().Result.Select(x => x.Value);
-            //var userSettings = existedSettings.Where(x => x.Scope == SettingScopeEnumeration.User);
-            //var overrideSettings = existedSettings.Where(x => x.Scope == SettingScopeEnumeration.Global);
-            //var overrideSettingNames = overrideSettings.Select(x => x.Name);
-
-            //var overridedSettings = overrideSettings.Union(defaultSettings, new GenericEqualityComparer<Setting>().With(x=>x.Name));
+            _principal = principal;
+            if (_settingDefinitions == default)
+            {
+                var definitionTypes = modules
+                   .Select(y => y.GetType().Assembly).Distinct()
+                   .SelectMany(y => y.DefinedTypes
+                   .Where(z => z.BaseType == typeof(SettingDefinition)));
+                var settingDefinitions =
+                    definitionTypes.SelectMany(x => x.GetProperties(BindingFlags.Static | BindingFlags.Public).Where(y => y.DeclaringType.IsAssignableTo(x))).Select(x => x.GetValue(null)).Cast<SettingDefinition>();
+                _settingDefinitions = new ReadOnlyCollection<SettingDefinition>(settingDefinitions.ToArray());
+            }
         }
 
-        public IReadOnlyList<SettingDefinition> SettingDefinitions { get; }
+        public IReadOnlyList<SettingDefinition> SettingDefinitions => _settingDefinitions;
 
-        /// <summary>
-        /// 获取当前生效的setting
-        /// </summary>
-        /// <typeparam name="TProviderType"></typeparam>
-        /// <param name="settingName"></param>
-        /// <param name="identity"></param>
-        /// <returns></returns>
-        public async Task<Setting?> GetEffectiveAsync<TProviderType>(TProviderType settingName, ClaimsIdentity identity) where TProviderType : SettingDefinition
-        {
-            Setting setting;
-            setting = await this.GetOrNullAsync(settingName, SettingScopeEnumeration.User, identity.Claims.FirstOrDefault(x => x.Type == GeexClaimType.Sub).Value) ??
-                      await this.GetOrNullAsync(settingName, SettingScopeEnumeration.Global);
-            return setting;
-        }
         public async Task<Setting> SetAsync(SettingDefinition settingDefinition, SettingScopeEnumeration scope, string? scopedKey, string? value)
         {
             var definition = this.SettingDefinitions.FirstOrDefault(x => x.Name == settingDefinition);
@@ -76,40 +68,64 @@ namespace Geex.Common.Settings.Core
             {
                 throw new BusinessException(GeexExceptionType.NotFound, message: "setting name not exists.");
             }
-            var setting = new Setting(definition, value, scope, scopedKey);
-            if (await _redisClient.SetNamedAsync(setting.RedisKey))
-            {
-                return setting;
-            }
-            throw new BusinessException(GeexExceptionType.Unknown, message: "failed to set setting");
+            var setting = await _dbContext.Find<Setting>().Match(x => x.Name == settingDefinition && x.Scope == scope && x.ScopedKey == scopedKey).ExecuteSingleAsync();
+            setting.SetValue(value);
+            await setting.SaveAsync();
+            _dbContext.OnCommitted += async (sender, args) =>
+             {
+                 await _redisClient.SetNamedAsync(setting.GetRedisKey());
+             };
+            return setting;
         }
 
         public async Task<IEnumerable<Setting>> GetAllForCurrentUserAsync(ClaimsPrincipal identity)
         {
-            var userKeys = await _redisClient.SearchKeysAsync($"{nameof(Setting)}:{SettingScopeEnumeration.User}:{identity.FindUserId()}:*");
-            var userSettings = await _redisClient.GetAllAsync<Setting>(userKeys);
-            var globalKeys = await _redisClient.SearchKeysAsync($"{nameof(Setting)}:{SettingScopeEnumeration.Global}:*");
-            var globalSettings = await _redisClient.GetAllAsync<Setting>(globalKeys);
-            return userSettings.Values.Union(globalSettings.Values, new GenericEqualityComparer<Setting>().With(x => x.Name));
+            var globalSettings = await this.GetGlobalSettingsAsync();
+            if (!identity.FindUserId().IsNullOrEmpty())
+            {
+                var userSettings = await this.GetUserSettingsAsync(identity);
+                return userSettings.Union(globalSettings, new GenericEqualityComparer<Setting>().With(x => x.Name));
+            }
+            return globalSettings;
         }
         public async Task<IEnumerable<Setting>> GetGlobalSettingsAsync()
         {
-            var globalKeys = await _redisClient.SearchKeysAsync($"{nameof(Setting)}:{SettingScopeEnumeration.Global}:*");
-            var globalSettings = await _redisClient.GetAllAsync<Setting>(globalKeys);
+            var globalSettings = await _redisClient.GetAllNamedByKeyAsync<Setting>($"{SettingScopeEnumeration.Global}:*");
+            if (SettingDefinitions.Except(globalSettings.Select(x => x.Value.Name)).Any())
+            {
+                var dbSettings = await _dbContext.Find<Setting>().Match(x => x.Scope == SettingScopeEnumeration.Global).ExecuteAsync();
+                await TrySyncSettings(globalSettings, dbSettings);
+                return dbSettings;
+            }
             return globalSettings.Values;
+        }
+
+        private async Task TrySyncSettings(IDictionary<string, Setting> cachedSettings, List<Setting> dbSettings)
+        {
+            if (cachedSettings.Values.OrderBy(x => x.Name).SequenceEqual(dbSettings.OrderBy(x => x.Name), new GenericEqualityComparer<Setting>().With(x => x.Name)))
+            {
+                return;
+            }
+            await _redisClient.RemoveAllAsync(cachedSettings.Keys);
+            _ = await _redisClient.AddAllAsync(dbSettings.Select(x => new Tuple<string, Setting>(x.GetRedisKey(), x)).ToList());
         }
 
         public async Task<IEnumerable<Setting>> GetUserSettingsAsync(ClaimsPrincipal identity)
         {
-            var userKeys = await _redisClient.SearchKeysAsync($"{nameof(Setting)}:{SettingScopeEnumeration.User}:{identity.FindUserId()}:*");
-            var userSettings = await _redisClient.GetAllAsync<Setting>(userKeys);
+            var userSettings = await _redisClient.GetAllNamedByKeyAsync<Setting>($"{SettingScopeEnumeration.User}:{identity.FindUserId()}:*");
+            if (SettingDefinitions.Except(userSettings.Select(x => x.Value.Name)).Any())
+            {
+                var dbSettings = await _dbContext.Find<Setting>().Match(x => x.Scope == SettingScopeEnumeration.User && x.ScopedKey == identity.FindUserId()).ExecuteAsync();
+                await TrySyncSettings(userSettings, dbSettings);
+                return dbSettings;
+            }
             return userSettings.Values;
         }
 
         public async Task<Setting?> GetOrNullAsync(SettingDefinition settingDefinition, SettingScopeEnumeration settingScope = default,
             string? scopedKey = default)
         {
-            return await _redisClient.GetNamedAsync<Setting>(new Setting(settingDefinition, default, settingScope, scopedKey).RedisKey);
+            return await _redisClient.GetNamedAsync<Setting>(new Setting(settingDefinition, default, settingScope, scopedKey).GetRedisKey());
         }
 
         public async Task<ISetting> Handle(UpdateSettingInput request, CancellationToken cancellationToken)
@@ -124,13 +140,13 @@ namespace Geex.Common.Settings.Core
             if (request.Scope != default)
             {
                 await request.Scope.SwitchAsync(
-                    (SettingScopeEnumeration.User, async () => settingValues = await this.GetUserSettingsAsync(_principalLazyInject.Value)),
+                    (SettingScopeEnumeration.User, async () => settingValues = await this.GetUserSettingsAsync(_principal)),
                     (SettingScopeEnumeration.Global, async () => settingValues = await this.GetGlobalSettingsAsync())
                 );
             }
             else
             {
-                settingValues = await this.GetAllForCurrentUserAsync(_principalLazyInject.Value);
+                settingValues = await this.GetAllForCurrentUserAsync(_principal);
             }
             var result = settingValues/*.Join(settingDefinitions, setting => setting.Name, settingDefinition => settingDefinition.Name, (settingValue, _) => settingValue)*/;
             return result.AsQueryable();

@@ -43,7 +43,7 @@ namespace Geex.Common
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddTransient(typeof(Lazy<>), typeof(LazyInject<>));
+            context.Services.AddTransient(typeof(LazyFactory<>));
             context.Services.AddTransient<ClaimsPrincipal>(x =>
                 x.GetService<IHttpContextAccessor>()?.HttpContext?.User);
             base.PreConfigureServices(context);
@@ -76,22 +76,10 @@ namespace Geex.Common
                 .AddSubscriptionType<Subscription>()
                 .BindRuntimeType<ObjectId, ObjectIdType>()
                 .OnSchemaError((ctx, err) => { throw new Exception("schema error", err); });
-
             context.Services.AddHttpContextAccessor();
             context.Services.AddObjectAccessor<IApplicationBuilder>();
 
             context.Services.AddHealthChecks();
-            foreach (var socketInterceptor in context.Services.Where(x => x.ServiceType == typeof(ISocketSessionInterceptor)).ToList())
-            {
-                schemaBuilder.ConfigureSchemaServices(s => s.Add(socketInterceptor));
-                //typeof(HotChocolateAspNetCoreServiceCollectionExtensions).GetMethods().First(x => x.Name == nameof(HotChocolateAspNetCoreServiceCollectionExtensions.AddSocketSessionInterceptor) && x.GetParameters().Length == 1).MakeGenericMethod(socketInterceptor.ImplementationType).Invoke(null, new[] { schemaBuilder });
-            }
-
-            foreach (var requestInterceptor in context.Services.Where(x => x.ServiceType == typeof(IHttpRequestInterceptor)).ToList())
-            {
-                schemaBuilder.ConfigureSchemaServices(s => s.Add(requestInterceptor));
-                //typeof(HotChocolateAspNetCoreServiceCollectionExtensions).GetMethods().First(x => x.Name == nameof(HotChocolateAspNetCoreServiceCollectionExtensions.AddHttpRequestInterceptor) && x.GetParameters().Length == 1).MakeGenericMethod(requestInterceptor.ImplementationType).Invoke(null, new object[] { schemaBuilder, new Func<IServiceProvider, ISocketSessionInterceptor>(x => x.GetApplicationServices().get) });
-            }
             base.ConfigureServices(context);
         }
 

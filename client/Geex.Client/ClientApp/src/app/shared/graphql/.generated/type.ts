@@ -11,14 +11,17 @@ export interface Scalars {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Any: any;
   /** ^\[1\]\(\[3-9\]\)[0-9]{9}$ */
   ChinesePhoneNumberType: any;
+  /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
+  DateTime: any;
   ObjectId: any;
 }
 
 export type AppPermission = 'ASSIGN_ROLE';
 
-export type AppSettings = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
+export type AppSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
 
 export type ApplyPolicy = 'BEFORE_RESOLVER' | 'AFTER_RESOLVER';
 
@@ -60,16 +63,76 @@ export interface CreateRoleInput {
   roleName: Scalars['String'];
 }
 
+export interface DeleteMessageDistributionsInput {
+  messageId?: Maybe<Scalars['String']>;
+  userIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+}
+
+export type FrontendCallType = 'NEW_MESSAGE';
+
+export type GeexClaimType = 'AVATAR' | 'EXPIRES' | 'NICKNAME' | 'PROVIDER' | 'SUB';
+
+export type GeexExceptionType = 'CONFLICT' | 'NOT_FOUND' | 'ON_PURPOSE' | 'UNKNOWN';
+
+export interface GetMessagesInput {
+  messageType?: Maybe<MessageType>;
+}
+
 export interface GetSettingsInput {
   scope?: Maybe<SettingScopeEnumeration>;
 }
 
-export interface GetTestsRequestInput {
+export interface GetTestTemplatesInput {
   name: Scalars['String'];
+}
+
+export interface GetTestsInput {
+  name: Scalars['String'];
+}
+
+export interface GetUnreadMessagesInput {
+  _?: Maybe<Scalars['String']>;
+}
+
+export interface IFrontendCall {
+  __typename?: 'IFrontendCall';
+  data?: Maybe<Scalars['Any']>;
+  frontendCallType?: Maybe<FrontendCallType>;
+}
+
+export interface IMessage {
+  __typename?: 'IMessage';
+  fromUserId?: Maybe<Scalars['String']>;
+  messageType: MessageType;
+  content?: Maybe<IMessageContent>;
+  toUserIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  id?: Maybe<Scalars['String']>;
+  severity: MessageSeverityType;
+}
+
+export interface IMessageContent {
+  __typename?: 'IMessageContent';
+  title?: Maybe<Scalars['String']>;
+  time: Scalars['DateTime'];
+}
+
+export interface ISetting {
+  __typename?: 'ISetting';
+  scope?: Maybe<SettingScopeEnumeration>;
+  scopedKey?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+  name?: Maybe<SettingDefinition>;
+  id?: Maybe<Scalars['String']>;
 }
 
 export interface ITest {
   __typename?: 'ITest';
+  name: Scalars['String'];
+  data: Scalars['String'];
+}
+
+export interface ITestTemplate {
+  __typename?: 'ITestTemplate';
   name: Scalars['String'];
 }
 
@@ -87,23 +150,50 @@ export interface IdentityUserTokenOfString {
   value?: Maybe<Scalars['String']>;
 }
 
-export type LocalizationSettings = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
+export type LocalizationSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
 
 export type LoginProvider = 'LOCAL';
 
+export interface MarkMessagesReadInput {
+  messageIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  userId?: Maybe<Scalars['String']>;
+}
+
+export type MessageSeverityType = 'INFO' | 'SUCCESS' | 'WARN' | 'ERROR' | 'FATAL';
+
+export type MessageType = 'NOTIFICATION' | 'TODO' | 'INTERACT';
+
+export type MessagingSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+
 export interface Mutation {
   __typename?: 'Mutation';
-  placeHolder: Scalars['String'];
-  updateSetting: Scalars['Boolean'];
+  _: Scalars['String'];
+  markMessagesRead: Scalars['Boolean'];
+  deleteMessageDistributions: Scalars['Boolean'];
+  sendMessage: Scalars['Boolean'];
+  updateSetting?: Maybe<ISetting>;
   createRole: Scalars['Boolean'];
   register: Scalars['Boolean'];
   assignRoles: Scalars['Boolean'];
   updateProfile: Scalars['Boolean'];
-  updateTest: Scalars['Boolean'];
+  updateTestTemplate: ITestTemplate;
+  updateTest: ITest;
   generateCaptcha: Captcha;
   validateCaptcha: Scalars['Boolean'];
   authorize: Scalars['Boolean'];
   authenticate: IdentityUserTokenOfString;
+}
+
+export interface MutationMarkMessagesReadArgs {
+  input?: Maybe<MarkMessagesReadInput>;
+}
+
+export interface MutationDeleteMessageDistributionsArgs {
+  input?: Maybe<DeleteMessageDistributionsInput>;
+}
+
+export interface MutationSendMessageArgs {
+  input?: Maybe<SendNotificationMessageRequestInput>;
 }
 
 export interface MutationUpdateSettingArgs {
@@ -126,8 +216,12 @@ export interface MutationUpdateProfileArgs {
   input: UploadProfileInput;
 }
 
+export interface MutationUpdateTestTemplateArgs {
+  input: UpdateTestTemplateInput;
+}
+
 export interface MutationUpdateTestArgs {
-  input: UpdateTestRequestInput;
+  input: UpdateTestInput;
 }
 
 export interface MutationGenerateCaptchaArgs {
@@ -148,17 +242,28 @@ export interface MutationAuthenticateArgs {
 
 export interface Query {
   __typename?: 'Query';
-  placeHolder: Scalars['String'];
-  settings?: Maybe<Array<Maybe<Setting>>>;
+  _: Scalars['String'];
+  messages?: Maybe<Array<Maybe<IMessage>>>;
+  unreadMessages?: Maybe<Array<Maybe<IMessage>>>;
+  settings?: Maybe<Array<Maybe<ISetting>>>;
   queryRoles: Array<Role>;
   /** This field does ... */
   queryUsers: Array<User>;
   userProfile: IUserProfile;
+  testTemplates: Array<ITestTemplate>;
   tests: Array<ITest>;
 }
 
+export interface QueryMessagesArgs {
+  input?: Maybe<GetMessagesInput>;
+}
+
+export interface QueryUnreadMessagesArgs {
+  input?: Maybe<GetUnreadMessagesInput>;
+}
+
 export interface QuerySettingsArgs {
-  dto?: Maybe<GetSettingsInput>;
+  input?: Maybe<GetSettingsInput>;
 }
 
 export interface QueryQueryRolesArgs {
@@ -169,8 +274,12 @@ export interface QueryUserProfileArgs {
   userIdentifier: Scalars['String'];
 }
 
+export interface QueryTestTemplatesArgs {
+  input: GetTestTemplatesInput;
+}
+
 export interface QueryTestsArgs {
-  req: GetTestsRequestInput;
+  input: GetTestsInput;
 }
 
 export interface RegisterUserInput {
@@ -190,22 +299,23 @@ export interface SendCaptchaInput {
   smsCaptchaPhoneNumber?: Maybe<Scalars['ChinesePhoneNumberType']>;
 }
 
-export interface Setting {
-  __typename?: 'Setting';
-  scope?: Maybe<SettingScopeEnumeration>;
-  scopedKey?: Maybe<Scalars['String']>;
-  value?: Maybe<Scalars['String']>;
-  name?: Maybe<SettingDefinition>;
+export interface SendNotificationMessageRequestInput {
+  toUserIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  messageContent?: Maybe<Scalars['String']>;
+  severity: MessageSeverityType;
 }
 
-export type SettingDefinition = 'APP_MENU' | 'APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE';
+export type SettingDefinition = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
 
 export type SettingScopeEnumeration = 'GLOBAL' | 'USER';
 
 export interface Subscription {
   __typename?: 'Subscription';
-  placeHolder: Scalars['String'];
+  _: Scalars['String'];
+  onFrontendCall?: Maybe<IFrontendCall>;
 }
+
+export type TestingSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
 
 export interface UpdateSettingInput {
   name?: Maybe<SettingDefinition>;
@@ -214,7 +324,12 @@ export interface UpdateSettingInput {
   scope?: Maybe<SettingScopeEnumeration>;
 }
 
-export interface UpdateTestRequestInput {
+export interface UpdateTestInput {
+  name: Scalars['String'];
+  newName: Scalars['String'];
+}
+
+export interface UpdateTestTemplateInput {
   name: Scalars['String'];
   newName: Scalars['String'];
 }
@@ -236,7 +351,7 @@ export interface ValidateCaptchaInput {
   captchaCode: Scalars['String'];
 }
 
-export type SettingPairFragment = { __typename?: 'Setting' } & Pick<Setting, 'name' | 'value'>;
+export type SettingPairFragment = { __typename?: 'ISetting' } & Pick<ISetting, 'name' | 'value'>;
 
 export type AuthenticateMutationVariables = Exact<{
   userIdentifier: Scalars['String'];
@@ -280,7 +395,9 @@ export type UpdateProfileMutation = { __typename?: 'Mutation' } & Pick<Mutation,
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SettingsQuery = { __typename?: 'Query' } & { settings?: Maybe<Array<Maybe<{ __typename?: 'Setting' } & SettingPairFragment>>> };
+export type SettingsQuery = { __typename?: 'Query' } & {
+  settings?: Maybe<Array<Maybe<{ __typename?: 'ISetting' } & SettingPairFragment>>>;
+};
 
 export type UpdateSettingMutationVariables = Exact<{
   settingScope: SettingScopeEnumeration;
@@ -289,7 +406,9 @@ export type UpdateSettingMutationVariables = Exact<{
   settingScopeKey?: Maybe<Scalars['String']>;
 }>;
 
-export type UpdateSettingMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'updateSetting'>;
+export type UpdateSettingMutation = { __typename?: 'Mutation' } & {
+  updateSetting?: Maybe<{ __typename?: 'ISetting' } & Pick<ISetting, 'name' | 'value'>>;
+};
 
 export type SendSmsCaptchaMutationVariables = Exact<{
   phoneOrEmail: Scalars['ChinesePhoneNumberType'];
@@ -309,11 +428,24 @@ export type ValidateSmsCaptchaMutation = { __typename?: 'Mutation' } & Pick<Muta
 export type InitSettingsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type InitSettingsQuery = { __typename?: 'Query' } & {
-  settings?: Maybe<Array<Maybe<{ __typename?: 'Setting' } & Pick<Setting, 'name' | 'value'>>>>;
+  settings?: Maybe<Array<Maybe<{ __typename?: 'ISetting' } & Pick<ISetting, 'name' | 'value'>>>>;
 };
 
+export type OnFrontendCallSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type OnFrontendCallSubscription = { __typename?: 'Subscription' } & {
+  onFrontendCall?: Maybe<{ __typename?: 'IFrontendCall' } & Pick<IFrontendCall, 'frontendCallType'>>;
+};
+
+export type SendMessageMutationVariables = Exact<{
+  toUserId: Scalars['String'];
+  messageContent: Scalars['String'];
+}>;
+
+export type SendMessageMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'sendMessage'>;
+
 export const SettingPairGql = (gql`
-  fragment SettingPair on Setting {
+  fragment SettingPair on ISetting {
     name
     value
   }
@@ -353,7 +485,7 @@ export const UpdateProfileGql = (gql`
 ` as unknown) as DocumentNode<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const SettingsGql = (gql`
   query settings {
-    settings(dto: { scope: GLOBAL }) {
+    settings(input: { scope: GLOBAL }) {
       ...SettingPair
     }
   }
@@ -366,7 +498,10 @@ export const UpdateSettingGql = (gql`
     $settingValue: String
     $settingScopeKey: String
   ) {
-    updateSetting(input: { name: $settingName, scope: $settingScope, scopedKey: $settingScopeKey, value: $settingValue })
+    updateSetting(input: { name: $settingName, scope: $settingScope, scopedKey: $settingScopeKey, value: $settingValue }) {
+      name
+      value
+    }
   }
 ` as unknown) as DocumentNode<UpdateSettingMutation, UpdateSettingMutationVariables>;
 export const SendSmsCaptchaGql = (gql`
@@ -384,9 +519,21 @@ export const ValidateSmsCaptchaGql = (gql`
 ` as unknown) as DocumentNode<ValidateSmsCaptchaMutation, ValidateSmsCaptchaMutationVariables>;
 export const InitSettingsGql = (gql`
   query initSettings {
-    settings(dto: {}) {
+    settings(input: {}) {
       name
       value
     }
   }
 ` as unknown) as DocumentNode<InitSettingsQuery, InitSettingsQueryVariables>;
+export const OnFrontendCallGql = (gql`
+  subscription onFrontendCall {
+    onFrontendCall {
+      frontendCallType
+    }
+  }
+` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
+export const SendMessageGql = (gql`
+  mutation sendMessage($toUserId: String!, $messageContent: String!) {
+    sendMessage(input: { toUserIds: [$toUserId], severity: INFO, messageContent: $messageContent })
+  }
+` as unknown) as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;

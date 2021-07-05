@@ -10,12 +10,13 @@ using Volo.Abp.DependencyInjection;
 
 namespace Geex.Common.Abstractions
 {
-    public class LazyInject<T> : Lazy<T>, ITransientDependency
+    public class LazyFactory<T> : IScopedDependency
     {
-        public LazyInject(IServiceProvider provider)
-        : base(() => provider.GetRequiredService<T>())
+        private readonly IServiceProvider _provider;
+        public T? Value =>_provider.GetService<T>();
+        public LazyFactory(IServiceProvider provider)
         {
-
+            _provider = provider;
         }
     }
 }

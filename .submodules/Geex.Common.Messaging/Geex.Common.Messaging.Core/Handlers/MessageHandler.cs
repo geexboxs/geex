@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Geex.Common.Abstractions;
 using Geex.Common.Messaging.Api.Aggregates.FrontendCalls;
 using Geex.Common.Messaging.Api.Aggregates.Messages;
 using Geex.Common.Messaging.Api.Aggregates.Messages.Inputs;
@@ -27,7 +27,6 @@ using Volo.Abp.DependencyInjection;
 namespace Geex.Common.Messaging.Core.Handlers
 {
     public class MessageHandler :
-        ITransientDependency,
         IRequestHandler<GetMessagesInput, IEnumerable<IMessage>>,
         IRequestHandler<DeleteMessageDistributionsInput, Unit>,
         IRequestHandler<MarkMessagesReadInput, Unit>,
@@ -36,9 +35,9 @@ namespace Geex.Common.Messaging.Core.Handlers
     {
         public DbContext DbContext { get; }
         public ClaimsPrincipal ClaimsPrincipal { get; }
-        public Lazy<ITopicEventSender> Sender { get; }
+        public LazyFactory<ITopicEventSender> Sender { get; }
 
-        public MessageHandler(DbContext dbContext, ClaimsPrincipal claimsPrincipal, Lazy<ITopicEventSender> sender)
+        public MessageHandler(DbContext dbContext, ClaimsPrincipal claimsPrincipal, LazyFactory<ITopicEventSender> sender)
         {
             DbContext = dbContext;
             ClaimsPrincipal = claimsPrincipal;

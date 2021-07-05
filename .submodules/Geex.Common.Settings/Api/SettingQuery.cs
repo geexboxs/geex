@@ -14,14 +14,13 @@ using HotChocolate.Types;
 namespace Geex.Common.Settings.Api
 {
     [ExtendObjectType(nameof(Query))]
-    public class SystemSettingQuery : Query
+    public class SettingQuery : Query
     {
         /// <summary>
         /// 根据provider获取全量设置
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [Authorize]
         public async Task<IQueryable<ISetting>> Settings(
             GetSettingsInput input)
         {

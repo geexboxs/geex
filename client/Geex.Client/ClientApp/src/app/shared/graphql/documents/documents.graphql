@@ -1,4 +1,4 @@
-fragment SettingPair on Setting {
+fragment SettingPair on ISetting {
   name
   value
 }
@@ -31,7 +31,7 @@ mutation updateProfile($newAvatar: String, $userId: ObjectId!) {
 }
 
 query settings {
-  settings(dto: { scope: GLOBAL }) {
+  settings(input: { scope: GLOBAL }) {
     ...SettingPair
   }
 }
@@ -42,7 +42,10 @@ mutation updateSetting(
   $settingValue: String
   $settingScopeKey: String
 ) {
-  updateSetting(input: { name: $settingName, scope: $settingScope, scopedKey: $settingScopeKey, value: $settingValue })
+  updateSetting(input: { name: $settingName, scope: $settingScope, scopedKey: $settingScopeKey, value: $settingValue }) {
+    name
+    value
+  }
 }
 
 mutation sendSmsCaptcha($phoneOrEmail: ChinesePhoneNumberType!) {
@@ -57,8 +60,18 @@ mutation validateSmsCaptcha($captchaKey: String!, $captchaCode: String!) {
 }
 
 query initSettings {
-  settings(dto: {}) {
+  settings(input: {}) {
     name
     value
   }
+}
+
+subscription onFrontendCall {
+  onFrontendCall {
+    frontendCallType
+  }
+}
+
+mutation sendMessage($toUserId: String!, $messageContent: String!) {
+  sendMessage(input: { toUserIds: [$toUserId], severity: INFO, messageContent: $messageContent })
 }

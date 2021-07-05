@@ -16,7 +16,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace Geex.Core.Notification.Handlers
 {
-    public class SendNotificationHandler : IRequestHandler<SendSmsCaptchaRequest, Unit>, ITransientDependency
+    public class SendNotificationHandler : IRequestHandler<SendSmsCaptchaRequest, Unit>, IScopedDependency
     {
         public ISmsNotificationSender Sender { get; }
         public ILogger<SendNotificationHandler> Logger { get; }

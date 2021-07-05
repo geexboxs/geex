@@ -2,6 +2,7 @@
 using Geex.Common.Redis;
 using Geex.Common.Settings.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp;
 using Volo.Abp.Modularity;
 
 namespace Geex.Common.Settings

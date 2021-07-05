@@ -30,14 +30,9 @@ namespace Geex.Common.Abstractions
             var type = this.GetType().Assembly.ExportedTypes.FirstOrDefault(x => x.IsAssignableTo<IGeexModuleOption<T>>());
             if (type == default)
             {
-                return;
+                throw new InvalidOperationException($"{nameof(IGeexModuleOption<T>)} of {nameof(T)} is not declared, cannot be configured.");
             }
             var options = (IGeexModuleOption<T>?)this.ServiceConfigurationContext.Services.GetSingletonInstanceOrNull(type);
-            if (options == default)
-            {
-                options = Activator.CreateInstance(type) as IGeexModuleOption<T>;
-                Configuration.GetSection(type.Name).Bind(options);
-            }
             optionsAction.Invoke(options!);
             this.ServiceConfigurationContext.Services.TryAdd(new ServiceDescriptor(type, options));
         }
@@ -46,9 +41,20 @@ namespace Geex.Common.Abstractions
             Configuration = context.Services.GetConfiguration();
             context.Services.Add(new ServiceDescriptor(typeof(GeexModule), this));
             context.Services.Add(new ServiceDescriptor(this.GetType(), this));
-            this.ConfigureModuleOptions(option => { });
-            this.ConfigureModuleEntityMaps();
+            this.InitModuleOptions();
             base.PreConfigureServices(context);
+        }
+
+        private void InitModuleOptions()
+        {
+            var type = this.GetType().Assembly.ExportedTypes.FirstOrDefault(x => x.IsAssignableTo<IGeexModuleOption<T>>());
+            if (type == default)
+            {
+                return;
+            }
+            var options = Activator.CreateInstance(type) as IGeexModuleOption<T>;
+            Configuration.GetSection(type.Name).Bind(options);
+            this.ServiceConfigurationContext.Services.TryAdd(new ServiceDescriptor(type, options));
         }
 
         public virtual void ConfigureModuleEntityMaps()
@@ -65,16 +71,16 @@ namespace Geex.Common.Abstractions
             }
         }
 
-
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            base.ConfigureServices(context);
+            this.ConfigureModuleEntityMaps();
             context.Services.AddMediatR(typeof(T));
+            base.ConfigureServices(context);
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
-            foreach (var hasStartupInitialize in context.ServiceProvider.GetServices<IHasStartupInitialize>())
+            foreach (var hasStartupInitialize in context.ServiceProvider.GetServices<IStartupInitializer>())
             {
                 hasStartupInitialize.Initialize().Wait();
             }

@@ -9,7 +9,7 @@ using HotChocolate.Types;
 namespace Geex.Common.Settings.Api
 {
     [ExtendObjectType(nameof(Mutation))]
-    public class SystemSettingMutation : Mutation
+    public class SettingMutation : Mutation
     {
         /// <summary>
         /// 更新设置

@@ -44,9 +44,9 @@ export class StartupService {
       .toPromise();
     const settings = res.data.settings;
     this.settingService.setApp({
-      name: settings.first((x) => x.name == 'APP_MENU').value,
+      name: settings.first((x) => x.name == 'APP_APP_MENU').value,
     });
-    this.menuService.add(JSON.parse(settings.first((x) => x.name == 'APP_MENU').value) as Menu[]);
+    this.menuService.add(JSON.parse(settings.first((x) => x.name == 'APP_APP_MENU').value) as Menu[]);
     this.i18n.merge(JSON.parse(settings.first((x) => x.name == 'LOCALIZATION_DATA').value));
   }
 

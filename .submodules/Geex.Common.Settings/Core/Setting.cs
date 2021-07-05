@@ -10,21 +10,23 @@ using HotChocolate;
 namespace Geex.Common.Settings.Core
 {
     [DebuggerDisplay("{Name}")]
-    public class Setting : Entity, ISetting, IHasRedisKey
+    public class Setting : Entity, ISetting
     {
         public SettingScopeEnumeration Scope { get; private set; }
         public string? ScopedKey { get; private set; }
         public string? Value { get; private set; }
         public SettingDefinition Name { get; private set; }
-
-        public string RedisKey => $"{this.Scope}{(this.ScopedKey == default ? "" : $":{this.ScopedKey}")}:{this.Name}";
-
         public Setting(SettingDefinition name, string value, SettingScopeEnumeration scope, string? scopedKey = default)
         {
             Name = name;
             Value = value;
             Scope = scope;
             ScopedKey = scopedKey;
+        }
+
+        public void SetValue(string? value)
+        {
+            this.Value = value;
         }
     }
 }

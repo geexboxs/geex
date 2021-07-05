@@ -94,6 +94,15 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));
                 }
+                foreach (var socketInterceptor in exportedTypes.Where(x => x.IsAssignableTo<ISocketSessionInterceptor>()).ToList())
+                {
+                    schemaBuilder.ConfigureSchemaServices(s => s.Add(ServiceDescriptor.Scoped(typeof(ISocketSessionInterceptor), socketInterceptor)));
+                }
+
+                foreach (var requestInterceptor in exportedTypes.Where(x => x.IsAssignableTo<IHttpRequestInterceptor>()).ToList())
+                {
+                    schemaBuilder.ConfigureSchemaServices(s => s.Add(ServiceDescriptor.Scoped(typeof(IHttpRequestInterceptor), requestInterceptor)));
+                }
             }
             return schemaBuilder;
         }

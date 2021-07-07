@@ -2,6 +2,22 @@ fragment SettingPair on ISetting {
   name
   value
 }
+
+fragment MessageContentFrag on IMessageContent {
+  title
+  time
+}
+
+fragment MessageFrag on IMessage {
+  content {
+    ...MessageContentFrag
+  }
+  fromUserId
+  id
+  messageType
+  severity
+}
+
 mutation authenticate($userIdentifier: String!, $password: String!) {
   authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
     value
@@ -69,6 +85,13 @@ query initSettings {
 subscription onFrontendCall {
   onFrontendCall {
     frontendCallType
+  }
+}
+
+query mesages {
+  messages(input: {}) {
+    ...MessageFrag
+    toUserIds
   }
 }
 

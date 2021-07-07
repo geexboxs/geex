@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Geex.Common.Gql.Roots
 {
-    public abstract class Mutation:IEmptyObject
+    public abstract  class Mutation:IEmptyObject
     {
         protected IMediator Mediator => ServiceLocator.Current.GetInstance<IMediator>();
         public string _ { get; set; }

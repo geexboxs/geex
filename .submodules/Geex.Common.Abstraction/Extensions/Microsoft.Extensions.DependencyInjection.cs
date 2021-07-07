@@ -82,11 +82,16 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 }
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
-                var rootTypes = exportedTypes.Where(x => !x.IsAbstract &&
-                                                         (x.IsAssignableTo<Query>() ||
-                                                          x.IsAssignableTo<Mutation>() ||
-                                                          x.IsAssignableTo<Subscription>())).ToArray();
-                schemaBuilder.AddTypes(rootTypes);
+                var rootTypes = exportedTypes.Where(x => 
+                                                         (x.BaseType == typeof(Query) ||
+                                                          x.BaseType == typeof(Mutation) ||
+                                                          x.BaseType == typeof(Subscription))).ToArray();
+                //schemaBuilder.AddTypes(rootTypes);
+                foreach (var rootType in rootTypes)
+                {
+                    schemaBuilder.AddTypeExtension(rootType);
+
+                }
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsAssignableTo<IType>()).Where(x => !x.IsGenericType || (x.IsGenericType && x.GenericTypeArguments.Any())).ToList();
                 schemaBuilder.AddTypes(objectTypes.ToArray());
                 var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum() && x.Name != nameof(Enumeration)).ToList();

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Geex.Common.Abstractions;
 using Geex.Common.Messaging.Api.Aggregates.FrontendCalls;
 using Geex.Common.Messaging.Api.Aggregates.Messages;
@@ -27,7 +28,7 @@ using Volo.Abp.DependencyInjection;
 namespace Geex.Common.Messaging.Core.Handlers
 {
     public class MessageHandler :
-        IRequestHandler<GetMessagesInput, IEnumerable<IMessage>>,
+        IRequestHandler<GetMessagesInput, IQueryable<IMessage>>,
         IRequestHandler<DeleteMessageDistributionsInput, Unit>,
         IRequestHandler<MarkMessagesReadInput, Unit>,
         IRequestHandler<SendNotificationMessageRequest, Unit>,
@@ -44,12 +45,10 @@ namespace Geex.Common.Messaging.Core.Handlers
             Sender = sender;
         }
 
-        public async Task<IEnumerable<IMessage>> Handle(GetMessagesInput input,
+        public async Task<IQueryable<IMessage>> Handle(GetMessagesInput input,
             CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-            //return await DbContext.Find<Message>().Match(x => x.Name == input.Name)
-            //    .ExecuteAsync(cancellationToken);
+            return DbContext.Queryable<Message>().Where(x => x.MessageType == input.MessageType);
         }
 
         public async Task<Unit> Handle(DeleteMessageDistributionsInput request, CancellationToken cancellationToken)

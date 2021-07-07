@@ -353,6 +353,12 @@ export interface ValidateCaptchaInput {
 
 export type SettingPairFragment = { __typename?: 'ISetting' } & Pick<ISetting, 'name' | 'value'>;
 
+export type MessageContentFragFragment = { __typename?: 'IMessageContent' } & Pick<IMessageContent, 'title' | 'time'>;
+
+export type MessageFragFragment = { __typename?: 'IMessage' } & Pick<IMessage, 'fromUserId' | 'id' | 'messageType' | 'severity'> & {
+    content?: Maybe<{ __typename?: 'IMessageContent' } & MessageContentFragFragment>;
+  };
+
 export type AuthenticateMutationVariables = Exact<{
   userIdentifier: Scalars['String'];
   password: Scalars['String'];
@@ -437,6 +443,12 @@ export type OnFrontendCallSubscription = { __typename?: 'Subscription' } & {
   onFrontendCall?: Maybe<{ __typename?: 'IFrontendCall' } & Pick<IFrontendCall, 'frontendCallType'>>;
 };
 
+export type MesagesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MesagesQuery = { __typename?: 'Query' } & {
+  messages?: Maybe<Array<Maybe<{ __typename?: 'IMessage' } & Pick<IMessage, 'toUserIds'> & MessageFragFragment>>>;
+};
+
 export type SendMessageMutationVariables = Exact<{
   toUserId: Scalars['String'];
   messageContent: Scalars['String'];
@@ -450,6 +462,24 @@ export const SettingPairGql = (gql`
     value
   }
 ` as unknown) as DocumentNode<SettingPairFragment, unknown>;
+export const MessageContentFragGql = (gql`
+  fragment MessageContentFrag on IMessageContent {
+    title
+    time
+  }
+` as unknown) as DocumentNode<MessageContentFragFragment, unknown>;
+export const MessageFragGql = (gql`
+  fragment MessageFrag on IMessage {
+    content {
+      ...MessageContentFrag
+    }
+    fromUserId
+    id
+    messageType
+    severity
+  }
+  ${MessageContentFragGql}
+` as unknown) as DocumentNode<MessageFragFragment, unknown>;
 export const AuthenticateGql = (gql`
   mutation authenticate($userIdentifier: String!, $password: String!) {
     authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
@@ -532,6 +562,15 @@ export const OnFrontendCallGql = (gql`
     }
   }
 ` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
+export const MesagesGql = (gql`
+  query mesages {
+    messages(input: {}) {
+      ...MessageFrag
+      toUserIds
+    }
+  }
+  ${MessageFragGql}
+` as unknown) as DocumentNode<MesagesQuery, MesagesQueryVariables>;
 export const SendMessageGql = (gql`
   mutation sendMessage($toUserId: String!, $messageContent: String!) {
     sendMessage(input: { toUserIds: [$toUserId], severity: INFO, messageContent: $messageContent })

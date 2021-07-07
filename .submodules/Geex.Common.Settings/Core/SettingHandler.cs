@@ -71,7 +71,7 @@ namespace Geex.Common.Settings.Core
             var setting = await _dbContext.Find<Setting>().Match(x => x.Name == settingDefinition && x.Scope == scope && x.ScopedKey == scopedKey).ExecuteSingleAsync();
             setting.SetValue(value);
             await setting.SaveAsync();
-            _dbContext.OnCommitted += async (sender, args) =>
+            _dbContext.OnCommitted += async (sender) =>
              {
                  await _redisClient.SetNamedAsync(setting.GetRedisKey());
              };

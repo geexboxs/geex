@@ -4,10 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-
 using Geex.Common.Abstractions;
 using Geex.Common.Gql;
-using Geex.Common.Gql.Interceptors;
 using Geex.Common.Gql.Roots;
 using Geex.Common.Gql.Types;
 
@@ -68,6 +66,7 @@ namespace Geex.Common
                     converter = o => o;
                     return source.GetBaseClasses(false).Intersect(target.GetBaseClasses(false)).Any();
                 })
+                .AddTransactionScopeHandler<GeexTransactionScopeHandler>()
                 .AddFiltering()
                 .AddSorting()
                 .AddProjections()
@@ -88,7 +87,6 @@ namespace Geex.Common
             var app = context.GetApplicationBuilder();
             var _env = context.GetEnvironment();
             var _configuration = context.GetConfiguration();
-
             app.UseCors();
             if (_env.IsDevelopment())
             {

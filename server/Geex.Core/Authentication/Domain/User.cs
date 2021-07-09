@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CommonServiceLocator;
 using Geex.Common;
+using Geex.Common.Abstraction;
 using Geex.Common.Abstractions.Enumerations;
 using Geex.Core.Authentication.Domain.Events;
 using Geex.Core.Authorization;

@@ -4,12 +4,14 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+using Autofac;
 
 using Geex.Common;
 using Geex.Common.Abstraction;
 using Geex.Common.Abstractions;
 using Geex.Common.Gql;
-using Geex.Common.Gql.Interceptors;
 using Geex.Common.Gql.Roots;
 using Geex.Common.Gql.Types;
 
@@ -22,6 +24,8 @@ using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 using HotChocolate.Types.Pagination;
 using HotChocolate.Utilities;
+
+using ImpromptuInterface;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +51,9 @@ namespace Microsoft.Extensions.DependencyInjection
             var mongoSettings = MongoClientSettings.FromUrl(mongoUrl);
             mongoSettings.ApplicationName = commonModuleOptions.AppName;
             DB.InitAsync(mongoUrl.DatabaseName, mongoSettings).Wait();
-            builder.AddScoped<DbContext>(x => new DbContext(transactional: true));
+            //builder.AddScoped(x => new DbContext(transactional: true));
+            builder.AddScoped<IUnitOfWork>(x => new WrapperUnitOfWork(() => x.GetService<DbContext>().CommitAsync()));
+            builder.GetSingletonInstance<ContainerBuilder>().Register<DbContext>(x => new DbContext(transactional: true)).InstancePerLifetimeScope();
             return builder;
         }
 
@@ -82,29 +88,39 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 }
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
-                var rootTypes = exportedTypes.Where(x => 
+                var rootTypes = exportedTypes.Where(x =>
                                                          (x.BaseType == typeof(Query) ||
                                                           x.BaseType == typeof(Mutation) ||
-                                                          x.BaseType == typeof(Subscription))).ToArray();
+                                                          x.BaseType == typeof(Subscription) ||
+                                                          AbpTypeExtensions.IsAssignableTo<ObjectTypeExtension>(x))).ToArray();
                 //schemaBuilder.AddTypes(rootTypes);
                 foreach (var rootType in rootTypes)
                 {
                     schemaBuilder.AddTypeExtension(rootType);
 
                 }
-                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsAssignableTo<IType>()).Where(x => !x.IsGenericType || (x.IsGenericType && x.GenericTypeArguments.Any())).ToList();
+                var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).Where(x => !x.IsGenericType || (x.IsGenericType && x.GenericTypeArguments.Any())).ToList();
                 schemaBuilder.AddTypes(objectTypes.ToArray());
+
+
                 var classEnumTypes = exportedTypes.Where(x => !x.IsAbstract && x.IsClassEnum() && x.Name != nameof(Enumeration)).ToList();
                 foreach (var classEnumType in classEnumTypes)
                 {
                     schemaBuilder.BindRuntimeType(classEnumType, typeof(EnumerationType<,>).MakeGenericType(classEnumType, classEnumType.GetClassEnumValueType()));
                 }
-                foreach (var socketInterceptor in exportedTypes.Where(x => x.IsAssignableTo<ISocketSessionInterceptor>()).ToList())
+
+                var directiveTypes = exportedTypes.Where(x => AbpTypeExtensions.IsAssignableTo<DirectiveType>(x)).ToList();
+                foreach (var directiveType in directiveTypes)
+                {
+                    schemaBuilder.AddDirectiveType(directiveType);
+                }
+
+                foreach (var socketInterceptor in exportedTypes.Where(x => AbpTypeExtensions.IsAssignableTo<ISocketSessionInterceptor>(x)).ToList())
                 {
                     schemaBuilder.ConfigureSchemaServices(s => s.Add(ServiceDescriptor.Scoped(typeof(ISocketSessionInterceptor), socketInterceptor)));
                 }
 
-                foreach (var requestInterceptor in exportedTypes.Where(x => x.IsAssignableTo<IHttpRequestInterceptor>()).ToList())
+                foreach (var requestInterceptor in exportedTypes.Where(x => AbpTypeExtensions.IsAssignableTo<IHttpRequestInterceptor>(x)).ToList())
                 {
                     schemaBuilder.ConfigureSchemaServices(s => s.Add(ServiceDescriptor.Scoped(typeof(IHttpRequestInterceptor), requestInterceptor)));
                 }

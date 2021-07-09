@@ -1,51 +1,49 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Geex.Common.Abstraction.Gql.Inputs;
 using Geex.Common.Messaging.Api.Aggregates.Messages;
 using Geex.Common.Messaging.Api.Aggregates.Messages.Inputs;
 using Geex.Common.Gql.Roots;
 using Geex.Common.Messaging.Api.GqlSchemas.Messages.Types;
 using HotChocolate;
 using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
+using MediatR;
 using MongoDB.Entities;
 
 namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
 {
-    public class MessageQuery : Query
+    public class MessageQuery : ObjectTypeExtension<MessageQuery>
     {
-        //protected override void Configure(IObjectTypeDescriptor descriptor)
-        //{
-        //    //descriptor.ExtendsType<Query>();
-        //    descriptor.Name(OperationTypeNames.Query);
-        //    descriptor
-        //        .Field("messages")
-        //        .Type<ListType<MessageGqlType>>()
-        //        .Resolve(async context =>
-        //        {
-        //            var input = context.ArgumentValue<GetMessagesInput>("input");
-        //            var result = await Mediator.Send(input);
-        //            return result;
-        //        })
-        //    //.UsePaging()
-        //    ;
-        //}
+        protected override void Configure(IObjectTypeDescriptor<MessageQuery> descriptor)
+        {
+            descriptor.Name(OperationTypeNames.Query);
+            descriptor.ResolveMethod(x => x.Messages(default))
+            .UseOffsetPaging<MessageGqlType>()
+            .UseFiltering<IMessage>(x => x.Field(y => y.MessageType))
+            ;
+        }
+
         /// <summary>
         /// 列表获取message
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<IQueryable<IMessage>> Messages(
-            GetMessagesInput input)
+            [Service] IMediator Mediator)
         {
-            var result = await Mediator.Send(input);
+            var result = await Mediator.Send(new QueryInput<IMessage>());
             return result;
         }
+
         /// <summary>
         /// 列表获取message
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<IQueryable<IMessage>> UnreadMessages(
+            [Service] IMediator Mediator,
             GetUnreadMessagesInput input)
         {
             var result = await Mediator.Send(input);

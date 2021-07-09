@@ -13,7 +13,7 @@ namespace Geex.Common.Messaging.Api.Aggregates.Messages.Inputs
     public class SendNotificationMessageRequest : IRequest
     {
         public List<string> ToUserIds { get; set; }
-        public string MessageContent { get; set; }
+        public string Text { get; set; }
         public MessageSeverityType Severity { get; set; }
     }
 }

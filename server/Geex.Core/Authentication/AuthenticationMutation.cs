@@ -18,7 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CommonServiceLocator;
+
 using Geex.Common.Abstractions;
 using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;

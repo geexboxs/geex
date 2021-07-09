@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Geex.Common.Abstraction.Gql.Inputs;
 using Geex.Common.Abstractions;
 using Geex.Common.Messaging.Api.Aggregates.FrontendCalls;
 using Geex.Common.Messaging.Api.Aggregates.Messages;
@@ -23,12 +23,10 @@ using MediatR;
 
 using MongoDB.Entities;
 
-using Volo.Abp.DependencyInjection;
-
 namespace Geex.Common.Messaging.Core.Handlers
 {
     public class MessageHandler :
-        IRequestHandler<GetMessagesInput, IQueryable<IMessage>>,
+        IRequestHandler<QueryInput<IMessage>, IQueryable<IMessage>>,
         IRequestHandler<DeleteMessageDistributionsInput, Unit>,
         IRequestHandler<MarkMessagesReadInput, Unit>,
         IRequestHandler<SendNotificationMessageRequest, Unit>,
@@ -45,10 +43,10 @@ namespace Geex.Common.Messaging.Core.Handlers
             Sender = sender;
         }
 
-        public async Task<IQueryable<IMessage>> Handle(GetMessagesInput input,
+        public async Task<IQueryable<IMessage>> Handle(QueryInput<IMessage> input,
             CancellationToken cancellationToken)
         {
-            return DbContext.Queryable<Message>().Where(x => x.MessageType == input.MessageType);
+            return DbContext.Queryable<Message>();
         }
 
         public async Task<Unit> Handle(DeleteMessageDistributionsInput request, CancellationToken cancellationToken)
@@ -73,7 +71,7 @@ namespace Geex.Common.Messaging.Core.Handlers
 
         public async Task<Unit> Handle(SendNotificationMessageRequest request, CancellationToken cancellationToken)
         {
-            var message = new Message(new NotificationContent(request.MessageContent), request.Severity);
+            var message = new Message(request.Text, request.Severity);
             await message.DistributeAsync(request.ToUserIds.ToArray());
             DbContext.AttachContextSession(message);
             await message.SaveAsync(cancellation: cancellationToken);

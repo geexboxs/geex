@@ -5,6 +5,7 @@ using Geex.Common.Gql.Roots;
 using HotChocolate;
 using HotChocolate.Subscriptions;
 using HotChocolate.Types;
+using MediatR;
 using MongoDB.Entities;
 
 namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
@@ -18,6 +19,7 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
         /// <param name="input"></param>
         /// <returns></returns>
         public async Task<bool> MarkMessagesRead(
+            [Service] IMediator Mediator,
             MarkMessagesReadInput input)
         {
             var result = await Mediator.Send(input);
@@ -29,6 +31,7 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
         /// <param name="input"></param>
         /// <returns></returns>
         public async Task<bool> DeleteMessageDistributions(
+            [Service] IMediator Mediator,
             DeleteMessageDistributionsInput input)
         {
             var result = await Mediator.Send(input);
@@ -39,7 +42,9 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<bool> SendMessage(SendNotificationMessageRequest input)
+        public async Task<bool> SendMessage(
+            [Service] IMediator Mediator,
+            SendNotificationMessageRequest input)
         {
             var result = await Mediator.Send(input);
             return true;

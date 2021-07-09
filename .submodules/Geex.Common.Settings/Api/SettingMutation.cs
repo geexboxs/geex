@@ -5,6 +5,7 @@ using Geex.Common.Settings.Api.Aggregates.Settings.Inputs;
 using Geex.Common.Settings.Core;
 using HotChocolate;
 using HotChocolate.Types;
+using MediatR;
 
 namespace Geex.Common.Settings.Api
 {
@@ -17,9 +18,10 @@ namespace Geex.Common.Settings.Api
         /// <param name="input"></param>
         /// <returns></returns>
         public async Task<ISetting> UpdateSetting(
+            [Service] IMediator Mediator,
             UpdateSettingInput input)
         {
-            return await this.Mediator.Send(input);
+            return await Mediator.Send(input);
         }
     }
 }

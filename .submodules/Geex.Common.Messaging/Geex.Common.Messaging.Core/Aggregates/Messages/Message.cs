@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CommonServiceLocator;
-using Geex.Common.Abstractions;
+using Geex.Common.Abstraction;
+using Microsoft.Extensions.DependencyInjection;
 using Geex.Common.Messaging.Api.Aggregates.Messages;
 using KuanFang.Rms.MessageManagement.Messages;
 using Microsoft.Extensions.Logging;
+using MongoDB.Entities;
+using Entity = Geex.Common.Abstractions.Entity;
 
 namespace Geex.Common.Messaging.Core.Aggregates.Messages
 {
@@ -15,34 +17,46 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
     /// </summary>
     public partial class Message : Entity, IMessage
     {
-        private ILogger<Message> Logger => ServiceLocator.Current.GetInstance<ILogger<Message>>();
+        private ILogger<Message> Logger => ServiceLocator.Current.GetService<ILogger<Message>>();
         protected Message()
         {
 
         }
-        public Message(IMessageContent content, MessageSeverityType severity = MessageSeverityType.Info)
+        public Message(string text, MessageSeverityType severity = MessageSeverityType.Info)
+        {
+            Title = text;
+            this.Severity = severity;
+            this.MessageType = MessageType.Notification;
+        }
+        public Message(string text, IMessageContent content = default, MessageSeverityType severity = MessageSeverityType.Info) : this(text, severity)
         {
             this.Content = content;
-            this.Severity = severity;
             this.MessageType = content switch
             {
-                NotificationContent => MessageType.Notification,
                 ToDoContent => MessageType.Todo,
                 InteractContent => MessageType.Interact,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => MessageType.Notification
             };
         }
-
-        public virtual ICollection<MessageDistribution> Distributions { get; private set; } = new List<MessageDistribution>();
+        [OwnerSide]
+        public virtual Many<MessageDistribution> Distributions { get; set; }
         public string? FromUserId { get; private set; }
+        public string Title { get; set; }
+        public DateTime Time => CreatedOn;
+
         public MessageType MessageType { get; private set; }
         public IMessageContent Content { get; private set; }
         public MessageSeverityType Severity { get; set; }
         public async Task<Message> DistributeAsync(params string[] userIds)
         {
-            if (this.Id == string.Empty)
+            if (this.Distributions == default)
             {
-                throw new NotSupportedException("必须先保存消息才能进行消息分配");
+                this.InitOneToMany(x => x.Distributions);
+            }
+
+            if (!this.Id.IsNullOrEmpty())
+            {
+                await this.SaveAsync();
             }
 
             if (this.Distributions.Any())
@@ -50,10 +64,10 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
                 throw new NotSupportedException("消息已经被分配");
             }
 
-            foreach (var userId in userIds)
-            {
-                this.Distributions.Add(new MessageDistribution(this.Id, userId));
-            }
+            var distributions = userIds.Select(x => new MessageDistribution(this.Id, x));
+            await distributions.SaveAsync();
+            await this.Distributions.AddAsync(distributions);
+            await this.Distributions.SaveAsync();
 
             return this;
         }
@@ -78,6 +92,8 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
 
     public partial class Message
     {
+
+
         public IList<string> ToUserIds => this.Distributions.ToList().Select(x => x.ToUserId).ToList();
     }
 }

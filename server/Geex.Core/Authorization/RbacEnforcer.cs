@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using CommonServiceLocator;
+using Geex.Common.Abstraction;
 using Geex.Common.Abstractions;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Authorization.Casbin;
 using Geex.Core.Authorization.Events;
 using MediatR;
-
+using Microsoft.Extensions.DependencyInjection;
 using NetCasbin;
 using NetCasbin.Model;
 
@@ -168,7 +167,7 @@ m = (p.sub == ""*"" || g(r.sub, p.sub)) && (p.obj == ""*"" || g2(r.obj, p.obj)) 
             await this.DeletePermissionsForUserAsync(subId);
             await this.AddPermissionForUserAsync(subId,
                 permissions.Cast<AppPermission, string>().ToList());
-            await ServiceLocator.Current.GetInstance<IMediator>().Publish(new PermissionChangedEvent(subId, permissions));
+            await ServiceLocator.Current.GetService<IMediator>().Publish(new PermissionChangedEvent(subId, permissions));
         }
     }
 }

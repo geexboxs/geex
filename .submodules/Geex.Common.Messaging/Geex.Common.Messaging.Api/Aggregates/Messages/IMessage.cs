@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using KuanFang.Rms.MessageManagement.Messages;
 
 namespace Geex.Common.Messaging.Api.Aggregates.Messages
@@ -15,5 +16,7 @@ namespace Geex.Common.Messaging.Api.Aggregates.Messages
         IList<string> ToUserIds { get; }
         string Id { get; }
         MessageSeverityType Severity { get; set; }
+        public string Title { get; }
+        public DateTime Time { get; }
     }
 }

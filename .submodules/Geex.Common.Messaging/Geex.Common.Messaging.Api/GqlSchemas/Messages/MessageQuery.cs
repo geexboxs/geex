@@ -14,15 +14,15 @@ using MongoDB.Entities;
 
 namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
 {
-    public class MessageQuery : ObjectTypeExtension<MessageQuery>
+    public class MessageQuery : QueryTypeExtension<MessageQuery>
     {
         protected override void Configure(IObjectTypeDescriptor<MessageQuery> descriptor)
         {
-            descriptor.Name(OperationTypeNames.Query);
             descriptor.ResolveMethod(x => x.Messages(default))
             .UseOffsetPaging<MessageGqlType>()
             .UseFiltering<IMessage>(x => x.Field(y => y.MessageType))
             ;
+            base.Configure(descriptor);
         }
 
         /// <summary>

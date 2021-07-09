@@ -10,8 +10,7 @@ using MongoDB.Entities;
 
 namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class MessageMutation : Mutation
+    public class MessageMutation : MutationTypeExtension<MessageMutation>
     {
         /// <summary>
         /// 标记消息已读
@@ -38,7 +37,7 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
             return true;
         }
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

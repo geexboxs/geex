@@ -9,12 +9,5 @@ namespace Geex.Core.UserManagement.GqlSchemas.Inputs
     {
         public ObjectId UserId { get; set; }
         public List<string> Roles { get; set; }
-        public class TypeDefine:InputObjectType<AssignRoleInput>
-        {
-            protected override void Configure(IInputObjectTypeDescriptor<AssignRoleInput> descriptor)
-            {
-                base.Configure(descriptor);
-            }
-        }
     }
 }

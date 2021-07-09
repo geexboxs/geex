@@ -31,10 +31,9 @@ using MongoDB.Entities;
 
 namespace Geex.Core.Authentication
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class AuthenticationMutation : Mutation
+    public class AuthenticationMutation : MutationTypeExtension<AuthenticationMutation>
     {
-        public async Task<IdentityUserToken<string>> Authenticate([Parent] Mutation mutation,
+        public async Task<UserToken> Authenticate(
             [Service] DbContext dbContext,
             [Service] UserTokenGenerateOptions userTokenGenerateOptions,
             AuthenticateInput input)

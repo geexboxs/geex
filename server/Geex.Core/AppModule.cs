@@ -45,6 +45,6 @@ namespace Geex.Core
         )]
     public class AppModule : GeexEntryModule<AppModule>
     {
-        
+
     }
 }

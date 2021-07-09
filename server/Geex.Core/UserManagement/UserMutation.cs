@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Autofac;
+
 using Geex.Common.Abstractions.Enumerations;
 using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
@@ -12,6 +13,7 @@ using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -21,10 +23,9 @@ using MongoDB.Entities;
 
 namespace Geex.Core.UserManagement
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class UserMutation : Mutation
+    public class UserMutation : MutationTypeExtension<UserMutation>
     {
-        public async Task<bool> Register([Parent] Mutation mutation,
+        public async Task<bool> Register(
             [Service] IUserCreationValidator userCreationValidator,
             [Service] IPasswordHasher<User> passwordHasher,
             RegisterUserInput input)
@@ -34,7 +35,7 @@ namespace Geex.Core.UserManagement
             return true;
         }
 
-        public async Task<bool> AssignRoles([Parent] Mutation mutation, [Service] DbContext dbContext, AssignRoleInput input)
+        public async Task<bool> AssignRoles([Service] DbContext dbContext, AssignRoleInput input)
         {
             var user = await dbContext.Find<User>().OneAsync(input.UserId.ToString());
             var roles = await dbContext.Find<Role>().ManyAsync(x => input.Roles.Contains(x.Id));
@@ -42,7 +43,7 @@ namespace Geex.Core.UserManagement
             return true;
         }
 
-        public async Task<bool> UpdateProfile([Parent] Mutation mutation, [Service] DbContext dbContext, UploadProfileInput input)
+        public async Task<bool> UpdateProfile([Service] DbContext dbContext, UploadProfileInput input)
         {
             var user = await dbContext.Find<User>().OneAsync(input.UserId.ToString());
             if (!input.NewAvatar.IsNullOrEmpty())

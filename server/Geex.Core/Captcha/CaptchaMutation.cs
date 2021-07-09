@@ -3,25 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Geex.Common.Gql.Roots;
 using Geex.Core.Captcha.Commands;
 using Geex.Core.Captcha.Domain;
 using Geex.Core.Captcha.GqlSchemas.Inputs;
 using Geex.Shared._ShouldMigrateToLib;
+
 using HotChocolate;
 using HotChocolate.Types;
 
 using MediatR;
+
 using StackExchange.Redis.Extensions.Core;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
 
 namespace Geex.Core.Captcha
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class UserMutation : Mutation
+    public class UserMutation : MutationTypeExtension<UserMutation>
     {
-        public async Task<Domain.Captcha> GenerateCaptcha([Parent] Mutation mutation,
+        public async Task<Domain.Captcha> GenerateCaptcha(
             [Service] IRedisDatabase cache,
             [Service] IMediator mediator,
             SendCaptchaInput input)
@@ -44,7 +46,7 @@ namespace Geex.Core.Captcha
             throw new ArgumentOutOfRangeException("input.CaptchaProvider");
         }
 
-        public async Task<bool> ValidateCaptcha([Parent] Mutation mutation,
+        public async Task<bool> ValidateCaptcha(
             [Service] IRedisDatabase cache,
             ValidateCaptchaInput input)
         {

@@ -50,7 +50,7 @@ namespace Geex.Common
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
             var schemaBuilder = context.Services.GetSingletonInstance<IRequestExecutorBuilder>();
-            
+
             base.PostConfigureServices(context);
         }
 
@@ -70,9 +70,9 @@ namespace Geex.Common
                 .AddFiltering()
                 .AddSorting()
                 .AddProjections()
-                .AddQueryType<Query>()
-                .AddMutationType<Mutation>()
-                .AddSubscriptionType<Subscription>()
+                .AddQueryType()
+                .AddMutationType()
+                .AddSubscriptionType()
                 .BindRuntimeType<ObjectId, ObjectIdType>()
                 .OnSchemaError((ctx, err) => { throw new Exception("schema error", err); });
             context.Services.AddHttpContextAccessor();

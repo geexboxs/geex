@@ -3,7 +3,7 @@ import { STColumn, STComponent } from '@delon/abc/st';
 import { SFSchema } from '@delon/form';
 import { ModalHelper, _HttpClient } from '@delon/theme';
 import { Apollo } from 'apollo-angular';
-import { messages } from '../../../shared/graphql/.generated/type';
+import { MessageFragGql } from '../../../shared/graphql/.generated/type';
 
 @Component({
   selector: 'app-messaging-messages',
@@ -11,7 +11,7 @@ import { messages } from '../../../shared/graphql/.generated/type';
 })
 export class MessagingMessagesComponent implements OnInit {
   data = this.apollo.query({
-    query: AuthenticateGql,
+    query: MessageFragGql,
     variables: {
       userIdentifier: this.userName.value,
       password: this.password.value,

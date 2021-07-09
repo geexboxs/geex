@@ -88,15 +88,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 }
                 var exportedTypes = gqlModuleType.Assembly.GetExportedTypes();
-                var rootTypes = exportedTypes.Where(x =>
-                                                         (x.BaseType == typeof(Query) ||
-                                                          x.BaseType == typeof(Mutation) ||
-                                                          x.BaseType == typeof(Subscription) ||
-                                                          AbpTypeExtensions.IsAssignableTo<ObjectTypeExtension>(x))).ToArray();
+                var extensionTypes = exportedTypes.Where(x =>
+                                                         (!x.IsAbstract && AbpTypeExtensions.IsAssignableTo<ObjectTypeExtension>(x))).ToArray();
                 //schemaBuilder.AddTypes(rootTypes);
-                foreach (var rootType in rootTypes)
+                foreach (var extensionType in extensionTypes)
                 {
-                    schemaBuilder.AddTypeExtension(rootType);
+                    schemaBuilder.AddTypeExtension(extensionType);
 
                 }
                 var objectTypes = exportedTypes.Where(x => !x.IsAbstract && AbpTypeExtensions.IsAssignableTo<IType>(x)).Where(x => !x.IsGenericType || (x.IsGenericType && x.GenericTypeArguments.Any())).ToList();

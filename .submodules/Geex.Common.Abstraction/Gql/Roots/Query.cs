@@ -6,13 +6,18 @@ using Geex.Common.Abstraction.Gql;
 using HotChocolate.Types;
 
 using MediatR;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Geex.Common.Gql.Roots
 {
-    public abstract class Query : IEmptyObject
+    public abstract class QueryTypeExtension<T> : ObjectTypeExtension<T> where T : ObjectTypeExtension
     {
-        protected IMediator Mediator => ServiceLocator.Current.GetService<IMediator>();
-        public string _ { get; set; }
+        protected override void Configure(IObjectTypeDescriptor<T> descriptor)
+        {
+            descriptor.Name(OperationTypeNames.Query);
+            descriptor.Field("kind").Ignore();
+            base.Configure(descriptor);
+        }
     }
 }

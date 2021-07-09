@@ -8,8 +8,7 @@ using MediatR;
 
 namespace Geex.Core.Testing.Api.GqlSchemas.Tests
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class TestMutation : Mutation
+    public class TestMutation : MutationTypeExtension<TestMutation>
     {
         /// <summary>
         /// 更新设置

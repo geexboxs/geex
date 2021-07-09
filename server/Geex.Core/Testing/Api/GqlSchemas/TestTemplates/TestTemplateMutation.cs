@@ -1,15 +1,17 @@
 ﻿using System.Threading.Tasks;
+
 using Geex.Common.Gql.Roots;
 using Geex.Core.Testing.Api.Aggregates.TestTemplates;
 using Geex.Core.Testing.Api.GqlSchemas.TestTemplates.Inputs;
+
 using HotChocolate;
 using HotChocolate.Types;
+
 using MediatR;
 
 namespace Geex.Core.Testing.Api.GqlSchemas.TestTemplates
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class TestTemplateMutation : Mutation
+    public class TestTemplateMutation : MutationTypeExtension<TestTemplateMutation>
     {
         /// <summary>
         /// 更新设置

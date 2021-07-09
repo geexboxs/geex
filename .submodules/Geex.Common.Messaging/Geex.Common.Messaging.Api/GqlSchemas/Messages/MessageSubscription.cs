@@ -15,8 +15,7 @@ using HotChocolate.Types;
 
 namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
 {
-    [ExtendObjectType(nameof(Subscription))]
-    public class MessageSubscription : Subscription
+    public class MessageSubscription : SubscriptionTypeExtension<MessageSubscription>
     {
         public ValueTask<ISourceStream<IFrontendCall>> SubscribeToFrontendCall(
         [Service] ITopicEventReceiver receiver,

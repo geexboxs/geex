@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autofac;
+
 using Geex.Common.Gql.Roots;
 using Geex.Core.Authentication.Domain;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Resolvers;
@@ -24,10 +26,9 @@ using Volo.Abp;
 
 namespace Geex.Core.Authorization
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class AuthorizationMutation : Mutation
+    public class AuthorizationMutation : MutationTypeExtension<AuthorizationMutation>
     {
-        public async Task<bool> Authorize([Parent] Mutation mutation,
+        public async Task<bool> Authorize(
             [Service] IComponentContext componentContext,
             AuthorizeInput input)
         {

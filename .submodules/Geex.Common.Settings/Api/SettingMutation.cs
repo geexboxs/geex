@@ -1,16 +1,18 @@
 ﻿using System.Threading.Tasks;
+
 using Geex.Common.Gql.Roots;
 using Geex.Common.Settings.Api.Aggregates.Settings;
 using Geex.Common.Settings.Api.Aggregates.Settings.Inputs;
 using Geex.Common.Settings.Core;
+
 using HotChocolate;
 using HotChocolate.Types;
+
 using MediatR;
 
 namespace Geex.Common.Settings.Api
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class SettingMutation : Mutation
+    public class SettingMutation : MutationTypeExtension<SettingMutation>
     {
         /// <summary>
         /// 更新设置

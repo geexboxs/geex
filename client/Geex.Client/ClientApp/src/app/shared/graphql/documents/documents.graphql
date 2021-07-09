@@ -3,23 +3,22 @@ fragment SettingPair on ISetting {
   value
 }
 
-fragment MessageContentFrag on IMessageContent {
-  title
-  time
-}
-
 fragment MessageFrag on IMessage {
-  content {
-    ...MessageContentFrag
-  }
   fromUserId
   id
   messageType
   severity
+  time
+  title
 }
 
-mutation authenticate($userIdentifier: String!, $password: String!) {
-  authenticate(input: { userIdentifier: $userIdentifier, password: $password }) {
+fragment PageInfoFrag on CollectionSegmentInfo {
+  hasPreviousPage
+  hasNextPage
+}
+
+mutation authenticate($phoneOrEmail: String!, $password: String!) {
+  authenticate(input: { userIdentifier: $phoneOrEmail, password: $password }) {
     value
   }
 }
@@ -88,13 +87,18 @@ subscription onFrontendCall {
   }
 }
 
-query mesages {
-  messages(input: {}) {
-    ...MessageFrag
-    toUserIds
+query mesages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+  messages(skip: $skip, take: $take, where: $filter) {
+    items {
+      ...MessageFrag
+    }
+    pageInfo {
+      ...PageInfoFrag
+    }
+    totalCount
   }
 }
 
 mutation sendMessage($toUserId: String!, $messageContent: String!) {
-  sendMessage(input: { toUserIds: [$toUserId], severity: INFO, messageContent: $messageContent })
+  sendMessage(input: { toUserIds: [$toUserId], severity: INFO, text: $messageContent })
 }

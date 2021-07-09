@@ -5,16 +5,27 @@ export type CaptchaFieldPolicy = {
   key?: FieldPolicy<any> | FieldReadFunction<any>;
   bitmap?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type ClaimsIdentityKeySpecifier = ('name' | ClaimsIdentityKeySpecifier)[];
-export type ClaimsIdentityFieldPolicy = {
-  name?: FieldPolicy<any> | FieldReadFunction<any>;
+export type CollectionSegmentInfoKeySpecifier = ('hasNextPage' | 'hasPreviousPage' | CollectionSegmentInfoKeySpecifier)[];
+export type CollectionSegmentInfoFieldPolicy = {
+  hasNextPage?: FieldPolicy<any> | FieldReadFunction<any>;
+  hasPreviousPage?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type IFrontendCallKeySpecifier = ('data' | 'frontendCallType' | IFrontendCallKeySpecifier)[];
 export type IFrontendCallFieldPolicy = {
   data?: FieldPolicy<any> | FieldReadFunction<any>;
   frontendCallType?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type IMessageKeySpecifier = ('fromUserId' | 'messageType' | 'content' | 'toUserIds' | 'id' | 'severity' | IMessageKeySpecifier)[];
+export type IMessageKeySpecifier = (
+  | 'fromUserId'
+  | 'messageType'
+  | 'content'
+  | 'toUserIds'
+  | 'id'
+  | 'severity'
+  | 'title'
+  | 'time'
+  | IMessageKeySpecifier
+)[];
 export type IMessageFieldPolicy = {
   fromUserId?: FieldPolicy<any> | FieldReadFunction<any>;
   messageType?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -22,11 +33,18 @@ export type IMessageFieldPolicy = {
   toUserIds?: FieldPolicy<any> | FieldReadFunction<any>;
   id?: FieldPolicy<any> | FieldReadFunction<any>;
   severity?: FieldPolicy<any> | FieldReadFunction<any>;
-};
-export type IMessageContentKeySpecifier = ('title' | 'time' | IMessageContentKeySpecifier)[];
-export type IMessageContentFieldPolicy = {
   title?: FieldPolicy<any> | FieldReadFunction<any>;
   time?: FieldPolicy<any> | FieldReadFunction<any>;
+};
+export type IMessageCollectionSegmentKeySpecifier = ('items' | 'pageInfo' | 'totalCount' | IMessageCollectionSegmentKeySpecifier)[];
+export type IMessageCollectionSegmentFieldPolicy = {
+  items?: FieldPolicy<any> | FieldReadFunction<any>;
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>;
+  totalCount?: FieldPolicy<any> | FieldReadFunction<any>;
+};
+export type IMessageContentKeySpecifier = ('_' | IMessageContentKeySpecifier)[];
+export type IMessageContentFieldPolicy = {
+  _?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type ISettingKeySpecifier = ('scope' | 'scopedKey' | 'value' | 'name' | 'id' | ISettingKeySpecifier)[];
 export type ISettingFieldPolicy = {
@@ -50,24 +68,18 @@ export type IUserProfileFieldPolicy = {
   avatar?: FieldPolicy<any> | FieldReadFunction<any>;
   userName?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type IdentityUserTokenOfStringKeySpecifier = (
-  | 'userId'
-  | 'loginProvider'
-  | 'name'
-  | 'value'
-  | IdentityUserTokenOfStringKeySpecifier
-)[];
-export type IdentityUserTokenOfStringFieldPolicy = {
-  userId?: FieldPolicy<any> | FieldReadFunction<any>;
-  loginProvider?: FieldPolicy<any> | FieldReadFunction<any>;
-  name?: FieldPolicy<any> | FieldReadFunction<any>;
-  value?: FieldPolicy<any> | FieldReadFunction<any>;
+export type KeyValuePairOfStringAndObjectKeySpecifier = ('key' | KeyValuePairOfStringAndObjectKeySpecifier)[];
+export type KeyValuePairOfStringAndObjectFieldPolicy = {
+  key?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type MutationKeySpecifier = (
-  | '_'
   | 'markMessagesRead'
   | 'deleteMessageDistributions'
   | 'sendMessage'
+  | 'contextData'
+  | 'scope'
+  | 'name'
+  | 'description'
   | 'updateSetting'
   | 'createRole'
   | 'register'
@@ -82,10 +94,13 @@ export type MutationKeySpecifier = (
   | MutationKeySpecifier
 )[];
 export type MutationFieldPolicy = {
-  _?: FieldPolicy<any> | FieldReadFunction<any>;
   markMessagesRead?: FieldPolicy<any> | FieldReadFunction<any>;
   deleteMessageDistributions?: FieldPolicy<any> | FieldReadFunction<any>;
   sendMessage?: FieldPolicy<any> | FieldReadFunction<any>;
+  contextData?: FieldPolicy<any> | FieldReadFunction<any>;
+  scope?: FieldPolicy<any> | FieldReadFunction<any>;
+  name?: FieldPolicy<any> | FieldReadFunction<any>;
+  description?: FieldPolicy<any> | FieldReadFunction<any>;
   updateSetting?: FieldPolicy<any> | FieldReadFunction<any>;
   createRole?: FieldPolicy<any> | FieldReadFunction<any>;
   register?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -99,9 +114,12 @@ export type MutationFieldPolicy = {
   authenticate?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type QueryKeySpecifier = (
-  | '_'
   | 'messages'
   | 'unreadMessages'
+  | 'contextData'
+  | 'scope'
+  | 'name'
+  | 'description'
   | 'settings'
   | 'queryRoles'
   | 'queryUsers'
@@ -111,9 +129,12 @@ export type QueryKeySpecifier = (
   | QueryKeySpecifier
 )[];
 export type QueryFieldPolicy = {
-  _?: FieldPolicy<any> | FieldReadFunction<any>;
   messages?: FieldPolicy<any> | FieldReadFunction<any>;
   unreadMessages?: FieldPolicy<any> | FieldReadFunction<any>;
+  contextData?: FieldPolicy<any> | FieldReadFunction<any>;
+  scope?: FieldPolicy<any> | FieldReadFunction<any>;
+  name?: FieldPolicy<any> | FieldReadFunction<any>;
+  description?: FieldPolicy<any> | FieldReadFunction<any>;
   settings?: FieldPolicy<any> | FieldReadFunction<any>;
   queryRoles?: FieldPolicy<any> | FieldReadFunction<any>;
   queryUsers?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -126,24 +147,34 @@ export type RoleFieldPolicy = {
   id?: FieldPolicy<any> | FieldReadFunction<any>;
   name?: FieldPolicy<any> | FieldReadFunction<any>;
 };
-export type SubscriptionKeySpecifier = ('_' | 'onFrontendCall' | SubscriptionKeySpecifier)[];
+export type SubscriptionKeySpecifier = ('onFrontendCall' | 'contextData' | 'scope' | 'name' | 'description' | SubscriptionKeySpecifier)[];
 export type SubscriptionFieldPolicy = {
-  _?: FieldPolicy<any> | FieldReadFunction<any>;
   onFrontendCall?: FieldPolicy<any> | FieldReadFunction<any>;
+  contextData?: FieldPolicy<any> | FieldReadFunction<any>;
+  scope?: FieldPolicy<any> | FieldReadFunction<any>;
+  name?: FieldPolicy<any> | FieldReadFunction<any>;
+  description?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type UserKeySpecifier = ('id' | 'roles' | UserKeySpecifier)[];
 export type UserFieldPolicy = {
   id?: FieldPolicy<any> | FieldReadFunction<any>;
   roles?: FieldPolicy<any> | FieldReadFunction<any>;
 };
+export type UserTokenKeySpecifier = ('loginProvider' | 'userId' | 'name' | 'value' | UserTokenKeySpecifier)[];
+export type UserTokenFieldPolicy = {
+  loginProvider?: FieldPolicy<any> | FieldReadFunction<any>;
+  userId?: FieldPolicy<any> | FieldReadFunction<any>;
+  name?: FieldPolicy<any> | FieldReadFunction<any>;
+  value?: FieldPolicy<any> | FieldReadFunction<any>;
+};
 export type TypedTypePolicies = TypePolicies & {
   Captcha?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | CaptchaKeySpecifier | (() => undefined | CaptchaKeySpecifier);
     fields?: CaptchaFieldPolicy;
   };
-  ClaimsIdentity?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?: false | ClaimsIdentityKeySpecifier | (() => undefined | ClaimsIdentityKeySpecifier);
-    fields?: ClaimsIdentityFieldPolicy;
+  CollectionSegmentInfo?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+    keyFields?: false | CollectionSegmentInfoKeySpecifier | (() => undefined | CollectionSegmentInfoKeySpecifier);
+    fields?: CollectionSegmentInfoFieldPolicy;
   };
   IFrontendCall?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | IFrontendCallKeySpecifier | (() => undefined | IFrontendCallKeySpecifier);
@@ -152,6 +183,10 @@ export type TypedTypePolicies = TypePolicies & {
   IMessage?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | IMessageKeySpecifier | (() => undefined | IMessageKeySpecifier);
     fields?: IMessageFieldPolicy;
+  };
+  IMessageCollectionSegment?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+    keyFields?: false | IMessageCollectionSegmentKeySpecifier | (() => undefined | IMessageCollectionSegmentKeySpecifier);
+    fields?: IMessageCollectionSegmentFieldPolicy;
   };
   IMessageContent?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | IMessageContentKeySpecifier | (() => undefined | IMessageContentKeySpecifier);
@@ -173,9 +208,9 @@ export type TypedTypePolicies = TypePolicies & {
     keyFields?: false | IUserProfileKeySpecifier | (() => undefined | IUserProfileKeySpecifier);
     fields?: IUserProfileFieldPolicy;
   };
-  IdentityUserTokenOfString?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
-    keyFields?: false | IdentityUserTokenOfStringKeySpecifier | (() => undefined | IdentityUserTokenOfStringKeySpecifier);
-    fields?: IdentityUserTokenOfStringFieldPolicy;
+  KeyValuePairOfStringAndObject?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+    keyFields?: false | KeyValuePairOfStringAndObjectKeySpecifier | (() => undefined | KeyValuePairOfStringAndObjectKeySpecifier);
+    fields?: KeyValuePairOfStringAndObjectFieldPolicy;
   };
   Mutation?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | MutationKeySpecifier | (() => undefined | MutationKeySpecifier);
@@ -196,5 +231,9 @@ export type TypedTypePolicies = TypePolicies & {
   User?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
     keyFields?: false | UserKeySpecifier | (() => undefined | UserKeySpecifier);
     fields?: UserFieldPolicy;
+  };
+  UserToken?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+    keyFields?: false | UserTokenKeySpecifier | (() => undefined | UserTokenKeySpecifier);
+    fields?: UserTokenFieldPolicy;
   };
 };

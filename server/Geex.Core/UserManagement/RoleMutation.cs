@@ -4,10 +4,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Autofac;
+
 using Geex.Common.Gql.Roots;
 using Geex.Core.UserManagement.GqlSchemas.Inputs;
 using Geex.Core.Users;
 using Geex.Shared._ShouldMigrateToLib.Auth;
+
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -18,10 +20,9 @@ using MongoDB.Entities;
 
 namespace Geex.Core.UserManagement
 {
-    [ExtendObjectType(nameof(Mutation))]
-    public class RoleMutation : Mutation
+    public class RoleMutation : MutationTypeExtension<RoleMutation>
     {
-        public async Task<bool> CreateRole([Parent] Mutation mutation,
+        public async Task<bool> CreateRole(
             [Service] IComponentContext componentContext,
             CreateRoleInput input)
         {

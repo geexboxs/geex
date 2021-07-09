@@ -11,10 +11,11 @@ using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 
+using MediatR;
+
 namespace Geex.Common.Settings.Api
 {
-    [ExtendObjectType(nameof(Query))]
-    public class SettingQuery : Query
+    public class SettingQuery : QueryTypeExtension<SettingQuery>
     {
         /// <summary>
         /// 根据provider获取全量设置
@@ -22,9 +23,10 @@ namespace Geex.Common.Settings.Api
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<IQueryable<ISetting>> Settings(
+            [Service] IMediator Mediator,
             GetSettingsInput input)
         {
-            return await this.Mediator.Send(input);
+            return await Mediator.Send(input);
         }
     }
 }

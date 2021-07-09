@@ -113,7 +113,7 @@ export class UserLoginComponent implements OnDestroy {
       .mutate({
         mutation: AuthenticateGql,
         variables: {
-          userIdentifier: this.userName.value,
+          phoneOrEmail: this.userName.value,
           password: this.password.value,
         },
       })

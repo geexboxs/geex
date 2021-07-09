@@ -10,7 +10,14 @@ import { environment } from '@env/environment';
 import { DelonACLModule } from '@delon/acl';
 
 const alainConfig: AlainConfig = {
-  st: { modal: { size: 'lg' } },
+  st: {
+    modal: { size: 'lg' },
+    page: {
+      front: false,
+      showSize: true,
+      total: true,
+    },
+  },
   pageHeader: { homeI18n: 'home' },
   lodop: {
     license: `A59B099A586B3851E0F0D7FDBF37B603`,

@@ -64,10 +64,9 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
                 throw new NotSupportedException("消息已经被分配");
             }
 
-            var distributions = userIds.Select(x => new MessageDistribution(this.Id, x));
-            await distributions.SaveAsync();
+            var distributions = userIds.Select(x => new MessageDistribution(this.Id, x)).ToList();
+            await distributions.SaveAsync((this as IEntity).Session);
             await this.Distributions.AddAsync(distributions);
-            await this.Distributions.SaveAsync();
 
             return this;
         }

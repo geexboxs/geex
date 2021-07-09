@@ -72,9 +72,9 @@ namespace Geex.Common.Messaging.Core.Handlers
         public async Task<Unit> Handle(SendNotificationMessageRequest request, CancellationToken cancellationToken)
         {
             var message = new Message(request.Text, request.Severity);
-            await message.DistributeAsync(request.ToUserIds.ToArray());
             DbContext.AttachContextSession(message);
             await message.SaveAsync(cancellation: cancellationToken);
+            await message.DistributeAsync(request.ToUserIds.ToArray());
 
             await Sender.Value.SendAsync(ClaimsPrincipal.FindUserId(), new FrontendCall(FrontendCallType.NewMessage, new { message.Content, message.FromUserId, message.MessageType, message.Severity }) as IFrontendCall
            , cancellationToken);

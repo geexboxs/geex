@@ -72,11 +72,8 @@ namespace Geex.Core.Authentication.Domain
         public async Task AssignRoles(List<Role> roles)
         {
             await this.Roles.RemoveAsync(this.Roles.Select(x => x.Id));
-            foreach (var role in roles)
-            {
-                await this.Roles.AddAsync(role);
-            }
-            await this.Roles.SaveAsync();
+            await roles.SaveAsync((this as IEntity).Session);
+            await this.Roles.AddAsync(roles);
             this.AddDomainEvent(new UserRoleChangedEvent(this.Id, roles.Select(x => x.Id).ToList()));
         }
     }

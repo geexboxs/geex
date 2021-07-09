@@ -542,13 +542,13 @@ export type OnFrontendCallSubscription = { __typename?: 'Subscription' } & {
   onFrontendCall?: Maybe<{ __typename?: 'IFrontendCall' } & Pick<IFrontendCall, 'frontendCallType'>>;
 };
 
-export type MesagesQueryVariables = Exact<{
+export type MessagesQueryVariables = Exact<{
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
   filter?: Maybe<IMessageFilterInput>;
 }>;
 
-export type MesagesQuery = { __typename?: 'Query' } & {
+export type MessagesQuery = { __typename?: 'Query' } & {
   messages?: Maybe<
     { __typename?: 'IMessageCollectionSegment' } & Pick<IMessageCollectionSegment, 'totalCount'> & {
         items?: Maybe<Array<Maybe<{ __typename?: 'IMessage' } & MessageFragFragment>>>;
@@ -668,8 +668,8 @@ export const OnFrontendCallGql = (gql`
     }
   }
 ` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
-export const MesagesGql = (gql`
-  query mesages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+export const MessagesGql = (gql`
+  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
     messages(skip: $skip, take: $take, where: $filter) {
       items {
         ...MessageFrag
@@ -682,7 +682,7 @@ export const MesagesGql = (gql`
   }
   ${MessageFragGql}
   ${PageInfoFragGql}
-` as unknown) as DocumentNode<MesagesQuery, MesagesQueryVariables>;
+` as unknown) as DocumentNode<MessagesQuery, MessagesQueryVariables>;
 export const SendMessageGql = (gql`
   mutation sendMessage($toUserId: String!, $messageContent: String!) {
     sendMessage(input: { toUserIds: [$toUserId], severity: INFO, text: $messageContent })

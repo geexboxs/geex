@@ -87,7 +87,7 @@ subscription onFrontendCall {
   }
 }
 
-query mesages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
   messages(skip: $skip, take: $take, where: $filter) {
     items {
       ...MessageFrag

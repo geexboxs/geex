@@ -55,13 +55,13 @@ export class MessagingMessagesComponent implements OnInit {
     // { title: '调用次数', type: 'number', index: 'callNo' },
     // { title: '头像', type: 'img', width: '50px', index: 'avatar' },
     // { title: '时间', type: 'date', index: 'updatedAt' },
-    // {
-    //   title: '',
-    //   buttons: [
-    //     { text: '查看', click: (item: any) => `/form/${item.id}` },
-    //     { text: '编辑', type: 'static', component: MessagingMessagesComponent, click: 'reload' },
-    //   ],
-    // },
+    {
+      title: '操作',
+      buttons: [
+        { text: '查看', click: (item: any) => `/form/${item.id}` },
+        { text: '编辑', type: 'static', component: MessagingMessagesComponent, click: 'reload' },
+      ],
+    },
   ];
   $param: Observable<any>;
   totalCount: number;

@@ -64,7 +64,6 @@ export class MessagingMessagesComponent implements OnInit {
     },
   ];
   $param: Observable<any>;
-  totalCount: number;
 
   constructor(
     private http: _HttpClient,
@@ -99,7 +98,7 @@ export class MessagingMessagesComponent implements OnInit {
     this.$data = $res.pipe(
       map((x) => {
         console.log(x);
-        this.totalCount = x.data.messages.totalCount;
+        this.st.total = x.data.messages.totalCount;
         return x.data.messages.items;
       }),
     );

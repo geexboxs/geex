@@ -11,4 +11,5 @@
 	branch = master
 [submodule ".submodules/Geex.IdentityServer"]
 	path = .submodules/Geex.IdentityServer
+    url = https://github.com/snys98/Geex.IdentityServer.git
 	branch = master

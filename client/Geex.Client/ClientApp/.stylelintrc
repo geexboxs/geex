@@ -9,6 +9,7 @@
     "stylelint-declaration-block-no-ignored-properties"
   ],
   "rules": {
+    "at-rule-name-space-after": null,
     "no-descending-specificity": null,
     "plugin/declaration-block-no-ignored-properties": true,
     "selector-type-no-unknown": [

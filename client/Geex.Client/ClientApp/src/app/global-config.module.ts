@@ -11,13 +11,19 @@ import { DelonACLModule } from '@delon/acl';
 
 const alainConfig: AlainConfig = {
   st: {
+    rowClassName: (record, i) => (i % 2 == 0 ? 'even' : undefined),
+    size: 'small',
     modal: { size: 'lg' },
+    bordered: true,
     page: {
       front: false,
       showSize: true,
       total: true,
     },
   },
+  se: {},
+  sf: {},
+  sv: {},
   pageHeader: { homeI18n: 'home' },
   lodop: {
     license: `A59B099A586B3851E0F0D7FDBF37B603`,

@@ -1,9 +1,19 @@
-<page-header [title]="'messaging'" [content]="phContentTpl" [action]="phActionTpl">
+<page-header [title]="'messaging'" [content]="phContentTpl" [tab]="phTab" [extra]="phExtra" [action]="phActionTpl">
   <ng-template #phContentTpl>
     <sf #sf mode="search" [schema]="searchSchema" (formSubmit)="st.reset($event)" (formReset)="st.reset($event)"></sf>
   </ng-template>
+  <ng-template #phExtra>
+    <button (click)="add()" nz-button nzType="primary">新增</button>
+  </ng-template>
+  <ng-template #phTab>
+    <nz-tabset>
+      <nz-tab nzTitle="Tab 1"></nz-tab>
+      <nz-tab nzTitle="Tab 2"></nz-tab>
+      <nz-tab nzTitle="Tab 3"></nz-tab>
+    </nz-tabset>
+  </ng-template>
   <ng-template #phActionTpl>
-    <button (click)="add()" nz-button nzType="primary">新建</button>
+    <button (click)="add()" nz-button nzType="primary">审批</button>
   </ng-template>
 </page-header>
 <nz-card>

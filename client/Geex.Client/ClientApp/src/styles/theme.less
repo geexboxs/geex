@@ -2,7 +2,24 @@
 // - `default` Default theme
 // - `dark` Import the official dark less style file
 // - `compact` Import the official compact less style file
-@import '~@delon/theme/theme-default.less';
+@import '~@delon/theme/theme-compact.less';
+// @import "~ng-zorro-antd/ng-zorro-antd.compact.less";
+
+.ant-table-thead > tr > th {
+  font-weight: bold !important;
+}
+
+.ant-table-tbody > tr:not(.even) {
+  background-color: rgba(250, 250, 254, 1);
+}
+
+.ant-table-tbody > tr.ant-table-row:hover {
+  background-color: rgba(250, 254, 250, 1) !important;
+}
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: rgba(250, 254, 250, 1) !important;
+}
 
 // ==========The following is the custom theme variable area==========
 // The theme paraments can be generated at https://ng-alain.github.io/ng-alain/

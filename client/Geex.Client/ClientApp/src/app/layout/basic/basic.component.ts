@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ReuseTabMatchMode, ReuseTabService } from '@delon/abc/reuse-tab';
 import { SettingsService, User } from '@delon/theme';
 import { LayoutDefaultOptions } from '@delon/theme/layout-default';
 import { environment } from '@env/environment';
@@ -62,7 +63,8 @@ import { environment } from '@env/environment';
         </nz-dropdown-menu>
       </ng-template>
       <ng-template #contentTpl>
-        <router-outlet></router-outlet>
+        <reuse-tab #reuseTab></reuse-tab>
+        <router-outlet (activate)="reuseTab.activate($event)"></router-outlet>
       </ng-template>
     </layout-default>
 
@@ -81,5 +83,7 @@ export class LayoutBasicComponent {
     return this.settings.user;
   }
 
-  constructor(private settings: SettingsService) {}
+  constructor(private settings: SettingsService, reuseTabService: ReuseTabService) {
+    reuseTabService.mode = ReuseTabMatchMode.URL;
+  }
 }

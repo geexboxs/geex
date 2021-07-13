@@ -13,6 +13,7 @@ import { ICONS_AUTO } from '../../../style-icons-auto';
 import { Apollo, gql } from 'apollo-angular';
 import { InitSettingsGql, InitSettingsQuery } from 'src/app/shared/graphql/.generated/type';
 import { I18NService } from '../i18n/i18n.service';
+import { ReuseTabMatchMode, ReuseTabService } from '@delon/abc/reuse-tab';
 
 /**
  * Used for application startup

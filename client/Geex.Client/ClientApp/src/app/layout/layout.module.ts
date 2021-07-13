@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GlobalFooterModule } from '@delon/abc/global-footer';
 import { NoticeIconModule } from '@delon/abc/notice-icon';
+import { ReuseTabModule } from '@delon/abc/reuse-tab';
 import { LayoutDefaultModule } from '@delon/theme/layout-default';
 import { SettingDrawerModule } from '@delon/theme/setting-drawer';
 import { ThemeBtnModule } from '@delon/theme/theme-btn';
@@ -42,6 +43,7 @@ const PASSPORT = [LayoutPassportComponent];
 
 @NgModule({
   imports: [
+    ReuseTabModule,
     CommonModule,
     FormsModule,
     RouterModule,

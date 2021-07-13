@@ -17,5 +17,5 @@
   </ng-template>
 </page-header>
 <nz-card>
-  <st #st [data]="$data" (change)="stChange($event)" [columns]="columns"></st>
+  <st #st [data]="data" [loading]="loading" (change)="stChange($event)" [columns]="columns"></st>
 </nz-card>

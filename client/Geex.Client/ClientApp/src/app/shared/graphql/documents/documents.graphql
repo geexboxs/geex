@@ -3,7 +3,7 @@ fragment SettingPair on ISetting {
   value
 }
 
-fragment MessageFrag on IMessage {
+fragment MessageBrief on IMessage {
   fromUserId
   id
   messageType
@@ -12,7 +12,14 @@ fragment MessageFrag on IMessage {
   title
 }
 
-fragment PageInfoFrag on CollectionSegmentInfo {
+fragment MessageDetail on IMessage {
+  toUserIds
+  content {
+    _
+  }
+}
+
+fragment PageInfo on CollectionSegmentInfo {
   hasPreviousPage
   hasNextPage
 }
@@ -87,13 +94,14 @@ subscription onFrontendCall {
   }
 }
 
-query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
-  messages(skip: $skip, take: $take, where: $filter) {
+query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
+  messages(skip: $skip, take: $take, where: $filter, includeDetail: $includeDetail) {
     items {
-      ...MessageFrag
+      ...MessageBrief
+      ...MessageDetail @include(if: $includeDetail)
     }
     pageInfo {
-      ...PageInfoFrag
+      ...PageInfo
     }
     totalCount
   }

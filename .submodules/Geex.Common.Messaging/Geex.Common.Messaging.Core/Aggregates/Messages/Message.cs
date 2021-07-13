@@ -20,9 +20,10 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
         private ILogger<Message> Logger => ServiceLocator.Current.GetService<ILogger<Message>>();
         protected Message()
         {
-
+            this.InitOneToMany((x) => x.Distributions);
         }
         public Message(string text, MessageSeverityType severity = MessageSeverityType.Info)
+        : this()
         {
             Title = text;
             this.Severity = severity;

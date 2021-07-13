@@ -1,15 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { SFSchema, SFUISchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalRef } from 'ng-zorro-antd/modal';
+import { BusinessComponentBase } from '../../../../shared/components/business.component.base';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-messaging-messages-edit',
+  selector: 'app-messaging-edit',
   templateUrl: './edit.component.html',
 })
-export class MessagingMessagesEditComponent implements OnInit {
-  record: any = {};
+export class MessagingEditComponent extends BusinessComponentBase {
+  $init: Observable<any>;
+
+  id: string;
   i: any;
   schema: SFSchema = {
     properties: {
@@ -38,20 +44,18 @@ export class MessagingMessagesEditComponent implements OnInit {
     },
   };
 
-  constructor(private modal: NzModalRef, private msgSrv: NzMessageService, public http: _HttpClient) {}
-
-  ngOnInit(): void {
-    if (this.record.id > 0) this.http.get(`/user/${this.record.id}`).subscribe((res) => (this.i = res));
+  constructor(injector: Injector) {
+    super(injector);
+    this.$routeChange.pipe(
+      map((params) => {
+        this.id = params.id;
+      }),
+    );
   }
 
   save(value: any): void {
-    this.http.post(`/user/${this.record.id}`, value).subscribe((res) => {
-      this.msgSrv.success('保存成功');
-      this.modal.close(true);
-    });
-  }
-
-  close(): void {
-    this.modal.destroy();
+    // this.http.post(`/user/${this.record.id}`, value).subscribe(res => {
+    //   this.msgSrv.success('保存成功');
+    // });
   }
 }

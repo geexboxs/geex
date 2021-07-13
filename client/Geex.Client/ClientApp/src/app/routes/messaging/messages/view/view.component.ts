@@ -1,23 +1,49 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { _HttpClient } from '@delon/theme';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalRef } from 'ng-zorro-antd/modal';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { BusinessComponentBase } from '../../../../shared/components/business.component.base';
+import {
+  MessagesQuery,
+  MessagesQueryVariables,
+  MessagesGql,
+  MessageDetailFragment,
+  MessageBriefFragment,
+} from '../../../../shared/graphql/.generated/type';
 
 @Component({
-  selector: 'app-messaging-messages-view',
+  selector: 'app-messaging-view',
   templateUrl: './view.component.html',
 })
-export class MessagingMessagesViewComponent implements OnInit {
-  record: any = {};
-  i: any;
+export class MessagingViewComponent extends BusinessComponentBase {
+  $init: Observable<any>;
 
-  constructor(private modal: NzModalRef, private msgSrv: NzMessageService, private http: _HttpClient) {}
+  id: string;
+  data: MessageBriefFragment & MessageDetailFragment;
 
-  ngOnInit(): void {
-    this.http.get(`/user/${this.record.id}`).subscribe((res) => (this.i = res));
-  }
-
-  close(): void {
-    this.modal.destroy();
+  constructor(injector: Injector) {
+    super(injector);
+    this.$init = this.$routeChange.pipe(
+      map(async (params) => {
+        this.id = params.id;
+        let res = await this.apollo
+          .query<MessagesQuery, MessagesQueryVariables>({
+            query: MessagesGql,
+            variables: {
+              filter: {
+                id: {
+                  eq: params.id,
+                },
+              },
+              includeDetail: true,
+            },
+          })
+          .toPromise();
+        this.loading = res.loading;
+        this.data = res.data.messages.items[0];
+      }),
+    );
   }
 }

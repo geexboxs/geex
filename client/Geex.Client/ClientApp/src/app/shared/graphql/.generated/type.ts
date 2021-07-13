@@ -326,6 +326,7 @@ export interface Query {
 export interface QueryMessagesArgs {
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
+  includeDetail?: Maybe<Scalars['Boolean']>;
   where?: Maybe<IMessageFilterInput>;
 }
 
@@ -450,15 +451,16 @@ export interface ValidateCaptchaInput {
 
 export type SettingPairFragment = { __typename?: 'ISetting' } & Pick<ISetting, 'name' | 'value'>;
 
-export type MessageFragFragment = { __typename?: 'IMessage' } & Pick<
+export type MessageBriefFragment = { __typename?: 'IMessage' } & Pick<
   IMessage,
   'fromUserId' | 'id' | 'messageType' | 'severity' | 'time' | 'title'
 >;
 
-export type PageInfoFragFragment = { __typename?: 'CollectionSegmentInfo' } & Pick<
-  CollectionSegmentInfo,
-  'hasPreviousPage' | 'hasNextPage'
->;
+export type MessageDetailFragment = { __typename?: 'IMessage' } & Pick<IMessage, 'toUserIds'> & {
+    content?: Maybe<{ __typename?: 'IMessageContent' } & Pick<IMessageContent, '_'>>;
+  };
+
+export type PageInfoFragment = { __typename?: 'CollectionSegmentInfo' } & Pick<CollectionSegmentInfo, 'hasPreviousPage' | 'hasNextPage'>;
 
 export type AuthenticateMutationVariables = Exact<{
   phoneOrEmail: Scalars['String'];
@@ -546,13 +548,14 @@ export type MessagesQueryVariables = Exact<{
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
   filter?: Maybe<IMessageFilterInput>;
+  includeDetail: Scalars['Boolean'];
 }>;
 
 export type MessagesQuery = { __typename?: 'Query' } & {
   messages?: Maybe<
     { __typename?: 'IMessageCollectionSegment' } & Pick<IMessageCollectionSegment, 'totalCount'> & {
-        items?: Maybe<Array<Maybe<{ __typename?: 'IMessage' } & MessageFragFragment>>>;
-        pageInfo: { __typename?: 'CollectionSegmentInfo' } & PageInfoFragFragment;
+        items?: Maybe<Array<Maybe<{ __typename?: 'IMessage' } & MessageBriefFragment & MessageDetailFragment>>>;
+        pageInfo: { __typename?: 'CollectionSegmentInfo' } & PageInfoFragment;
       }
   >;
 };
@@ -570,8 +573,8 @@ export const SettingPairGql = (gql`
     value
   }
 ` as unknown) as DocumentNode<SettingPairFragment, unknown>;
-export const MessageFragGql = (gql`
-  fragment MessageFrag on IMessage {
+export const MessageBriefGql = (gql`
+  fragment MessageBrief on IMessage {
     fromUserId
     id
     messageType
@@ -579,13 +582,21 @@ export const MessageFragGql = (gql`
     time
     title
   }
-` as unknown) as DocumentNode<MessageFragFragment, unknown>;
-export const PageInfoFragGql = (gql`
-  fragment PageInfoFrag on CollectionSegmentInfo {
+` as unknown) as DocumentNode<MessageBriefFragment, unknown>;
+export const MessageDetailGql = (gql`
+  fragment MessageDetail on IMessage {
+    toUserIds
+    content {
+      _
+    }
+  }
+` as unknown) as DocumentNode<MessageDetailFragment, unknown>;
+export const PageInfoGql = (gql`
+  fragment PageInfo on CollectionSegmentInfo {
     hasPreviousPage
     hasNextPage
   }
-` as unknown) as DocumentNode<PageInfoFragFragment, unknown>;
+` as unknown) as DocumentNode<PageInfoFragment, unknown>;
 export const AuthenticateGql = (gql`
   mutation authenticate($phoneOrEmail: String!, $password: String!) {
     authenticate(input: { userIdentifier: $phoneOrEmail, password: $password }) {
@@ -669,19 +680,21 @@ export const OnFrontendCallGql = (gql`
   }
 ` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
 export const MessagesGql = (gql`
-  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
-    messages(skip: $skip, take: $take, where: $filter) {
+  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
+    messages(skip: $skip, take: $take, where: $filter, includeDetail: $includeDetail) {
       items {
-        ...MessageFrag
+        ...MessageBrief
+        ...MessageDetail @include(if: $includeDetail)
       }
       pageInfo {
-        ...PageInfoFrag
+        ...PageInfo
       }
       totalCount
     }
   }
-  ${MessageFragGql}
-  ${PageInfoFragGql}
+  ${MessageBriefGql}
+  ${MessageDetailGql}
+  ${PageInfoGql}
 ` as unknown) as DocumentNode<MessagesQuery, MessagesQueryVariables>;
 export const SendMessageGql = (gql`
   mutation sendMessage($toUserId: String!, $messageContent: String!) {

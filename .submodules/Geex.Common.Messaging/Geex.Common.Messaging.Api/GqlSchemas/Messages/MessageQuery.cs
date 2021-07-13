@@ -7,7 +7,9 @@ using Geex.Common.Messaging.Api.Aggregates.Messages.Inputs;
 using Geex.Common.Gql.Roots;
 using Geex.Common.Messaging.Api.GqlSchemas.Messages.Types;
 using HotChocolate;
+using HotChocolate.Language;
 using HotChocolate.Types;
+using HotChocolate.Types.Descriptors.Definitions;
 using HotChocolate.Types.Pagination;
 using MediatR;
 using MongoDB.Entities;
@@ -20,7 +22,12 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
         {
             descriptor.ResolveMethod(x => x.Messages(default))
             .UseOffsetPaging<MessageGqlType>()
-            .UseFiltering<IMessage>(x => x.Field(y => y.MessageType))
+            .UseFiltering<IMessage>(x =>
+            {
+                x.Field(y => y.MessageType);
+                x.Field(x=>x.Id);
+            })
+            .UseTwoLevelQuery()
             ;
             base.Configure(descriptor);
         }

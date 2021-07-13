@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApolloQueryResult } from '@apollo/client/core';
 import { STChange, STColumn, STComponent } from '@delon/abc/st';
@@ -8,8 +8,9 @@ import { Apollo } from 'apollo-angular';
 import { Observable, pipe } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
+import { BusinessComponentBase } from '../../../shared/components/business.component.base';
 import {
-  MessageFragFragment,
+  MessageBriefFragment,
   MessagesGql,
   MessagesQuery,
   MessagesQueryVariables,
@@ -21,8 +22,9 @@ import {
   selector: 'app-messaging-messages',
   templateUrl: './messages.component.html',
 })
-export class MessagingMessagesComponent implements OnInit {
-  $data: Observable<MessageFragFragment[]>;
+export class MessagingMessagesComponent extends BusinessComponentBase {
+  $init: Observable<any>;
+  data: MessageBriefFragment[];
   searchSchema: SFSchema = {
     properties: {
       title: {
@@ -35,7 +37,7 @@ export class MessagingMessagesComponent implements OnInit {
   private readonly sf!: SFComponent;
   @ViewChild('st')
   private readonly st!: STComponent;
-  columns: STColumn<MessageFragFragment>[] = [
+  columns: STColumn<MessageBriefFragment>[] = [
     { title: 'Id', index: 'id' },
     { title: '标题', index: 'title' },
     {
@@ -58,27 +60,16 @@ export class MessagingMessagesComponent implements OnInit {
     {
       title: '操作',
       buttons: [
-        { text: '查看', click: (item: any) => `/form/${item.id}` },
-        { text: '编辑', type: 'static', component: MessagingMessagesComponent, click: 'reload' },
+        { text: '查看', click: (item: MessageBriefFragment) => this.router.navigate(['view', item.id], { relativeTo: this.route }) },
+        { text: '编辑', click: (item: MessageBriefFragment) => this.router.navigate(['edit', item.id], { relativeTo: this.route }) },
       ],
     },
   ];
-  $param: Observable<any>;
 
-  constructor(
-    private http: _HttpClient,
-    public apollo: Apollo,
-    private modal: ModalHelper,
-    private route: ActivatedRoute,
-    private router: Router,
-    private cdr: ChangeDetectorRef,
-  ) {
-    this.$param = combineLatest([this.route.params, this.route.queryParams]).pipe<any>(
-      map((x) => {
-        return { ...x[0], ...x[1] };
-      }),
-    );
-    let $res = this.$param.pipe(
+  constructor(injector: Injector) {
+    super(injector);
+
+    let $res = this.$routeChange.pipe(
       switchMap((param) => {
         return this.apollo.query<MessagesQuery, MessagesQueryVariables>({
           query: MessagesGql,
@@ -90,31 +81,26 @@ export class MessagingMessagesComponent implements OnInit {
                 contains: param.title ?? '',
               },
             },
+            includeDetail: false,
           },
         });
       }),
     );
 
-    this.$data = $res.pipe(
+    this.$init = $res.pipe(
       map((x) => {
-        console.log(x);
         this.st.total = x.data.messages.totalCount;
-        return x.data.messages.items;
+        this.loading = x.loading;
+        this.data = x.data.messages.items;
       }),
     );
   }
 
-  async ngAfterViewInit(): Promise<void> {
-    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
-    //Add 'implements AfterViewInit' to the class.
-  }
   stChange(args: STChange) {
     if (args.type == 'pi') {
       this.router.navigate([], { queryParams: { page: args.pi, title: this.sf.value.title } });
     }
   }
-
-  ngOnInit(): void {}
 
   add(): void {
     // this.modal

@@ -94,11 +94,11 @@ subscription onFrontendCall {
   }
 }
 
-query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
-  messages(skip: $skip, take: $take, where: $filter, includeDetail: $includeDetail) {
+query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+  messages(skip: $skip, take: $take, where: $filter) {
     items {
       ...MessageBrief
-      ...MessageDetail @include(if: $includeDetail)
+      ...MessageDetail
     }
     pageInfo {
       ...PageInfo

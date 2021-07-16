@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
+using Geex.Common.Abstraction;
+
+using HotChocolate.Data.Filters;
 using HotChocolate.Language;
 using HotChocolate.Types.Descriptors;
 using HotChocolate.Types.Descriptors.Definitions;
@@ -27,12 +30,6 @@ namespace HotChocolate.Types
             field.Type(method.ReturnType);
             field = field.ResolveWith(propertyOrMethod);
             return field;
-        }
-
-        public static IObjectFieldDescriptor UseTwoLevelQuery(this IObjectFieldDescriptor descriptor)
-        {
-            descriptor.Argument("includeDetail", a => a.Type(typeof(bool?)).DefaultValue(null));
-            return descriptor;
         }
     }
 }

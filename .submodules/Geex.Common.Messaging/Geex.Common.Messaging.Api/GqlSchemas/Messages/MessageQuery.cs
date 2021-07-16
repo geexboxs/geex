@@ -25,9 +25,8 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
             .UseFiltering<IMessage>(x =>
             {
                 x.Field(y => y.MessageType);
-                x.Field(x=>x.Id);
+                x.Field(y=>y.Id);
             })
-            .UseTwoLevelQuery()
             ;
             base.Configure(descriptor);
         }

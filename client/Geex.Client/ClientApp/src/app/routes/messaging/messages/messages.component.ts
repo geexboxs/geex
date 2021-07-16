@@ -81,7 +81,6 @@ export class MessagingMessagesComponent extends BusinessComponentBase {
                 contains: param.title ?? '',
               },
             },
-            includeDetail: false,
           },
         });
       }),

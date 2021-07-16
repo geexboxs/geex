@@ -37,7 +37,6 @@ export class MessagingViewComponent extends BusinessComponentBase {
                   eq: params.id,
                 },
               },
-              includeDetail: true,
             },
           })
           .toPromise();

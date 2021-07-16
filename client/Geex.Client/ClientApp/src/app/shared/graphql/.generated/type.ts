@@ -152,10 +152,10 @@ export interface IMessageFilterInput {
   and?: Maybe<Array<IMessageFilterInput>>;
   or?: Maybe<Array<IMessageFilterInput>>;
   messageType?: Maybe<MessageTypeOperationFilterInput>;
+  id?: Maybe<StringOperationFilterInput>;
   fromUserId?: Maybe<StringOperationFilterInput>;
   content?: Maybe<IMessageContentFilterInput>;
   toUserIds?: Maybe<ListStringOperationFilterInput>;
-  id?: Maybe<StringOperationFilterInput>;
   severity?: Maybe<MessageSeverityTypeOperationFilterInput>;
   title?: Maybe<StringOperationFilterInput>;
   time?: Maybe<ComparableDateTimeOperationFilterInput>;
@@ -326,7 +326,6 @@ export interface Query {
 export interface QueryMessagesArgs {
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
-  includeDetail?: Maybe<Scalars['Boolean']>;
   where?: Maybe<IMessageFilterInput>;
 }
 
@@ -548,7 +547,6 @@ export type MessagesQueryVariables = Exact<{
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
   filter?: Maybe<IMessageFilterInput>;
-  includeDetail: Scalars['Boolean'];
 }>;
 
 export type MessagesQuery = { __typename?: 'Query' } & {
@@ -680,11 +678,11 @@ export const OnFrontendCallGql = (gql`
   }
 ` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
 export const MessagesGql = (gql`
-  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
-    messages(skip: $skip, take: $take, where: $filter, includeDetail: $includeDetail) {
+  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+    messages(skip: $skip, take: $take, where: $filter) {
       items {
         ...MessageBrief
-        ...MessageDetail @include(if: $includeDetail)
+        ...MessageDetail
       }
       pageInfo {
         ...PageInfo

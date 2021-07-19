@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29411.138
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Server", "Geex.Server\Geex.Server.csproj", "{DFB7E9AB-15A6-4287-987A-185DF363050E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common", "..\.submodules\Geex.Common\Geex.Common.csproj", "{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Core", "Geex.Core\Geex.Core.csproj", "{2DF5580F-2D52-4DB0-9087-15D003177303}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoDB.Entities", "..\.submodules\MongoDB.Entities\MongoDB.Entities\MongoDB.Entities.csproj", "{C3514DCE-609E-4F72-BA86-58FE026E829B}"
@@ -36,6 +34,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Messaging.Api",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Messaging.Core", "..\.submodules\Geex.Common.Messaging\Geex.Common.Messaging.Core\Geex.Common.Messaging.Core.csproj", "{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common", "..\.submodules\Geex.Common\Geex.Common.csproj", "{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,10 +46,6 @@ Global
 		{DFB7E9AB-15A6-4287-987A-185DF363050E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFB7E9AB-15A6-4287-987A-185DF363050E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFB7E9AB-15A6-4287-987A-185DF363050E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DF5580F-2D52-4DB0-9087-15D003177303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DF5580F-2D52-4DB0-9087-15D003177303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DF5580F-2D52-4DB0-9087-15D003177303}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -90,12 +86,15 @@ Global
 		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B54B0F00-00C0-4DB8-9B62-F1B8AF3CEA0A} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{C3514DCE-609E-4F72-BA86-58FE026E829B} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{24C6E7E7-CE87-4271-97FD-33059408BF8F} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{687C0644-A26A-40ED-9B2B-9C83E17C96F6} = {708825AC-62A7-4AF2-AA60-565130F0053F}
@@ -106,6 +105,7 @@ Global
 		{FA9112DB-8186-4DB1-8745-8407EA0F87A3} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48} = {FA9112DB-8186-4DB1-8745-8407EA0F87A3}
 		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4} = {FA9112DB-8186-4DB1-8745-8407EA0F87A3}
+		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B29333E1-4892-465E-983D-B4CDFFEA01C3}

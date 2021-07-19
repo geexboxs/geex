@@ -14,5 +14,5 @@
     url = https://github.com/snys98/Geex.IdentityServer.git
 	branch = master
 [submodule "Geex.Common"]
-	path = Geex.Common
-	url = C:/Users/lulus/workspace/geexbox/geex/.submodules/Geex.Common
+	path = .submodules/Geex.Common
+	url = https://github.com/snys98/Geex.Common.git

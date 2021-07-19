@@ -37,6 +37,7 @@ export class MessagingViewComponent extends BusinessComponentBase {
                   eq: params.id,
                 },
               },
+              includeDetail: true,
             },
           })
           .toPromise();
@@ -44,5 +45,11 @@ export class MessagingViewComponent extends BusinessComponentBase {
         this.data = res.data.messages.items[0];
       }),
     );
+  }
+  edit() {
+    this.router.navigate(['messaging', 'edit', this.id]);
+  }
+  reload() {
+    this.router.navigate([], { skipLocationChange: true });
   }
 }

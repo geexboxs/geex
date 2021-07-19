@@ -45,6 +45,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes, {
       useHash: environment.useHash,
       enableTracing: !environment.production,
+      onSameUrlNavigation: 'reload',
       // NOTICE: If you use `reuse-tab` component and turn on keepingScroll you can set to `disabled`
       // Pls refer to https://ng-alain.com/components/reuse-tab
       // scrollPositionRestoration: 'top',

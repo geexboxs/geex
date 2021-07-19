@@ -76,6 +76,8 @@ export type MutationKeySpecifier = (
   | 'markMessagesRead'
   | 'deleteMessageDistributions'
   | 'sendMessage'
+  | 'createMessage'
+  | 'editMessage'
   | 'contextData'
   | 'scope'
   | 'name'
@@ -97,6 +99,8 @@ export type MutationFieldPolicy = {
   markMessagesRead?: FieldPolicy<any> | FieldReadFunction<any>;
   deleteMessageDistributions?: FieldPolicy<any> | FieldReadFunction<any>;
   sendMessage?: FieldPolicy<any> | FieldReadFunction<any>;
+  createMessage?: FieldPolicy<any> | FieldReadFunction<any>;
+  editMessage?: FieldPolicy<any> | FieldReadFunction<any>;
   contextData?: FieldPolicy<any> | FieldReadFunction<any>;
   scope?: FieldPolicy<any> | FieldReadFunction<any>;
   name?: FieldPolicy<any> | FieldReadFunction<any>;

@@ -45,7 +45,7 @@ namespace Geex.Common.Messaging.Core.Aggregates.Messages
         public string Title { get; set; }
         public DateTime Time => CreatedOn;
 
-        public MessageType MessageType { get; private set; }
+        public MessageType MessageType { get; set; }
         public IMessageContent Content { get; private set; }
         public MessageSeverityType Severity { get; set; }
         public async Task<Message> DistributeAsync(params string[] userIds)

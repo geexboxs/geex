@@ -19,6 +19,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 export const SHARED_ZORRO_MODULES = [
   NzFormModule,
@@ -42,4 +43,5 @@ export const SHARED_ZORRO_MODULES = [
   NzIconModule,
   NzCheckboxModule,
   NzSpinModule,
+  NzDividerModule,
 ];

@@ -1,21 +1,74 @@
-<page-header [title]="'messaging'" [content]="phContentTpl" [tab]="phTab" [extra]="phExtra" [action]="phActionTpl">
+<page-header [title]="'messaging'"
+             [content]="phContentTpl"
+             [tab]="phTab"
+             [extra]="phExtra"
+             [action]="phActionTpl">
   <ng-template #phContentTpl>
-    <sf #sf mode="search" [schema]="searchSchema" (formSubmit)="st.reset($event)" (formReset)="st.reset($event)"></sf>
+    <sf #sf
+        mode="search"
+        [schema]="searchSchema"
+        (formSubmit)="st.reset($event)"
+        (formReset)="st.reset($event)"></sf>
   </ng-template>
   <ng-template #phExtra>
-    <button (click)="add()" nz-button nzType="primary">新增</button>
+    <button (click)="add()"
+            nz-button
+            nzType="primary">
+      <i nz-icon
+         nzType="plus"></i>
+      新增</button>
   </ng-template>
   <ng-template #phTab>
-    <nz-tabset>
-      <nz-tab nzTitle="Tab 1"></nz-tab>
-      <nz-tab nzTitle="Tab 2"></nz-tab>
-      <nz-tab nzTitle="Tab 3"></nz-tab>
-    </nz-tabset>
+    <!-- <nz-tabset #contentTabSet>
+          <nz-tab nzTitle="没有实现功能的tab 1"></nz-tab>
+          <nz-tab nzTitle="没有实现功能的tab 2"></nz-tab>
+          <nz-tab nzTitle="没有实现功能的tab 3"></nz-tab>
+        </nz-tabset> -->
   </ng-template>
   <ng-template #phActionTpl>
-    <button (click)="add()" nz-button nzType="primary">审批</button>
+    <!-- <button (click)="add()"
+                nz-button
+                nzType="primary">
+          <i nz-icon
+             nzType="audit"></i>
+          审批</button> -->
   </ng-template>
 </page-header>
 <nz-card>
-  <st #st [data]="data" [loading]="loading" (change)="stChange($event)" [columns]="columns"></st>
+  <nz-alert [nzType]="'info'"
+            [nzShowIcon]="true"
+            [nzMessage]="message">
+    <ng-template #message>
+      <div class="tm-page-header">
+        <div>
+          <span [innerHTML]="'已选择 '+selectedData?.length+' 项'"></span>
+          <nz-divider nzType="vertical"></nz-divider>
+          <a (click)="st.reset($event)"><i nz-icon
+               nzType="reload"></i>
+            刷新
+          </a>
+          <ng-container *ngIf="isGranted('Messages.BatchAudit')">
+            <nz-divider nzType="vertical"></nz-divider>
+            <a (click)="batchAudit(true)"><i nz-icon
+                 nzType="audit"></i>
+              审批
+            </a>
+          </ng-container>
+          <ng-container *ngIf="isGranted('Messages.BatchAudit')">
+            <nz-divider nzType="vertical"></nz-divider>
+            <a (click)="batchAudit(false)"><i nz-icon
+                 nzType="rollback"></i>
+              取消审批
+            </a>
+          </ng-container>
+        </div>
+      </div>
+    </ng-template>
+  </nz-alert>
+  <st class="mt-sm"
+      #st
+      [data]="data"
+      [loading]="loading"
+      (change)="stChange($event)"
+      [columns]="columns"></st>
 </nz-card>

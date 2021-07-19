@@ -21,11 +21,22 @@ export interface Scalars {
   ObjectId: any;
 }
 
-export type AppPermission = 'ASSIGN_ROLE';
+export enum AppPermission {
+  AssignRole = 'ASSIGN_ROLE',
+}
 
-export type AppSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+export enum AppSettings {
+  AppAppMenu = 'APP_APP_MENU',
+  AppAppName = 'APP_APP_NAME',
+  LocalizationData = 'LOCALIZATION_DATA',
+  LocalizationLanguage = 'LOCALIZATION_LANGUAGE',
+  TestingModuleName = 'TESTING_MODULE_NAME',
+}
 
-export type ApplyPolicy = 'BEFORE_RESOLVER' | 'AFTER_RESOLVER';
+export enum ApplyPolicy {
+  BeforeResolver = 'BEFORE_RESOLVER',
+  AfterResolver = 'AFTER_RESOLVER',
+}
 
 export interface AssignRoleInput {
   userId: Scalars['ObjectId'];
@@ -43,7 +54,10 @@ export interface AuthorizeInput {
   targetId: Scalars['ObjectId'];
 }
 
-export type AuthorizeTargetType = 'ROLE' | 'USER';
+export enum AuthorizeTargetType {
+  Role = 'ROLE',
+  User = 'USER',
+}
 
 export interface Captcha {
   __typename?: 'Captcha';
@@ -52,9 +66,17 @@ export interface Captcha {
   bitmap?: Maybe<Scalars['String']>;
 }
 
-export type CaptchaProvider = 'IMAGE' | 'SMS';
+export enum CaptchaProvider {
+  Image = 'IMAGE',
+  Sms = 'SMS',
+}
 
-export type CaptchaType = 'NUMBER' | 'ENGLISH' | 'NUMBER_AND_LETTER' | 'CHINESE';
+export enum CaptchaType {
+  Number = 'NUMBER',
+  English = 'ENGLISH',
+  NumberAndLetter = 'NUMBER_AND_LETTER',
+  Chinese = 'CHINESE',
+}
 
 /** Information about the offset pagination. */
 export interface CollectionSegmentInfo {
@@ -80,6 +102,11 @@ export interface ComparableDateTimeOperationFilterInput {
   nlte?: Maybe<Scalars['DateTime']>;
 }
 
+export interface CreateMessageRequestInput {
+  text?: Maybe<Scalars['String']>;
+  severity: MessageSeverityType;
+}
+
 export interface CreateRoleInput {
   roleName: Scalars['String'];
 }
@@ -89,11 +116,31 @@ export interface DeleteMessageDistributionsInput {
   userIds?: Maybe<Array<Maybe<Scalars['String']>>>;
 }
 
-export type FrontendCallType = 'NEW_MESSAGE';
+export interface EditMessageRequestInput {
+  text?: Maybe<Scalars['String']>;
+  severity?: Maybe<MessageSeverityType>;
+  id?: Maybe<Scalars['String']>;
+  messageType?: Maybe<MessageType>;
+}
 
-export type GeexClaimType = 'AVATAR' | 'EXPIRES' | 'NICKNAME' | 'PROVIDER' | 'SUB';
+export enum FrontendCallType {
+  NewMessage = 'NEW_MESSAGE',
+}
 
-export type GeexExceptionType = 'CONFLICT' | 'NOT_FOUND' | 'ON_PURPOSE' | 'UNKNOWN';
+export enum GeexClaimType {
+  Avatar = 'AVATAR',
+  Expires = 'EXPIRES',
+  Nickname = 'NICKNAME',
+  Provider = 'PROVIDER',
+  Sub = 'SUB',
+}
+
+export enum GeexExceptionType {
+  Conflict = 'CONFLICT',
+  NotFound = 'NOT_FOUND',
+  OnPurpose = 'ON_PURPOSE',
+  Unknown = 'UNKNOWN',
+}
 
 export interface GetSettingsInput {
   scope?: Maybe<SettingScopeEnumeration>;
@@ -199,16 +246,30 @@ export interface ListStringOperationFilterInput {
   any?: Maybe<Scalars['Boolean']>;
 }
 
-export type LocalizationSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+export enum LocalizationSettings {
+  AppAppMenu = 'APP_APP_MENU',
+  AppAppName = 'APP_APP_NAME',
+  LocalizationData = 'LOCALIZATION_DATA',
+  LocalizationLanguage = 'LOCALIZATION_LANGUAGE',
+  TestingModuleName = 'TESTING_MODULE_NAME',
+}
 
-export type LoginProvider = 'LOCAL';
+export enum LoginProvider {
+  Local = 'LOCAL',
+}
 
 export interface MarkMessagesReadInput {
   messageIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   userId?: Maybe<Scalars['String']>;
 }
 
-export type MessageSeverityType = 'INFO' | 'SUCCESS' | 'WARN' | 'ERROR' | 'FATAL';
+export enum MessageSeverityType {
+  Info = 'INFO',
+  Success = 'SUCCESS',
+  Warn = 'WARN',
+  Error = 'ERROR',
+  Fatal = 'FATAL',
+}
 
 export interface MessageSeverityTypeOperationFilterInput {
   eq?: Maybe<MessageSeverityType>;
@@ -217,7 +278,11 @@ export interface MessageSeverityTypeOperationFilterInput {
   nin?: Maybe<Array<MessageSeverityType>>;
 }
 
-export type MessageType = 'NOTIFICATION' | 'TODO' | 'INTERACT';
+export enum MessageType {
+  Notification = 'NOTIFICATION',
+  Todo = 'TODO',
+  Interact = 'INTERACT',
+}
 
 export interface MessageTypeOperationFilterInput {
   eq?: Maybe<MessageType>;
@@ -226,13 +291,21 @@ export interface MessageTypeOperationFilterInput {
   nin?: Maybe<Array<MessageType>>;
 }
 
-export type MessagingSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+export enum MessagingSettings {
+  AppAppMenu = 'APP_APP_MENU',
+  AppAppName = 'APP_APP_NAME',
+  LocalizationData = 'LOCALIZATION_DATA',
+  LocalizationLanguage = 'LOCALIZATION_LANGUAGE',
+  TestingModuleName = 'TESTING_MODULE_NAME',
+}
 
 export interface Mutation {
   __typename?: 'Mutation';
   markMessagesRead: Scalars['Boolean'];
   deleteMessageDistributions: Scalars['Boolean'];
   sendMessage: Scalars['Boolean'];
+  createMessage?: Maybe<IMessage>;
+  editMessage: Scalars['Boolean'];
   contextData: Array<KeyValuePairOfStringAndObject>;
   scope?: Maybe<Scalars['String']>;
   name: Scalars['Name'];
@@ -260,6 +333,14 @@ export interface MutationDeleteMessageDistributionsArgs {
 
 export interface MutationSendMessageArgs {
   input?: Maybe<SendNotificationMessageRequestInput>;
+}
+
+export interface MutationCreateMessageArgs {
+  input?: Maybe<CreateMessageRequestInput>;
+}
+
+export interface MutationEditMessageArgs {
+  input?: Maybe<EditMessageRequestInput>;
 }
 
 export interface MutationUpdateSettingArgs {
@@ -372,13 +453,21 @@ export interface SendCaptchaInput {
 
 export interface SendNotificationMessageRequestInput {
   toUserIds?: Maybe<Array<Maybe<Scalars['String']>>>;
-  text?: Maybe<Scalars['String']>;
-  severity: MessageSeverityType;
+  messageId?: Maybe<Scalars['String']>;
 }
 
-export type SettingDefinition = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+export enum SettingDefinition {
+  AppAppMenu = 'APP_APP_MENU',
+  AppAppName = 'APP_APP_NAME',
+  LocalizationData = 'LOCALIZATION_DATA',
+  LocalizationLanguage = 'LOCALIZATION_LANGUAGE',
+  TestingModuleName = 'TESTING_MODULE_NAME',
+}
 
-export type SettingScopeEnumeration = 'GLOBAL' | 'USER';
+export enum SettingScopeEnumeration {
+  Global = 'GLOBAL',
+  User = 'USER',
+}
 
 export interface StringOperationFilterInput {
   and?: Maybe<Array<StringOperationFilterInput>>;
@@ -404,7 +493,13 @@ export interface Subscription {
   description?: Maybe<Scalars['String']>;
 }
 
-export type TestingSettings = 'APP_APP_MENU' | 'APP_APP_NAME' | 'LOCALIZATION_DATA' | 'LOCALIZATION_LANGUAGE' | 'TESTING_MODULE_NAME';
+export enum TestingSettings {
+  AppAppMenu = 'APP_APP_MENU',
+  AppAppName = 'APP_APP_NAME',
+  LocalizationData = 'LOCALIZATION_DATA',
+  LocalizationLanguage = 'LOCALIZATION_LANGUAGE',
+  TestingModuleName = 'TESTING_MODULE_NAME',
+}
 
 export interface UpdateSettingInput {
   name?: Maybe<SettingDefinition>;
@@ -547,6 +642,7 @@ export type MessagesQueryVariables = Exact<{
   skip?: Maybe<Scalars['Int']>;
   take?: Maybe<Scalars['Int']>;
   filter?: Maybe<IMessageFilterInput>;
+  includeDetail: Scalars['Boolean'];
 }>;
 
 export type MessagesQuery = { __typename?: 'Query' } & {
@@ -558,9 +654,26 @@ export type MessagesQuery = { __typename?: 'Query' } & {
   >;
 };
 
-export type SendMessageMutationVariables = Exact<{
-  toUserId: Scalars['String'];
+export type CreateMessageMutationVariables = Exact<{
   messageContent: Scalars['String'];
+  severity: MessageSeverityType;
+}>;
+
+export type CreateMessageMutation = { __typename?: 'Mutation' } & {
+  createMessage?: Maybe<{ __typename?: 'IMessage' } & Pick<IMessage, 'id'>>;
+};
+
+export type EditMessageMutationVariables = Exact<{
+  id: Scalars['String'];
+  messageContent?: Maybe<Scalars['String']>;
+  severity?: Maybe<MessageSeverityType>;
+  messageType?: Maybe<MessageType>;
+}>;
+
+export type EditMessageMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'editMessage'>;
+
+export type SendMessageMutationVariables = Exact<{
+  toUserId: Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>;
 }>;
 
 export type SendMessageMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'sendMessage'>;
@@ -678,11 +791,11 @@ export const OnFrontendCallGql = (gql`
   }
 ` as unknown) as DocumentNode<OnFrontendCallSubscription, OnFrontendCallSubscriptionVariables>;
 export const MessagesGql = (gql`
-  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+  query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
     messages(skip: $skip, take: $take, where: $filter) {
       items {
         ...MessageBrief
-        ...MessageDetail
+        ...MessageDetail @include(if: $includeDetail)
       }
       pageInfo {
         ...PageInfo
@@ -694,8 +807,20 @@ export const MessagesGql = (gql`
   ${MessageDetailGql}
   ${PageInfoGql}
 ` as unknown) as DocumentNode<MessagesQuery, MessagesQueryVariables>;
+export const CreateMessageGql = (gql`
+  mutation createMessage($messageContent: String!, $severity: MessageSeverityType!) {
+    createMessage(input: { severity: $severity, text: $messageContent }) {
+      id
+    }
+  }
+` as unknown) as DocumentNode<CreateMessageMutation, CreateMessageMutationVariables>;
+export const EditMessageGql = (gql`
+  mutation editMessage($id: String!, $messageContent: String, $severity: MessageSeverityType, $messageType: MessageType) {
+    editMessage(input: { severity: $severity, text: $messageContent, id: $id, messageType: $messageType })
+  }
+` as unknown) as DocumentNode<EditMessageMutation, EditMessageMutationVariables>;
 export const SendMessageGql = (gql`
-  mutation sendMessage($toUserId: String!, $messageContent: String!) {
-    sendMessage(input: { toUserIds: [$toUserId], severity: INFO, text: $messageContent })
+  mutation sendMessage($toUserId: [String]!) {
+    sendMessage(input: { toUserIds: $toUserId })
   }
 ` as unknown) as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;

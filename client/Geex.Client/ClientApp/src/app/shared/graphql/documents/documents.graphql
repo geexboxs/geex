@@ -94,11 +94,11 @@ subscription onFrontendCall {
   }
 }
 
-query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
+query messages($skip: Int, $take: Int, $filter: IMessageFilterInput, $includeDetail: Boolean!) {
   messages(skip: $skip, take: $take, where: $filter) {
     items {
       ...MessageBrief
-      ...MessageDetail
+      ...MessageDetail @include(if: $includeDetail)
     }
     pageInfo {
       ...PageInfo
@@ -107,6 +107,16 @@ query messages($skip: Int, $take: Int, $filter: IMessageFilterInput) {
   }
 }
 
-mutation sendMessage($toUserId: String!, $messageContent: String!) {
-  sendMessage(input: { toUserIds: [$toUserId], severity: INFO, text: $messageContent })
+mutation createMessage($messageContent: String!, $severity: MessageSeverityType!) {
+  createMessage(input: { severity: $severity, text: $messageContent }) {
+    id
+  }
+}
+
+mutation editMessage($id: String!, $messageContent: String, $severity: MessageSeverityType, $messageType: MessageType) {
+  editMessage(input: { severity: $severity, text: $messageContent, id: $id, messageType: $messageType })
+}
+
+mutation sendMessage($toUserId: [String]!) {
+  sendMessage(input: { toUserIds: $toUserId })
 }

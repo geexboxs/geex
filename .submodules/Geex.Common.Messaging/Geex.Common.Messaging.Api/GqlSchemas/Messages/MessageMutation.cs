@@ -49,5 +49,31 @@ namespace Geex.Common.Messaging.Api.GqlSchemas.Messages
             return true;
         }
 
+        /// <summary>
+        /// 创建消息
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<IMessage> CreateMessage(
+            [Service] IMediator Mediator,
+            CreateMessageRequest input)
+        {
+            var result = await Mediator.Send(input);
+            return result;
+        }
+
+        /// <summary>
+        /// 编辑消息
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public async Task<bool> EditMessage(
+            [Service] IMediator Mediator,
+            EditMessageRequest input)
+        {
+            var result = await Mediator.Send(input);
+            return true;
+        }
+
     }
 }

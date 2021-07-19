@@ -9,6 +9,7 @@ import { Observable, pipe } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { BusinessComponentBase } from '../../../shared/components/business.component.base';
+import html from 'html-template-tag';
 import {
   MessageBriefFragment,
   MessagesGql,
@@ -25,6 +26,7 @@ import {
 export class MessagingMessagesComponent extends BusinessComponentBase {
   $init: Observable<any>;
   data: MessageBriefFragment[];
+  selectedData: MessageBriefFragment[];
   searchSchema: SFSchema = {
     properties: {
       title: {
@@ -34,12 +36,25 @@ export class MessagingMessagesComponent extends BusinessComponentBase {
     },
   };
   @ViewChild('sf')
-  private readonly sf!: SFComponent;
+  readonly sf!: SFComponent;
   @ViewChild('st')
-  private readonly st!: STComponent;
+  readonly st!: STComponent;
   columns: STColumn<MessageBriefFragment>[] = [
-    { title: 'Id', index: 'id' },
-    { title: '标题', index: 'title' },
+    {
+      title: '',
+      width: 30,
+      type: 'checkbox',
+      index: 'checked',
+      fixed: 'left',
+      className: ['text-center'],
+    },
+    // { title: 'Id', index: 'id' },
+    {
+      title: '标题',
+      index: 'title',
+      type: 'link',
+      click: (item: MessageBriefFragment) => this.router.navigate(['view', item.id], { relativeTo: this.route }),
+    },
     {
       title: '重要性',
       index: 'severity',
@@ -54,14 +69,14 @@ export class MessagingMessagesComponent extends BusinessComponentBase {
     { title: '消息类型', index: 'messageType' },
     { title: '发送人', index: 'fromUserId' },
     { title: '发送时间', index: 'time', type: 'date' },
-    // { title: '调用次数', type: 'number', index: 'callNo' },
-    // { title: '头像', type: 'img', width: '50px', index: 'avatar' },
-    // { title: '时间', type: 'date', index: 'updatedAt' },
     {
       title: '操作',
       buttons: [
-        { text: '查看', click: (item: MessageBriefFragment) => this.router.navigate(['view', item.id], { relativeTo: this.route }) },
-        { text: '编辑', click: (item: MessageBriefFragment) => this.router.navigate(['edit', item.id], { relativeTo: this.route }) },
+        {
+          icon: 'edit',
+          text: '编辑',
+          click: (item: MessageBriefFragment) => this.router.navigate(['edit', item.id], { relativeTo: this.route }),
+        },
       ],
     },
   ];
@@ -74,13 +89,14 @@ export class MessagingMessagesComponent extends BusinessComponentBase {
         return this.apollo.query<MessagesQuery, MessagesQueryVariables>({
           query: MessagesGql,
           variables: {
-            skip: (param.page - 1) * (this.st?.ps ?? 10),
-            take: this.st?.ps ?? 10,
+            skip: Number((param.pi - 1) * (this.st?.ps ?? 10)),
+            take: Number(param.ps ?? this.st?.ps ?? 10),
             filter: {
               title: {
                 contains: param.title ?? '',
               },
             },
+            includeDetail: false,
           },
         });
       }),
@@ -91,19 +107,28 @@ export class MessagingMessagesComponent extends BusinessComponentBase {
         this.st.total = x.data.messages.totalCount;
         this.loading = x.loading;
         this.data = x.data.messages.items;
+        this.selectedData = [];
       }),
     );
   }
 
   stChange(args: STChange) {
-    if (args.type == 'pi') {
-      this.router.navigate([], { queryParams: { page: args.pi, title: this.sf.value.title } });
+    if (args.type == 'pi' || args.type == 'ps') {
+      this.router.navigate([], { queryParams: { pi: args.pi, ps: args.ps, title: this.sf.value.title } });
+    }
+
+    if (args.type == 'checkbox') {
+      this.selectedData = args.checkbox;
     }
   }
 
+  selectChange(data: MessageBriefFragment[]): void {
+    console.log(data);
+  }
+
+  batchAudit(auditPassOrCancel: boolean) {}
+
   add(): void {
-    // this.modal
-    //   .createStatic(FormEditComponent, { i: { id: 0 } })
-    //   .subscribe(() => this.st.reload());
+    this.router.navigate(['edit'], { relativeTo: this.route });
   }
 }

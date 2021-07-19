@@ -1,12 +1,23 @@
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { SFSchema, SFUISchema } from '@delon/form';
+import { SFComponent, SFSchema, SFUISchema } from '@delon/form';
 import { _HttpClient } from '@delon/theme';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { BusinessComponentBase } from '../../../../shared/components/business.component.base';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {
+  EditMessageGql,
+  CreateMessageGql,
+  IMessage,
+  MessageSeverityType,
+  MessagesGql,
+  MessagesQuery,
+  MessagesQueryVariables,
+  MessageType,
+} from '../../../../shared/graphql/.generated/type';
+import { EditMode } from '../../../../shared/types/common';
 
 @Component({
   selector: 'app-messaging-edit',
@@ -14,48 +25,100 @@ import { map } from 'rxjs/operators';
 })
 export class MessagingEditComponent extends BusinessComponentBase {
   $init: Observable<any>;
-
+  mode: EditMode;
   id: string;
-  i: any;
+  data: IMessage;
+  @ViewChild('sf')
+  readonly sf!: SFComponent;
   schema: SFSchema = {
     properties: {
-      no: { type: 'string', title: '编号' },
-      owner: { type: 'string', title: '姓名', maxLength: 15 },
-      callNo: { type: 'number', title: '调用次数' },
-      href: { type: 'string', title: '链接', format: 'uri' },
-      description: { type: 'string', title: '描述', maxLength: 140 },
+      title: { type: 'string', title: '标题', widget: 'text' },
+      messageType: {
+        type: 'string',
+        title: '消息类型',
+        widget: 'select',
+        enum: Object.entries(MessageType).map((x) => ({ label: x[0], value: x[1] })),
+      },
+      severity: {
+        type: 'string',
+        title: '重要性',
+        widget: 'select',
+        enum: Object.entries(MessageSeverityType).map((x) => ({ label: x[0], value: x[1] })),
+      },
     },
-    required: ['owner', 'callNo', 'href', 'description'],
+    required: ['title', 'messageType', 'severity'],
   };
   ui: SFUISchema = {
     '*': {
       spanLabelFixed: 100,
       grid: { span: 12 },
     },
-    $no: {
-      widget: 'text',
-    },
-    $href: {
-      widget: 'string',
-    },
-    $description: {
-      widget: 'textarea',
-      grid: { span: 24 },
-    },
   };
 
   constructor(injector: Injector) {
     super(injector);
-    this.$routeChange.pipe(
-      map((params) => {
+    this.$init = this.$routeChange.pipe(
+      map(async (params) => {
         this.id = params.id;
+        this.mode = params.id == undefined ? 'create' : 'edit';
+        if (params.id) {
+          let res = await this.apollo
+            .query<MessagesQuery, MessagesQueryVariables>({
+              query: MessagesGql,
+              variables: {
+                filter: {
+                  id: {
+                    eq: params.id,
+                  },
+                },
+                includeDetail: true,
+              },
+            })
+            .toPromise();
+          this.data = res.data.messages.items[0];
+        } else {
+          this.data = {
+            messageType: MessageType.Notification,
+            severity: MessageSeverityType.Info,
+            time: new Date(),
+            title: '',
+            toUserIds: [],
+          };
+        }
       }),
     );
   }
 
-  save(value: any): void {
-    // this.http.post(`/user/${this.record.id}`, value).subscribe(res => {
-    //   this.msgSrv.success('保存成功');
-    // });
+  async submit(value: Partial<IMessage>): Promise<void> {
+    if (this.mode == 'create') {
+      let res = await this.apollo
+        .mutate({
+          mutation: CreateMessageGql,
+          variables: {
+            messageContent: value.title,
+            severity: value.severity,
+          },
+        })
+        .toPromise();
+      if (res.data.createMessage.id) {
+        this.msgSrv.success('创建成功');
+      }
+    } else {
+      let res = await this.apollo
+        .mutate({
+          mutation: EditMessageGql,
+          variables: {
+            id: this.id,
+            messageContent: value.title,
+            messageType: value.messageType,
+            severity: value.severity,
+          },
+        })
+        .toPromise();
+      if (res.data.editMessage) {
+        this.msgSrv.success('修改成功');
+      }
+    }
+    this.router.navigate(['messaging', 'view', this.id], { replaceUrl: true });
   }
 }

@@ -15,10 +15,11 @@ const alainConfig: AlainConfig = {
     size: 'small',
     modal: { size: 'lg' },
     bordered: true,
+
     page: {
       front: false,
       showSize: true,
-      total: true,
+      total: '当前 {{range[0]}}-{{range[1]}} 条，共 {{total}} 条记录',
     },
   },
   se: {},

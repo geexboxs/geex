@@ -18,4 +18,4 @@ generates:
       - typescript-apollo-client-helpers
 config:
   declarationKind: 'interface'
-  enumsAsTypes: true
+  enumsAsTypes: false

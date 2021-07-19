@@ -7,7 +7,8 @@ import { MessagingEditComponent } from './messages/edit/edit.component';
 const routes: Routes = [
   { path: '', component: MessagingMessagesComponent },
   { path: 'view/:id', component: MessagingViewComponent },
-  { path: 'edit/:id', component: MessagingEditComponent },
+  { path: 'edit', component: MessagingEditComponent, data: { reuse: false } },
+  { path: 'edit/:id', component: MessagingEditComponent, data: { reuse: false } },
 ];
 
 @NgModule({

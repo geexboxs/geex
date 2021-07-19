@@ -47,6 +47,7 @@
     "ajv": "^7.1.1",
     "apollo-angular": "2.4.0",
     "graphql": "^15.5.0",
+    "html-template-tag": "^4.0.0",
     "kiwi-intl": "^1.2.4",
     "linqts-camelcase": "^1.12.4",
     "lodash-es": "^4.17.21",

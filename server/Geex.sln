@@ -28,13 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Abstraction", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Logging", "..\.submodules\Geex.Common.Logging\Geex.Common.Logging.csproj", "{1717CA46-15D1-4076-A942-5D3925D05FA1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Geex.Common.Messaging", "Geex.Common.Messaging", "{FA9112DB-8186-4DB1-8745-8407EA0F87A3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Messaging.Api", "..\.submodules\Geex.Common.Messaging\Geex.Common.Messaging.Api\Geex.Common.Messaging.Api.csproj", "{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Messaging.Core", "..\.submodules\Geex.Common.Messaging\Geex.Common.Messaging.Core\Geex.Common.Messaging.Core.csproj", "{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common", "..\.submodules\Geex.Common\Geex.Common.csproj", "{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geex.Common.Messaging", "..\.submodules\Geex.Common.Messaging\Geex.Common.Messaging.csproj", "{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,18 +74,14 @@ Global
 		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1717CA46-15D1-4076-A942-5D3925D05FA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,10 +94,8 @@ Global
 		{76DF6C4E-F9DC-4B27-91E2-8F6D19417041} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{E557BB3E-4510-4375-908C-1763D08C7E46} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 		{1717CA46-15D1-4076-A942-5D3925D05FA1} = {708825AC-62A7-4AF2-AA60-565130F0053F}
-		{FA9112DB-8186-4DB1-8745-8407EA0F87A3} = {708825AC-62A7-4AF2-AA60-565130F0053F}
-		{0BBBCC59-4B5A-4766-B4A8-25EDD7206C48} = {FA9112DB-8186-4DB1-8745-8407EA0F87A3}
-		{9397C18A-3C2B-4BA9-A928-2CDE1DB9C8B4} = {FA9112DB-8186-4DB1-8745-8407EA0F87A3}
 		{39A91BC2-31DD-4F72-8A6B-7F066AD7DF86} = {708825AC-62A7-4AF2-AA60-565130F0053F}
+		{4A3DD9F6-4503-41DA-9A18-E76352AEE2B7} = {708825AC-62A7-4AF2-AA60-565130F0053F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B29333E1-4892-465E-983D-B4CDFFEA01C3}

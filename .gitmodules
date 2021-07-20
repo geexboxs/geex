@@ -1,6 +1,6 @@
-[submodule ".submodules/casbin-aspnetcore"]
-	path = .submodules/casbin-aspnetcore
-	url = https://github.com/geexboxs/casbin-aspnetcore.git
+[submodule ".submodules/Geex.Casbin"]
+	path = .submodules/Geex.Casbin
+	url = https://github.com/geex-graphql/Geex.Casbin.git
 	branch = master
 [submodule ".submodules/MongoDB.Entities"]
 	path = .submodules/MongoDB.Entities
@@ -12,9 +12,33 @@
 	branch = master
 [submodule ".submodules/Geex.IdentityServer"]
 	path = .submodules/Geex.IdentityServer
-    url = https://github.com/snys98/Geex.IdentityServer.git
+    url = https://github.com/geex-graphql/Geex.IdentityServer.git
 	branch = master
-[submodule "Geex.Common"]
+[submodule ".submodules/Geex.Common"]
 	path = .submodules/Geex.Common
-	url = https://github.com/snys98/Geex.Common.git
+	url = https://github.com/geex-graphql/Geex.Common.git
+	branch = master
+[submodule ".submodules/Geex.Common.Abstraction"]
+	path = .submodules/Geex.Common.Abstraction
+    url = https://github.com/geex-graphql/Geex.Common.Abstraction.git
+	branch = master
+[submodule ".submodules/Geex.Common.Logging"]
+	path = .submodules/Geex.Common.Logging
+	url = https://github.com/geex-graphql/Geex.Common.Logging.git
+	branch = master
+[submodule ".submodules/Geex.Common.Messaging"]
+	path = .submodules/Geex.Common.Messaging
+    url = https://github.com/geex-graphql/Geex.Common.Messaging.git
+	branch = master
+[submodule ".submodules/Geex.Common.Redis"]
+	path = .submodules/Geex.Common.Redis
+    url = https://github.com/geex-graphql/Geex.Common.Redis.git
+	branch = master
+[submodule ".submodules/Geex.Common.Settings"]
+	path = .submodules/Geex.Common.Settings
+    url = https://github.com/geex-graphql/Geex.Common.Settings.git
+	branch = master
+[submodule ".submodules/Geex.TemplateGenerator"]
+	path = .submodules/Geex.TemplateGenerator
+    url = https://github.com/geex-graphql/Geex.TemplateGenerator.git
 	branch = master

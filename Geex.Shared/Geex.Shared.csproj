@@ -23,7 +23,7 @@
     <PackageReference Include="IdentityServer4.Storage" Version="3.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="MongoDB.Bson" Version="2.9.3" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
     <PackageReference Include="Oddz.IdentityServer4.Contrib.MongoDB" Version="3.0.1" />
     <PackageReference Include="Repository.Mongo" Version="2.2.1" />
   </ItemGroup>
